@@ -23,6 +23,7 @@ apache-airflow = {extras = ["airbyte", "amazon", "apache.beam", "apache.cassandr
 invoke = "^1.6.0"
 numpy = "^1.21.1"
 bpython = "^0.21"
+pytest-cov = "^2.12.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
