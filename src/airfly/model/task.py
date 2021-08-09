@@ -3,6 +3,7 @@ from importlib._bootstrap_external import SourceFileLoader
 from typing import (
     Any,
     Callable,
+    Dict,
     Generator,
     Iterable,
     List,
@@ -28,8 +29,19 @@ class Task:
     def upstream(self) -> Union[Tuple[TaskClass, ...], TaskClass]:
         pass
 
-    def run(self) -> Any:
+    @property
+    def downstream(self) -> Union[Tuple[TaskClass, ...], TaskClass]:
         pass
+
+
+class AirflowTask(Task):
+    @property
+    def operator_class(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def kargs(self) -> Dict[str, Any]:
+        return {}
 
 
 def make_task(obj: T, upstream: Union[Callable, TaskClass]) -> T:
@@ -40,7 +52,7 @@ def is_taskclass(obj) -> bool:
     return isinstance(obj, type) and issubclass(obj, Task)
 
 
-def equipped_task(obj) -> bool:
+def equipped_airfly(obj) -> bool:
 
     return isinstance(obj, Callable) and hasattr(obj, "__airfly_task__")
 
@@ -61,7 +73,7 @@ def collect_taskclass_from_module(modname: str, exclude: str = None) -> List[Tas
 
             if is_taskclass(obj) and obj.__module__.startswith(modname):
                 tasks.add(obj)
-            elif equipped_task(obj) and obj.__module__.startswith(modname):
+            elif equipped_airfly(obj) and obj.__module__.startswith(modname):
                 tasks.add(obj.__airfly_task__)
 
     sorted_tasks = sorted(tasks, key=lambda t: qualname(t))
@@ -71,7 +83,7 @@ def collect_taskclass_from_module(modname: str, exclude: str = None) -> List[Tas
 
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class TaskPair:
-    task: TaskClass
+    this: TaskClass
     upstream: TaskClass
 
 
@@ -112,12 +124,12 @@ class TaskTree:
             upstream = getattr(taskclass(), field, None)
 
             if is_taskclass(upstream) and (upstream in taskset):
-                yield TaskPair(task=taskclass, upstream=upstream)
+                yield TaskPair(this=taskclass, upstream=upstream)
 
             elif isinstance(upstream, Iterable):
                 for up in upstream:
                     if is_taskclass(up) and (up in taskset):
-                        yield TaskPair(task=taskclass, upstream=up)
+                        yield TaskPair(this=taskclass, upstream=up)
 
     @property
     def roots(self):

@@ -90,7 +90,7 @@ class AST(_AST):
 
         return astor.to_source(self.ast)
 
-    def dump(self, filepath: str, formatted: bool = True) -> Any:
+    def dump(self, filepath: str, formatted: bool = False) -> Any:
 
         code = self.render()
 
