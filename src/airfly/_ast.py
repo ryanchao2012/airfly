@@ -295,3 +295,18 @@ class ImportFrom(stmt):
     module: str
     names: List[alias] = attr.ib(factory=list)
     level: int = 0
+
+
+class operator(AST):
+    pass
+
+
+class RShift(operator):
+    pass
+
+
+@immutable
+class BinOp(expr):
+    left: expr
+    op: operator
+    right: expr
