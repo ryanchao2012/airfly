@@ -1,7 +1,7 @@
 class TestTask:
     @classmethod
     def setup_class(cls):
-        from airfly.task import Task
+        from airfly.model.base import Task
 
         assert Task
 
@@ -15,38 +15,29 @@ class TestTask:
     def teardown_method(self, method):
         pass
 
-    def test_run(self):
+
+class TestTask_:
+    @classmethod
+    def setup_class(cls):
+        from airfly.model.base import Task_
+
+        assert Task_
+
+    @classmethod
+    def teardown_class(cls):
         pass
 
+    def setup_method(self, method):
+        pass
 
-def test_make_task():
-    from airfly.task import make_task
-
-    assert make_task
-
-
-def test_is_taskclass():
-    from airfly.task import is_taskclass
-
-    assert is_taskclass
-
-
-def test_equipped_task():
-    from airfly.task import equipped_task
-
-    assert equipped_task
-
-
-def test_collect_taskclass_from_module():
-    from airfly.task import collect_taskclass_from_module
-
-    assert collect_taskclass_from_module
+    def teardown_method(self, method):
+        pass
 
 
 class TestTaskPair:
     @classmethod
     def setup_class(cls):
-        from airfly.task import TaskPair
+        from airfly.model.base import TaskPair
 
         assert TaskPair
 
@@ -64,7 +55,7 @@ class TestTaskPair:
 class TestTaskTree:
     @classmethod
     def setup_class(cls):
-        from airfly.task import TaskTree
+        from airfly.model.base import TaskTree
 
         assert TaskTree
 
@@ -78,8 +69,14 @@ class TestTaskTree:
     def teardown_method(self, method):
         pass
 
-    def test_traverse(self):
-        pass
 
-    def test_pairs(self):
-        pass
+def test_collect_taskset():
+    from airfly.model.base import collect_taskset
+
+    assert collect_taskset
+
+
+def test_build_taskpairs():
+    from airfly.model.base import build_taskpairs
+
+    assert build_taskpairs

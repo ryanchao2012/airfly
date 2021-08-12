@@ -656,3 +656,57 @@ class TestCode:
 
     def teardown_method(self, method):
         pass
+
+
+class Testoperator:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import operator
+
+        assert operator
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+
+class TestRShift:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import RShift
+
+        assert RShift
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+
+class TestBinOp:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import BinOp
+
+        assert BinOp
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
