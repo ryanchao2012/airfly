@@ -1,30 +1,17 @@
 from types import ModuleType
 from typing import Generator, List, Sequence, Set, Tuple, Type, Union
 
+import attr
 import networkx as nx
 from airfly._ast import immutable
-from airfly.utils import collect_objects, qualname
+from airfly.utils import collect_objects
 
-TaskClass = Type["Task"]
+TaskClass = Type["BaseTask"]
 
 
-class Task:
+class BaseTask:
     upstreams: Union[Tuple[TaskClass, ...], TaskClass] = None
     downstreams: Union[Tuple[TaskClass, ...], TaskClass] = None
-
-
-class Task_:
-    @property
-    def task_id(self):
-        return qualname(self.__class__)
-
-    @property
-    def upstream(self) -> Union[Tuple[TaskClass, ...], TaskClass]:
-        pass
-
-    @property
-    def downstream(self) -> Union[Tuple[TaskClass, ...], TaskClass]:
-        pass
 
 
 @immutable
@@ -33,53 +20,53 @@ class TaskPair:
     down: TaskClass
 
 
+@immutable
 class TaskTree:
-    def __init__(self, taskset: Set[Task], taskpairs: Sequence[TaskPair]):
 
-        self._taskset = taskset
-        self._taskpairs = taskpairs
+    taskset: Set[BaseTask]
+    taskpairs: Set[TaskPair]
 
+    _dag: nx.DiGraph = attr.ib(init=False)
+
+    @_dag.default
+    def _create_dag(self):
         dag = nx.DiGraph()
-        dag.add_nodes_from(taskset)
-        dag.add_edges_from((pair.up, pair.down) for pair in taskpairs)
+        dag.add_nodes_from(self.taskset)
+        dag.add_edges_from((pair.up, pair.down) for pair in self.taskpairs)
 
-        self._dag = dag
-
-    @property
-    def dag(self):
-        return self._dag
+        return dag
 
     @property
     def roots(self) -> List[TaskClass]:
-        return [node for node in self.dag.nodes() if self.dag.in_degree(node) == 0]
+        return [node for node in self._dag.nodes() if self._dag.in_degree(node) == 0]
 
     @property
     def leaves(self) -> List[TaskClass]:
-        return [node for node in self.dag.nodes() if self.dag.out_degree(node) == 0]
+        return [node for node in self._dag.nodes() if self._dag.out_degree(node) == 0]
 
     @property
     def nodes(self) -> Sequence[TaskClass]:
-        return self.dag.nodes
+        return self._dag.nodes
 
     @property
     def edges(self) -> Sequence[Tuple[TaskClass, TaskClass]]:
-        return self.dag.edges
+        return self._dag.edges
 
 
 def collect_taskset(
-    module: ModuleType, taskclass: TaskClass = Task
+    module: ModuleType, taskclass: TaskClass = BaseTask
 ) -> Generator[TaskClass, None, None]:
 
     for cls in collect_objects(
         module,
-        predicate=lambda obj: isinstance(obj, type) and issubclass(obj, Task),
+        predicate=lambda obj: isinstance(obj, type) and issubclass(obj, taskclass),
     ):
 
         yield cls  # return task class with no duplication
 
 
-def build_taskpairs(
-    taskset: Set[TaskClass], taskclass: TaskClass = Task
+def collect_taskpairs(
+    taskset: Set[TaskClass], taskclass: TaskClass = BaseTask
 ) -> Generator[TaskPair, None, None]:
 
     cached = set()
@@ -115,3 +102,11 @@ def build_taskpairs(
                 cached.add(pair)
 
                 yield pair
+
+
+class Workflow:
+    def to_source(self) -> str:
+        raise NotImplementedError
+
+    def to_file(self, path: str):
+        pass
