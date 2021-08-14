@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "airfly"
-version = "0.3.0"
+version = "0.3.1"
 description = "Generate airflow's dag.py on the fly"
 authors = ["ryanchao2012 <ryanchao2012@gmail.com>"]
 license = "MIT"
@@ -24,6 +24,11 @@ invoke = "^1.6.0"
 numpy = "^1.21.1"
 bpython = "^0.21"
 pytest-cov = "^2.12.1"
+
+
+[tool.poetry.scripts]
+airfly = "airfly.cli.main:main"
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
