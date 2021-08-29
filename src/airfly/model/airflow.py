@@ -1,9 +1,10 @@
 import ast
 import os
 from types import FunctionType
-from typing import Dict, List, Optional, Sequence, Set, Type, Union
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Type, Union
 
 import airfly
+import regex as re
 from airfly._ast import (
     Assign,
     BinOp,
@@ -165,35 +166,34 @@ class AirflowDAG(Workflow):
         self,
         name: str,
         tasktree: TaskTree,
-        inserts: str = None,
         includes: Union[str, List[str]] = None,
-        configfile: str = None,
-        **dag_kwargs,
+        dag_params: Tuple[Optional[str], Optional[str]] = None,
     ):
 
         self._name = name
         self._tasktree = tasktree
-        self._configfile = configfile
-        self._inserts = inserts
         self._includes = includes
+        self._dag_params = dag_params
+
+        self._imports = []
 
     def to_module(self) -> Module:
 
         body = (
             [self._build_header()]
             + self._build_imports()
-            + self._build_inserts()
+            + self._build_includes()
             + [self._build_dag_context()]
         )
 
         return Module(body=body)
 
     def render(self, formatted: bool = True) -> str:
-        src = self.to_module().render()
+        src = re.sub("\n+", "\n", self.to_module().render())
 
         return isorting(blacking(src)) if formatted else src
 
-    def _build_inserts(self) -> List[stmt]:
+    def _build_includes(self) -> List[stmt]:
 
         if self._includes:
             includes = self._includes
@@ -212,25 +212,57 @@ class AirflowDAG(Workflow):
 
                         statements.append(st)
 
-            body = list(imports) + statements
+            body = (
+                imports
+                + statements
+                + [Comment(body="<" * 10 + " End of code insertion")]
+            )
 
         else:
-            body = ast.parse(
-                self._inserts if isinstance(self._inserts, str) else ""
-            ).body
+            body = ast.parse("").body
 
         return body
 
     def _build_header(self, header: str = None) -> stmt:
         return Comment(body=header if isinstance(header, str) else self._default_header)
 
-    def _build_dag_context(self, ctx_args=None) -> stmt:
+    def _parse_dag_params_from_pyfile(
+        self, dag_params: Tuple[Optional[str], Optional[str]]
+    ) -> List[keyword]:
+
+        try:
+            param_file, param_var = self._dag_params
+
+            if os.path.isfile(param_file):
+
+                with open(param_file) as f:
+                    mod = ast.parse(f.read().strip())
+
+                for st in mod.body:
+                    if isinstance(st, ast.Assign) and st.targets[0].id == param_var:
+                        if isinstance(st.value, ast.Dict) or (
+                            isinstance(st.value, ast.Call)
+                            and st.value.func.id == "dict"
+                        ):
+
+                            return [keyword(arg=None, value=Name(id=param_var))]
+
+        except Exception:
+            pass  # TODO: logging
+
+        return []
+
+    def _build_dag_context(self) -> stmt:
+
+        keywords = self._parse_dag_params_from_pyfile(self._dag_params)
 
         return With(
             items=[
                 withitem(
                     context_expr=Call(
-                        func=Name(id="DAG"), args=[Constant(value=self._name)]
+                        func=Name(id="DAG"),
+                        args=[Constant(value=self._name)],
+                        keywords=keywords,
                     ),
                     optional_vars=Name(id="dag", ctx=Store()),
                 )
@@ -275,10 +307,7 @@ class AirflowDAG(Workflow):
                 if st not in imports:
                     imports.append(st)
 
-        return list(imports)
-
-    def _load_configfile(self, path: str):
-        pass
+        return imports
 
     def _insert_from_pyfile(self, path: str) -> List[stmt]:
 
@@ -287,7 +316,9 @@ class AirflowDAG(Workflow):
             if os.path.isfile(path):
 
                 with open(path) as f:
-                    mod = ast.parse(f.read())
+                    mod = ast.parse(f.read().strip())
+
+                mod.body.insert(0, Comment(body=">" * 10 + f" Include from '{path}'"))
 
                 return mod.body
 

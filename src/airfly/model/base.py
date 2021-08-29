@@ -54,12 +54,14 @@ class TaskTree:
 
 
 def collect_taskset(
-    module: ModuleType, taskclass: TaskClass = BaseTask
+    module: ModuleType, taskclass: TaskClass = BaseTask, predicate=lambda _: True
 ) -> Generator[TaskClass, None, None]:
 
     for cls in collect_objects(
         module,
-        predicate=lambda obj: isinstance(obj, type) and issubclass(obj, taskclass),
+        predicate=lambda obj: isinstance(obj, type)
+        and issubclass(obj, taskclass)
+        and predicate(obj),
     ):
 
         yield cls  # return task class with no duplication
