@@ -19,7 +19,7 @@ from .utils import (
 @click.option(
     "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
 )
-@click.option("--name", "-n", help="Assign to DAG id, default: 'mydag'")
+@click.option("--name", "-n", help="Assign to DAG id.")
 @click.option(
     "--modname",
     "-m",
