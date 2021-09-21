@@ -207,7 +207,7 @@ with DAG("demo_dag", **dag_kwargs) as dag:
 
 
 ## Exclude tasks from codegen
-By passing `--exclude-pattern` to match any unwanted objects by their `__qualname__`. then filter them out.
+By passing `--exclude-pattern` to match any unwanted objects with their `__qualname__`. then filter them out.
 ```
 $ airfly --name demo_dag --modname demo --exclude-pattern templated > dag.py
 excluding demo.templated
