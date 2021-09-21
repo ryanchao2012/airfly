@@ -228,3 +228,4 @@ with DAG("demo_dag") as dag:
     demo_print_date >> demo_sleep
 ```
 
+The `templated` task is gone.
