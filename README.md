@@ -1,4 +1,4 @@
-# airfly: Auto generate Airflow's `dag.py` on the fly
+# airfly: auto generate Airflow's `dag.py` on the fly
 
 Pipeline management is essential for data operation in company, many engineering teams rely on tools like Airflow to help them organize workflows, such as ETL, data analytic jobs or machine learning projects.
 
