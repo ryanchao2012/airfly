@@ -1,5 +1,5 @@
 """
-Tutorial workflow, fork from https://airflow.apache.org/docs/apache-airflow/stable/tutorial.html
+A simple workflow for demo, fork from https://airflow.apache.org/docs/apache-airflow/stable/tutorial.html
 """
 
 from textwrap import dedent
@@ -37,4 +37,4 @@ class sleep(AirflowTask):
     params = dict(depends_on_past=False, bash_command="sleep 5", retries=3)
 
     upstreams = print_date
-    downstreams = [templated]
+    downstreams = (templated,)
