@@ -1,4 +1,4 @@
-# airfly: auto generate Airflow's `dag.py` on the fly
+# airfly: Auto generate Airflow's `dag.py` on the fly
 
 Pipeline management is essential for data operation in company, many engineering teams rely on tools like Airflow to help them organize workflows, such as ETL, data analytic jobs or machine learning projects.
 
@@ -17,7 +17,7 @@ As workflow grows progressively, the increasing complexity of task relations pro
 
 ### Wrap Airflow operator with `AirflowTask`
 
-In order to do codegen, collect the operator's metadata into a `AirflowTask` subclass as following(see [demo](./examples/demo.py)):
+In order to do codegen, collect the operator's metadata into a `AirflowTask` subclass as following(see [demo](./examples/tutorial/demo.py)):
 
 ```python
 # in demo.py
@@ -109,10 +109,10 @@ with DAG("demo_dag") as dag:
 
 ## Inject parameters to `DAG`
 
-If any additional arguments are needed, write and manage those configurations in a python file(see [demo](./examples/demo_params.py)), `airfly` can pass them to `DAG` during codegen.
+If any additional arguments are needed, write and manage those configurations in a python file(see [demo](./examples/tutorial/params.py)), `airfly` can pass them to `DAG` during codegen.
 
 ```python
-# in demo_params.py
+# in params.py
 
 from datetime import timedelta
 
@@ -152,7 +152,7 @@ dag_kwargs = dict(
 
 Inject those arguments by giving `--dag-params` option:
 ```
-$ airfly --name demo_dag --modname demo --dag-params demo_params.py:dag_kwargs > dag.py
+$ airfly --name demo_dag --modname demo --dag-params params.py:dag_kwargs > dag.py
 ```
 
 The outputs in `dag.py`:
@@ -164,7 +164,7 @@ from airflow.models import DAG
 from airflow.operators.bash import BashOperator
 from airflow.utils.dates import days_ago
 
-# >>>>>>>>>> Include from 'demo_params.py'
+# >>>>>>>>>> Include from 'params.py'
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
@@ -228,3 +228,8 @@ with DAG("demo_dag") as dag:
 ```
 
 The `templated` task is gone.
+
+
+## Examples
+
+Please visit [examples](./examples) to explore more use cases. 
