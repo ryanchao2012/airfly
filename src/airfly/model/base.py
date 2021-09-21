@@ -68,7 +68,7 @@ def collect_taskset(
 
 
 def collect_taskpairs(
-    taskset: Set[TaskClass], taskclass: TaskClass = BaseTask
+    taskset: Set[TaskClass], taskclass: TaskClass = BaseTask, predicate=lambda _: True
 ) -> Generator[TaskPair, None, None]:
 
     cached = set()
@@ -84,7 +84,7 @@ def collect_taskpairs(
 
             pair = TaskPair(up=u, down=cls)
 
-            if pair not in cached:
+            if pair not in cached and predicate(pair):
 
                 cached.add(pair)
 
@@ -99,7 +99,7 @@ def collect_taskpairs(
 
             pair = TaskPair(up=cls, down=d)
 
-            if pair not in cached:
+            if pair not in cached and predicate(pair):
 
                 cached.add(pair)
 

@@ -20,12 +20,15 @@ def print_version(ctx, param, value):
     ctx.exit()
 
 
-def should_exclude(obj: Union[FunctionType, type], pattern: Optional[str] = None):
+def should_exclude(
+    obj: Union[FunctionType, type], pattern: Optional[str] = None, verbose: bool = True
+):
     if pattern and isinstance(pattern, str):
         obj_name = qualname(obj)
         if re.search(pattern, obj_name):
-            click.secho("excluding ", err=True, nl=False, fg="bright_white")
-            click.secho(obj_name, err=True, fg="bright_black")
+            if verbose:
+                click.secho("excluding ", err=True, nl=False, fg="bright_white")
+                click.secho(obj_name, err=True, fg="bright_black")
             return True
 
     return False

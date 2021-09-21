@@ -59,10 +59,11 @@ from .utils import (
     "-d",
     callback=convert_dag_params,
     help=(
-        "Parameters(keyword arguments) to construct DAG object."
-        " Defined by a dictionary in a python file,"
-        " pass this option with <python-file>:<variable> form,"
-        " the <variable> should be the dictionary."
+        "Parameters to construct DAG object,"
+        " defined by a dictionary in a python file."
+        " Pass this option with <python-file>:<variable> form,"
+        " the <variable> should be the dictionary"
+        " which will be passed to DAG as keyword arguments."
     ),
 )
 def main(name, modname, path, exclude_pattern, includes, dag_params):
@@ -89,7 +90,16 @@ def main(name, modname, path, exclude_pattern, includes, dag_params):
         )
     )
 
-    taskpairs = collect_taskpairs(taskset, taskclass=AirflowTask)
+    taskpairs = set(
+        collect_taskpairs(
+            taskset,
+            taskclass=AirflowTask,
+            predicate=lambda pair: not (
+                should_exclude(pair.up, exclude_pattern, verbose=False)
+                or should_exclude(pair.down, exclude_pattern, verbose=False)
+            ),
+        )
+    )
     tasktree = TaskTree(taskset=taskset, taskpairs=taskpairs)
 
     dag = AirflowDAG(name, tasktree, includes=includes, dag_params=dag_params)
