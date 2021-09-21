@@ -203,7 +203,7 @@ with DAG("demo_dag", **dag_kwargs) as dag:
     demo_sleep >> demo_templated
 ```
 
-`airfly` wraps required information including variables and imports into output snippet, and pass the specified value to `DAG` object.
+`airfly` wraps required information including variables and imports into output python script, and pass the specified value to `DAG` object.
 
 
 ## Exclude tasks from codegen
