@@ -17,7 +17,7 @@ As workflow grows progressively, the increasing complexity of task relations pro
 
 ### Wrap Airflow operator with `AirflowTask`
 
-In order to do codegen, collect the operator's metadata into a `AirflowTask` subclass as following:
+In order to do codegen, collect the operator's metadata into a `AirflowTask` subclass as following(see [demo](./examples/demo.py)):
 
 ```python
 # in demo.py
@@ -109,7 +109,7 @@ with DAG("demo_dag") as dag:
 
 ## Inject parameters to `DAG`
 
-If any additional arguments are needed, write and manage those configurations in a python file, `airfly` can pass them to `DAG` during codegen.
+If any additional arguments are needed, write and manage those configurations in a python file(see [demo](./examples/demo_params.py)), `airfly` can pass them to `DAG` during codegen.
 
 ```python
 # in demo_params.py
