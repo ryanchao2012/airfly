@@ -4,7 +4,7 @@ For this complex example, we can break down the tasks into several modules. It's
 
 Imagine that if all codes were put into a single `DAG` context, after a few development iterations, it will probably become a disaster and hard to keep the structure anymore.
 
-We can just simply generate the `dag.py` by `airfly`:
+We can just simply generate the `dag.py` with `airfly`:
 ```
 $ airfly --name example_complex --path .. --modname complex --dag-params params.py:dag_kwargs > dag.py
 ```

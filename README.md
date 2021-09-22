@@ -1,4 +1,10 @@
-# airfly: Auto generate Airflow's `dag.py` on the fly
+![](https://github.com/ryanchao2012/airfly/actions/workflows/airfly-run-unittests.yml/badge.svg)
+![](https://img.shields.io/pypi/v/airfly.svg)
+![](https://img.shields.io/pypi/pyversions/airfly)
+![](https://img.shields.io/github/license/ryanchao2012/airfly)
+
+
+# AirFly: Auto Generate Airflow's `dag.py` On The Fly
 
 Pipeline management is essential for data operation in company, many engineering teams rely on tools like Airflow to help them organize workflows, such as ETL, data analytic jobs or machine learning projects.
 
@@ -7,6 +13,39 @@ Airflow provides rich extensibility to let developers arrange workloads into a s
 As workflow grows progressively, the increasing complexity of task relations prones to messing up the dag structure, leads to decrease of code maintainability, especially in collaborative scenarios.
 
 `airfly` tries to mitigate such pain-points and brings automation to this development life cycle, it assumes all tasks are managed in certain python module, developers specify the dependencies while defining the task objects. During deployment, `airfly` can resolve the dependency tree and automatically build the `dag.py` for you.
+
+## Install
+
+Download `airfly` from PyPi
+
+```
+$ pip install airfly
+
+$ airfly --help
+Usage: airfly [OPTIONS]
+
+Options:
+  --version                   Show version and exit.
+  -n, --name TEXT             Assign to DAG id.
+  -m, --modname TEXT          Name of the module to search tasks for building
+                              the task dependency tree and using it to
+                              generate the airflow DAG file.
+  -p, --path TEXT             Insert into "sys.path" to include certain
+                              modules, multi-value is allowed.
+  -e, --exclude-pattern TEXT  Exclude the tasks from the dependency tree if
+                              their __qualname__ get matched with this regex
+                              pattern.
+  -i, --includes TEXT         Paths of python files, the codes within will be
+                              included in the output DAG file, multi-value is
+                              allowed.
+  -d, --dag-params TEXT       Parameters to construct DAG object, defined by a
+                              dictionary in a python file. Pass this option
+                              with <python-file>:<variable> form, the
+                              <variable> should be the dictionary which will
+                              be passed to DAG as keyword arguments.
+  --help                      Show this message and exit.
+
+```
 
 ## Usage
 
@@ -73,7 +112,7 @@ class sleep(AirflowTask):
 
 
 ### Generate the `dag.py` file
-By commandline interface:
+With commandline interface:
 ```
 $ airfly --name demo_dag --modname demo > dag.py
 ```
@@ -150,7 +189,7 @@ dag_kwargs = dict(
 )
 ```
 
-Inject those arguments by giving `--dag-params` option:
+Inject those arguments with `--dag-params` option:
 ```
 $ airfly --name demo_dag --modname demo --dag-params params.py:dag_kwargs > dag.py
 ```

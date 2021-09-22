@@ -17,7 +17,12 @@ from .utils import (
 
 @click.command()
 @click.option(
-    "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
+    "--version",
+    is_flag=True,
+    callback=print_version,
+    expose_value=False,
+    is_eager=True,
+    help="Show version and exit.",
 )
 @click.option("--name", "-n", help="Assign to DAG id.")
 @click.option(
