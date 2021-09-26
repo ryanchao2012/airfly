@@ -1,3 +1,39 @@
+class TestSerializable:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import Serializable
+
+        assert Serializable
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+    def test_to_dict(self):
+        pass
+
+    def test_from_dict(self):
+        pass
+
+    def test_from_json(self):
+        pass
+
+    def test_to_json(self):
+        pass
+
+    def test_evolve(self):
+        pass
+
+    def test_mutate_from_other(self):
+        pass
+
+
 class Test_AST:
     @classmethod
     def setup_class(cls):
@@ -33,10 +69,10 @@ class TestAST:
     def teardown_method(self, method):
         pass
 
-    def test_render(self):
+    def test_get_ast_type(self):
         pass
 
-    def test_get_ast_type(self):
+    def test_render(self):
         pass
 
     def test_dump(self):
@@ -223,6 +259,42 @@ class Testkeyword:
         pass
 
 
+class Testslice:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import slice
+
+        assert slice
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+
+class TestIndex:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import Index
+
+        assert Index
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+
 class TestCall:
     @classmethod
     def setup_class(cls):
@@ -277,6 +349,24 @@ class TestConstant:
         pass
 
 
+class TestSubscript:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import Subscript
+
+        assert Subscript
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+
 class Teststmt:
     @classmethod
     def setup_class(cls):
@@ -313,48 +403,33 @@ class TestExpr:
         pass
 
 
+class TestComment:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import Comment
+
+        assert Comment
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+    def test_get_ast_type(self):
+        pass
+
+
 class TestAssign:
     @classmethod
     def setup_class(cls):
         from airfly._ast import Assign
 
         assert Assign
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-
-class TestImport:
-    @classmethod
-    def setup_class(cls):
-        from airfly._ast import Import
-
-        assert Import
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-
-class TestImportFrom:
-    @classmethod
-    def setup_class(cls):
-        from airfly._ast import ImportFrom
-
-        assert ImportFrom
 
     @classmethod
     def teardown_class(cls):
@@ -391,24 +466,6 @@ class TestFunctionDef:
         from airfly._ast import FunctionDef
 
         assert FunctionDef
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-
-class TestIf:
-    @classmethod
-    def setup_class(cls):
-        from airfly._ast import If
-
-        assert If
 
     @classmethod
     def teardown_class(cls):
@@ -475,135 +532,6 @@ class TestModule:
         pass
 
 
-class TestClassDefinition:
-    @classmethod
-    def setup_class(cls):
-        from airfly._ast import ClassDefinition
-
-        assert ClassDefinition
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-
-class TestSerializable:
-    @classmethod
-    def setup_class(cls):
-        from airfly._ast import Serializable
-
-        assert Serializable
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-    def test_to_dict(self):
-        pass
-
-    def test_from_dict(self):
-        pass
-
-    def test_from_json(self):
-        pass
-
-    def test_to_json(self):
-        pass
-
-    def test_evolve(self):
-        pass
-
-    def test_mutate_from_other(self):
-        pass
-
-
-class Testslice:
-    @classmethod
-    def setup_class(cls):
-        from airfly._ast import slice
-
-        assert slice
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-
-class TestIndex:
-    @classmethod
-    def setup_class(cls):
-        from airfly._ast import Index
-
-        assert Index
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-
-class TestSubscript:
-    @classmethod
-    def setup_class(cls):
-        from airfly._ast import Subscript
-
-        assert Subscript
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-
-class TestComment:
-    @classmethod
-    def setup_class(cls):
-        from airfly._ast import Comment
-
-        assert Comment
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-    def test_get_ast_type(self):
-        pass
-
-
 class TestClassDef:
     @classmethod
     def setup_class(cls):
@@ -646,6 +574,42 @@ class TestCode:
         from airfly._ast import Code
 
         assert Code
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+
+class TestImport:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import Import
+
+        assert Import
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+
+class TestImportFrom:
+    @classmethod
+    def setup_class(cls):
+        from airfly._ast import ImportFrom
+
+        assert ImportFrom
 
     @classmethod
     def teardown_class(cls):

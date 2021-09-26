@@ -1,9 +1,42 @@
-class TestTask:
+class TestTaskTree:
     @classmethod
     def setup_class(cls):
-        from airfly.model.base import Task
+        from airfly.model.base import TaskTree
 
-        assert Task
+        assert TaskTree
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+    def test__create_dag(self):
+        pass
+
+
+def test_collect_taskpairs():
+    from airfly.model.base import collect_taskpairs
+
+    assert collect_taskpairs
+
+
+def test_collect_taskset():
+    from airfly.model.base import collect_taskset
+
+    assert collect_taskset
+
+
+class TestBaseTask:
+    @classmethod
+    def setup_class(cls):
+        from airfly.model.base import BaseTask
+
+        assert BaseTask
 
     @classmethod
     def teardown_class(cls):
@@ -16,12 +49,12 @@ class TestTask:
         pass
 
 
-class TestTask_:
+class TestWorkflow:
     @classmethod
     def setup_class(cls):
-        from airfly.model.base import Task_
+        from airfly.model.base import Workflow
 
-        assert Task_
+        assert Workflow
 
     @classmethod
     def teardown_class(cls):
@@ -31,6 +64,12 @@ class TestTask_:
         pass
 
     def teardown_method(self, method):
+        pass
+
+    def test_to_source(self):
+        pass
+
+    def test_to_file(self):
         pass
 
 
@@ -50,33 +89,3 @@ class TestTaskPair:
 
     def teardown_method(self, method):
         pass
-
-
-class TestTaskTree:
-    @classmethod
-    def setup_class(cls):
-        from airfly.model.base import TaskTree
-
-        assert TaskTree
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-
-def test_collect_taskset():
-    from airfly.model.base import collect_taskset
-
-    assert collect_taskset
-
-
-def test_build_taskpairs():
-    from airfly.model.base import build_taskpairs
-
-    assert build_taskpairs

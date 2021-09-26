@@ -1,9 +1,3 @@
-def test_qualname():
-    from airfly.utils import qualname
-
-    assert qualname
-
-
 def test_blacking():
     from airfly.utils import blacking
 
@@ -26,6 +20,12 @@ def test_load_module_by_name():
     from airfly.utils import load_module_by_name
 
     assert load_module_by_name
+
+
+def test_qualname():
+    from airfly.utils import qualname
+
+    assert qualname
 
 
 def test__escape_any_commandline_parser():
