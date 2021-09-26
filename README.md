@@ -51,12 +51,12 @@ Options:
 
 `airfly` expects the implementations are populated in a Python module(or package), the task dependencies are declared by assigning `upstreams` and `downstreams` attributes to each object. The task objects are actually wrappers for Airflow operators, when `airfly` walks through the entire module, all tasks are discovered and collected, the dependency tree and the `DAG` context are automatically built, with some `ast` helpers, `airfly` can wrap all these information, convert them into python code, and finally save them to `dag.py`.
 
-<img src="assets/layout.png" width="500">
+<img src="https://github.com/ryanchao2012/airfly/blob/main/assets/layout.png?raw=true" width="800">
 
 
 ### Wrap Airflow operator with `AirflowTask`
 
-In order to do codegen, collect the operator's metadata into a `AirflowTask` subclass as following(see [demo](./examples/tutorial/demo.py)):
+In order to do codegen, collect the operator's metadata into a `AirflowTask` subclass as following(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/demo.py)):
 
 ```python
 # in demo.py
@@ -148,7 +148,7 @@ with DAG("demo_dag") as dag:
 
 ## Inject parameters to `DAG`
 
-If any additional arguments are needed, write and manage those configurations in a python file(see [demo](./examples/tutorial/params.py)), `airfly` can pass them to `DAG` during codegen.
+If any additional arguments are needed, write and manage those configurations in a python file(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/params.py)), `airfly` can pass them to `DAG` during codegen.
 
 ```python
 # in params.py
@@ -271,4 +271,6 @@ The `templated` task is gone.
 
 ## Examples
 
-Please visit [examples](./examples) to explore more use cases. 
+Please visit [examples](https://github.com/ryanchao2012/airfly/blob/main/examples) to explore more use cases.
+
+<a href="https://github.com/ryanchao2012/airfly/blob/main/examples"><img src="https://github.com/ryanchao2012/airfly/blob/main/assets/view.png?raw=true" width="800"></img></a>
