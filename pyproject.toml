@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "airfly"
-version = "0.5.1"
+version = "0.6.0"
 description = "Auto generate Airflow's dag.py on the fly"
 authors = ["ryanchao2012 <ryanchao2012@gmail.com>"]
 license = "MIT"
@@ -13,16 +13,19 @@ attrs = "<21"
 astor = "^0.8.1"
 networkx = "^2.6.2"
 cattrs = "<1.7.0"
+black = "^21.7b0"
+isort = "<5.9"
+click = "^8.0.1"
+regex = "^2021.9.24"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
-black = "^21.7b0"
-isort = "<5.9"
 flake8 = "^3.9.2"
 gutt = "^0.6.2"
 ipython = "^7.25.0"
 jedi = "<0.18"
 apache-airflow = {extras = ["airbyte", "amazon", "apache.beam", "apache.cassandra", "apache.druid", "apache.hdfs", "apache.hive", "apache.kylin", "apache.livy", "apache.pig", "apache.pinot", "apache.spark", "apache.sqoop", "asana", "celery", "cloudant", "cncf.kubernetes", "databricks", "datadog", "dingding", "discord", "docker", "elasticsearch", "exasol", "facebook", "ftp", "google", "grpc", "hashicorp", "http", "imap", "jdbc", "jenkins", "jira", "microsoft.azure", "microsoft.mssql", "microsoft.winrm", "mongo", "mysql", "neo4j", "odbc", "openfaas", "opsgenie", "oracle", "pagerduty", "papermill", "plexus", "postgres", "presto", "qubole", "redis", "salesforce", "samba", "segment", "sendgrid", "sftp", "singularity", "slack", "snowflake", "sqlite", "ssh", "tableau", "telegram", "trino", "vertica", "yandex", "zendesk"], version = "^2.1.2", optional = true}
+invoke = "^1.6.0"
 pytest-cov = "^2.12.1"
 
 
