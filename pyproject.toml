@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "airfly"
-version = "0.6.2"
+version = "0.6.3"
 description = "Auto generate Airflow's dag.py on the fly"
 authors = ["ryanchao2012 <ryanchao2012@gmail.com>"]
 license = "MIT"

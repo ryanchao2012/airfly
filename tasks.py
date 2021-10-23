@@ -100,13 +100,13 @@ def collect_airflow(c, output=f"src/{PACKAGE_NAME}/_vendor"):
 
     scopes = {}
 
-    def collect_codes(cls):
+    def collect_code(cls):
 
         for parent in cls.__bases__:
             if parent is object:
                 continue
 
-            collect_codes(parent)
+            collect_code(parent)
 
         mod = ".".join([namespace, cls.__module__])
         name = cls.__name__
@@ -173,7 +173,7 @@ def collect_airflow(c, output=f"src/{PACKAGE_NAME}/_vendor"):
             scopes[mod].update({name: clsdef})
 
     for im in impls:
-        collect_codes(im)
+        collect_code(im)
 
     for dst_module, items in scopes.items():
 
@@ -192,7 +192,7 @@ def collect_airflow(c, output=f"src/{PACKAGE_NAME}/_vendor"):
 
         module_ = Module(body=[comment] + body)
 
-        click.secho("generating codes into: ", nl=False, fg="bright_white")
+        click.secho("generating code into: ", nl=False, fg="bright_white")
         click.secho(f"{dstfile}\r", fg="bright_cyan")
 
         module_.dump(dstfile, formatted=True)

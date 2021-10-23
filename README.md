@@ -16,7 +16,7 @@ As workflow grows progressively, the increasing complexity of task relations pro
 
 ## Install
 
-Download `airfly` from PyPi
+Download `airfly` from PyPI
 
 ```
 $ pip install airfly
@@ -35,7 +35,7 @@ Options:
   -e, --exclude-pattern TEXT  Exclude the tasks from the dependency tree if
                               their __qualname__ get matched with this regex
                               pattern.
-  -i, --includes TEXT         Paths of python files, the codes within will be
+  -i, --includes TEXT         Paths of python files, the code within will be
                               included in the output DAG file, multi-value is
                               allowed.
   -d, --dag-params TEXT       Parameters to construct DAG object, defined by a

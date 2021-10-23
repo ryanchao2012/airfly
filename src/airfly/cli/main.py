@@ -54,7 +54,7 @@ from .utils import (
     "-i",
     callback=validate_includes,
     help=(
-        "Paths of python files, the codes within"
+        "Paths of python files, the code within"
         " will be included in the output DAG file, multi-value is allowed."
     ),
     multiple=True,
