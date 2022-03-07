@@ -5,7 +5,9 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Type, Union
 
 import airfly
 import regex as re
-from airfly._ast import (
+from airfly._vendor import collect_airflow_operators
+from airfly.utils import blacking, isorting, qualname
+from asttrs import (
     Assign,
     BinOp,
     Call,
@@ -24,8 +26,6 @@ from airfly._ast import (
     stmt,
     withitem,
 )
-from airfly._vendor import collect_airflow_operators
-from airfly.utils import blacking, isorting, qualname
 
 from .base import BaseTask, TaskTree, Workflow
 
@@ -189,7 +189,7 @@ class AirflowDAG(Workflow):
         return Module(body=body)
 
     def render(self, formatted: bool = True) -> str:
-        src = re.sub("\n+", "\n", self.to_module().render())
+        src = re.sub("\n+", "\n", self.to_module().to_source())
 
         return isorting(blacking(src)) if formatted else src
 

@@ -3,8 +3,8 @@ from typing import Generator, List, Sequence, Set, Tuple, Type, Union
 
 import attr
 import networkx as nx
-from airfly._ast import immutable
 from airfly.utils import collect_objects
+from asttrs import immutable
 
 TaskClass = Type["BaseTask"]
 
