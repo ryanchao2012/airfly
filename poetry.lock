@@ -161,17 +161,17 @@ pyflakes = ">=2.3.0,<2.4.0"
 
 [[package]]
 name = "gutt"
-version = "0.9.1"
+version = "0.10.0"
 description = "Auto generate unit test templates"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-asttrs = "<1.0.0"
-black = "<23.0.0"
-click = "<9.0.0"
-isort = "<6.0.0"
+asttrs = ">=0.7.0,<0.8.0"
+black = "*"
+click = "*"
+isort = "*"
 
 [[package]]
 name = "importlib-metadata"
@@ -562,7 +562,7 @@ docs = ["jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "jaraco.packaging (>=9)
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "f2dd310e807da129e18c6dc6725e6262d57c9fa2c40ad32814118d26e7c41b52"
+content-hash = "211d52b87375f8d1ff964c5c2b0851362ed651c34a6ce2949ac18301130882bf"
 
 [metadata.files]
 appnope = []
