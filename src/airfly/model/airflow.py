@@ -15,6 +15,7 @@ from asttrs import (
     Constant,
     Expr,
     ImportFrom,
+    Load,
     Module,
     Name,
     Pass,
@@ -136,14 +137,14 @@ class AirflowTask(BaseTask):
                 params.update({k: v})
 
         assign = Assign(
-            targets=[Name(id=task_varname)],
+            targets=[Name(id=task_varname, ctx=Store())],
             value=Call(
-                func=Name(id=op_basename),
+                func=Name(id=op_basename, ctx=Load()),
                 keywords=[
                     keyword(
                         arg=k,
                         value=(
-                            Name(id=qualname(v, level=1))
+                            Name(id=qualname(v, level=1), ctx=Load())
                             if isinstance(v, FunctionType)
                             else Constant(value=v)  # TODO: handle callable and lambda
                         ),
@@ -245,7 +246,9 @@ class AirflowDAG(Workflow):
                             and st.value.func.id == "dict"
                         ):
 
-                            return [keyword(arg=None, value=Name(id=param_var))]
+                            return [
+                                keyword(arg=None, value=Name(id=param_var, ctx=Load()))
+                            ]
 
         except Exception:
             pass  # TODO: logging
@@ -260,7 +263,7 @@ class AirflowDAG(Workflow):
             items=[
                 withitem(
                     context_expr=Call(
-                        func=Name(id="DAG"),
+                        func=Name(id="DAG", ctx=Load()),
                         args=[Constant(value=self._name)],
                         keywords=keywords,
                     ),
@@ -288,9 +291,9 @@ class AirflowDAG(Workflow):
             body.append(
                 Expr(
                     value=BinOp(
-                        left=Name(id=up_stmt.targets[0]),
+                        left=Name(id=up_stmt.targets[0], ctx=Store()),
                         op=RShift(),
-                        right=Name(id=down_stmt.targets[0]),
+                        right=Name(id=down_stmt.targets[0], ctx=Load()),
                     )
                 )
             )
