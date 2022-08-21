@@ -16,7 +16,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 
 [[package]]
 name = "asttrs"
-version = "0.6.0"
+version = "0.7.0"
 description = "A attrs-style wrapper for python ast"
 category = "main"
 optional = false
@@ -161,9 +161,9 @@ pyflakes = ">=2.3.0,<2.4.0"
 
 [[package]]
 name = "gutt"
-version = "0.8.3"
+version = "0.9.1"
 description = "Auto generate unit test templates"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 
@@ -562,7 +562,7 @@ docs = ["jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "jaraco.packaging (>=9)
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "01bb7ecb460d7ea71166b0d260e0fa68bd78116e309516f34ed5ad2d651ad744"
+content-hash = "f2dd310e807da129e18c6dc6725e6262d57c9fa2c40ad32814118d26e7c41b52"
 
 [metadata.files]
 appnope = []
