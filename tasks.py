@@ -7,11 +7,7 @@ from types import ModuleType
 
 import click
 import regex as re
-from airflow.models.baseoperator import BaseOperator
-from invoke import task
-
-import airfly as package
-from airfly._ast import (
+from asttrs import (
     AnnAssign,
     ClassDef,
     Comment,
@@ -22,6 +18,9 @@ from airfly._ast import (
     Pass,
     alias,
 )
+from invoke import task
+
+import airfly as package
 from airfly.utils import collect_objects, load_module_by_name, makefile, qualname
 
 PACKAGE_NAME = package.__name__
