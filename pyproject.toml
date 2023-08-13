@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "airfly"
-version = "0.7.2"
+version = "0.8.0"
 description = "Auto generate Airflow's dag.py on the fly"
 authors = ["ryanchao2012 <ryanchao2012@gmail.com>"]
 license = "MIT"
@@ -8,7 +8,7 @@ readme = "README.md"
 repository = "https://github.com/ryanchao2012/airfly"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 asttrs = "^0.7.0"
 attrs = "*"
 black = "*"
@@ -17,10 +17,10 @@ networkx = "*"
 isort = "*"
 regex = "*"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+ipython = ">=8.10"
 pytest = "^7.2.0"
 flake8 = "^3.9.2"
-ipython = "^7.25.0"
 jedi = "<0.18"
 invoke = "^1.6.0"
 pytest-cov = "^2.12.1"
