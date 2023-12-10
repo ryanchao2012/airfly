@@ -51,7 +51,21 @@ Options:
 
 `airfly` expects the implementations are populated in a Python module(or package), the task dependencies are declared by assigning `upstreams` and `downstreams` attributes to each object. The task objects are actually wrappers for Airflow operators, when `airfly` walks through the entire module, all tasks are discovered and collected, the dependency tree and the `DAG` context are automatically built, with some `ast` helpers, `airfly` can wrap all these information, convert them into python code, and finally save them to `dag.py`.
 
-<img src="https://github.com/ryanchao2012/airfly/blob/main/assets/layout.png?raw=true" width="800">
+```
+main_dag
+├── __init__.py
+├── mod_a.py
+│   ├── task_a1
+│   └── task_a2
+│       └── upstreams: task_a1
+├── mod_b.py
+│   └── task_b1
+│       └── downstreams: task_a1, task_a2
+├── sub_dag
+│   ├── __init__.py
+│   ├── mod_c.py
+:   :
+```
 
 
 ### Wrap Airflow operator with `AirflowTask`
