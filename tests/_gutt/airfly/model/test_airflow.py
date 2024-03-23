@@ -1,9 +1,9 @@
-class TestAirflowDAG:
+class TestDAGBuilder:
     @classmethod
     def setup_class(cls):
-        from airfly.model.airflow import AirflowDAG
+        from airfly.model.airflow import DAGBuilder
 
-        assert AirflowDAG
+        assert DAGBuilder
 
     @classmethod
     def teardown_class(cls):
@@ -43,12 +43,12 @@ class TestAirflowDAG:
         pass
 
 
-class TestAirflowTask:
+class TestAirFly:
     @classmethod
     def setup_class(cls):
-        from airfly.model.airflow import AirflowTask
+        from airfly.model.airflow import AirFly
 
-        assert AirflowTask
+        assert AirFly
 
     @classmethod
     def teardown_class(cls):
