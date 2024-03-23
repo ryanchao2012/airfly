@@ -22,7 +22,7 @@ dependencies = [
     "black",
     "isort",
     "click",
-    "asttrs",
+    "asttrs>=0.7.0",
 ]
 
 [tool.pdm.dev-dependencies]
