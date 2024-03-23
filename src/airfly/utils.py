@@ -67,7 +67,7 @@ def isorting(source_code: str):
 
     p = sp.Popen(f"cat {fname}".split(), stdout=sp.PIPE)
 
-    out = sp.check_output("isort -q -".split(), stdin=p.stdout)
+    out = sp.check_output("isort --profile black -q -".split(), stdin=p.stdout)
 
     p.wait()
 

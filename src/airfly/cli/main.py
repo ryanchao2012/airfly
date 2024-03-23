@@ -1,6 +1,7 @@
 import os
 
 import click
+
 from airfly.model.airflow import AirflowDAG, AirflowTask
 from airfly.model.base import TaskTree, collect_taskpairs, collect_taskset
 from airfly.utils import load_module_by_name
@@ -109,4 +110,4 @@ def main(name, modname, path, exclude_pattern, includes, dag_params):
 
     dag = AirflowDAG(name, tasktree, includes=includes, dag_params=dag_params)
 
-    print(dag.render())
+    print(dag.render(), end="")
