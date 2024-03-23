@@ -3,15 +3,19 @@ from typing import Generator, List, Sequence, Set, Tuple, Type, Union
 
 import attr
 import networkx as nx
+
 from airfly.utils import collect_objects
-from asttrs import immutable
 
-TaskClass = Type["BaseTask"]
+immutable = attr.s(auto_attribs=True, slots=True, frozen=True, kw_only=True)
 
 
-class BaseTask:
-    upstreams: Union[Tuple[TaskClass, ...], TaskClass] = None
-    downstreams: Union[Tuple[TaskClass, ...], TaskClass] = None
+TaskClass = Type["Task"]
+
+
+class Task:
+    task_id: str = None  # NOTE: if not given, we will use qualname() to assign task_id
+    upstream: Union[TaskClass, Tuple[TaskClass, ...]] = None
+    downstream: Union[TaskClass, Tuple[TaskClass, ...]] = None
 
 
 @immutable
@@ -23,7 +27,7 @@ class TaskPair:
 @immutable
 class TaskTree:
 
-    taskset: Set[BaseTask]
+    taskset: Set[TaskClass]
     taskpairs: Set[TaskPair]
 
     _dag: nx.DiGraph = attr.ib(init=False)
@@ -54,7 +58,9 @@ class TaskTree:
 
 
 def collect_taskset(
-    module: ModuleType, taskclass: TaskClass = BaseTask, predicate=lambda _: True
+    module: ModuleType,
+    taskclass: TaskClass = Task,
+    predicate=lambda _: True,
 ) -> Generator[TaskClass, None, None]:
 
     for cls in collect_objects(
@@ -68,14 +74,14 @@ def collect_taskset(
 
 
 def collect_taskpairs(
-    taskset: Set[TaskClass], taskclass: TaskClass = BaseTask, predicate=lambda _: True
+    taskset: Set[TaskClass], taskclass: TaskClass = Task, predicate=lambda _: True
 ) -> Generator[TaskPair, None, None]:
 
     cached = set()
 
     for cls in taskset:
-
-        ups = cls.upstreams  # could be None, Task or Tuple[Task, ...]
+        # TODO: if upstream is a property, try create task instance(cls()) to get them
+        ups = cls.upstream  # could be None, Task or Tuple[Task, ...]
 
         if isinstance(ups, type) and issubclass(ups, taskclass):
             ups = [ups]
@@ -90,7 +96,8 @@ def collect_taskpairs(
 
                 yield pair
 
-        downs = cls.downstreams  # could be None, Task or Tuple[Task, ...]
+        # TODO: if downstream is a property, try create task instance(cls()) to get them
+        downs = cls.downstream  # could be None, Task or Tuple[Task, ...]
 
         if isinstance(downs, type) and issubclass(downs, taskclass):
             downs = [downs]
@@ -104,11 +111,3 @@ def collect_taskpairs(
                 cached.add(pair)
 
                 yield pair
-
-
-class Workflow:
-    def to_source(self) -> str:
-        raise NotImplementedError
-
-    def to_file(self, path: str):
-        pass
