@@ -43,12 +43,12 @@ def test_collect_taskset():
     assert collect_taskset
 
 
-class TestBaseTask:
+class TestTask:
     @classmethod
     def setup_class(cls):
-        from airfly.model.base import BaseTask
+        from airfly.model.base import Task
 
-        assert BaseTask
+        assert Task
 
     @classmethod
     def teardown_class(cls):
@@ -58,30 +58,6 @@ class TestBaseTask:
         pass
 
     def teardown_method(self, method):
-        pass
-
-
-class TestWorkflow:
-    @classmethod
-    def setup_class(cls):
-        from airfly.model.base import Workflow
-
-        assert Workflow
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-    def test_to_source(self):
-        pass
-
-    def test_to_file(self):
         pass
 
 
