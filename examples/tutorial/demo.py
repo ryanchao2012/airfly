@@ -36,5 +36,5 @@ class sleep(AirflowTask):
     operator_class = "BashOperator"
     params = dict(depends_on_past=False, bash_command="sleep 5", retries=3)
 
-    upstreams = print_date
-    downstreams = (templated,)
+    upstream = print_date
+    downstream = (templated,)

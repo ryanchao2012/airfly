@@ -45,7 +45,7 @@ class run_this(AirflowTask):
 class sleep_for_0(AirflowTask):
     operator_class = "PythonOperator"
     params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 0})
-    upstreams = run_this
+    upstream = run_this
 
 
 class sleep_for_1(sleep_for_0):
