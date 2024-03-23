@@ -7,4 +7,4 @@ class S3ToSFTPOperator(BaseOperator):
     s3_key: "str"
     sftp_path: "str"
     sftp_conn_id: "str"
-    s3_conn_id: "str"
+    aws_conn_id: "str | None"

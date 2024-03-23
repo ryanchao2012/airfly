@@ -7,6 +7,6 @@ class VerticaToMySqlOperator(BaseOperator):
     mysql_table: "str"
     vertica_conn_id: "str"
     mysql_conn_id: "str"
-    mysql_preoperator: "typing.Union[str, NoneType]"
-    mysql_postoperator: "typing.Union[str, NoneType]"
+    mysql_preoperator: "str | None"
+    mysql_postoperator: "str | None"
     bulk_load: "bool"

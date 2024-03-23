@@ -4,7 +4,7 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 class CloudDataTransferServiceJobStatusSensor(BaseSensorOperator):
     job_name: "str"
-    expected_statuses: "typing.Union[typing.Set[str], str]"
-    project_id: "typing.Union[str, NoneType]"
+    expected_statuses: "set[str] | str"
+    project_id: "str | None"
     gcp_conn_id: "str"
-    impersonation_chain: "typing.Union[str, typing.Sequence[str], NoneType]"
+    impersonation_chain: "str | Sequence[str] | None"

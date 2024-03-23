@@ -2,14 +2,24 @@
 from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 
-class SimpleHttpOperator(BaseOperator):
-    endpoint: "typing.Union[str, NoneType]"
+class HttpOperator(BaseOperator):
+    endpoint: "str | None"
     method: "str"
-    data: "typing.Any"
-    headers: "typing.Union[typing.Dict[str, str], NoneType]"
-    response_check: "typing.Union[typing.Callable[..., bool], NoneType]"
-    response_filter: "typing.Union[typing.Callable[..., typing.Any], NoneType]"
-    extra_options: "typing.Union[typing.Dict[str, typing.Any], NoneType]"
+    data: "dict[str, Any] | str | None"
+    headers: "dict[str, str] | None"
+    pagination_function: "Callable[..., Any] | None"
+    response_check: "Callable[..., bool] | None"
+    response_filter: "Callable[..., Any] | None"
+    extra_options: "dict[str, Any] | None"
     http_conn_id: "str"
     log_response: "bool"
-    auth_type: "typing.Type[requests.auth.AuthBase]"
+    auth_type: "type[AuthBase] | None"
+    tcp_keep_alive: "bool"
+    tcp_keep_alive_idle: "int"
+    tcp_keep_alive_count: "int"
+    tcp_keep_alive_interval: "int"
+    deferrable: "bool"
+
+
+class SimpleHttpOperator(HttpOperator):
+    pass

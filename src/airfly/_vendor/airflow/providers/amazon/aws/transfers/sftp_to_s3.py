@@ -8,3 +8,4 @@ class SFTPToS3Operator(BaseOperator):
     sftp_path: "str"
     sftp_conn_id: "str"
     s3_conn_id: "str"
+    use_temp_file: "bool"

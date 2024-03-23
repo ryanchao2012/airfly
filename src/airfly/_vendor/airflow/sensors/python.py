@@ -3,7 +3,7 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 
 class PythonSensor(BaseSensorOperator):
-    python_callable: "typing.Callable"
-    op_args: "typing.Union[typing.List, NoneType]"
-    op_kwargs: "typing.Union[typing.Dict, NoneType]"
-    templates_dict: "typing.Union[typing.Dict, NoneType]"
+    python_callable: "Callable"
+    op_args: "list | None"
+    op_kwargs: "Mapping[str, Any] | None"
+    templates_dict: "dict | None"

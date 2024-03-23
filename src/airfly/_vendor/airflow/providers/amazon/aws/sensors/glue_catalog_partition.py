@@ -2,10 +2,11 @@
 from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 
-class AwsGlueCatalogPartitionSensor(BaseSensorOperator):
+class GlueCatalogPartitionSensor(BaseSensorOperator):
     table_name: "str"
     expression: "str"
-    aws_conn_id: "str"
-    region_name: "typing.Union[str, NoneType]"
+    aws_conn_id: "str | None"
+    region_name: "str | None"
     database_name: "str"
     poke_interval: "int"
+    deferrable: "bool"

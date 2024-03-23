@@ -5,8 +5,8 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 class GCSToGoogleDriveOperator(BaseOperator):
     source_bucket: "str"
     source_object: "str"
-    destination_object: "typing.Union[str, NoneType]"
+    destination_object: "str | None"
+    destination_folder_id: "str"
     move_object: "bool"
     gcp_conn_id: "str"
-    delegate_to: "typing.Union[str, NoneType]"
-    impersonation_chain: "typing.Union[str, typing.Sequence[str], NoneType]"
+    impersonation_chain: "str | Sequence[str] | None"

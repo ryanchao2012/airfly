@@ -7,4 +7,4 @@ class PrestoToMySqlOperator(BaseOperator):
     mysql_table: "str"
     presto_conn_id: "str"
     mysql_conn_id: "str"
-    mysql_preoperator: "typing.Union[str, NoneType]"
+    mysql_preoperator: "str | None"

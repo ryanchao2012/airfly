@@ -4,4 +4,10 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 class SFTPSensor(BaseSensorOperator):
     path: "str"
+    file_pattern: "str"
+    newer_than: "datetime | None"
     sftp_conn_id: "str"
+    python_callable: "Callable | None"
+    op_args: "list | None"
+    op_kwargs: "dict[str, Any] | None"
+    deferrable: "bool"

@@ -4,3 +4,7 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 class TimeSensor(BaseSensorOperator):
     target_time: "_empty"
+
+
+class TimeSensorAsync(BaseSensorOperator):
+    target_time: "_empty"

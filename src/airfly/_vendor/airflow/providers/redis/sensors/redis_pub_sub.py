@@ -3,5 +3,5 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 
 class RedisPubSubSensor(BaseSensorOperator):
-    channels: "typing.Union[typing.List[str], str]"
+    channels: "list[str] | str"
     redis_conn_id: "str"

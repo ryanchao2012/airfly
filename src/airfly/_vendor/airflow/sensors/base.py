@@ -4,8 +4,10 @@ from airfly._vendor.airflow.models.skipmixin import SkipMixin
 
 
 class BaseSensorOperator(BaseOperator, SkipMixin):
-    poke_interval: "float"
-    timeout: "float"
+    poke_interval: "timedelta | float"
+    timeout: "timedelta | float"
     soft_fail: "bool"
     mode: "str"
     exponential_backoff: "bool"
+    max_wait: "timedelta | float | None"
+    silent_fail: "bool"

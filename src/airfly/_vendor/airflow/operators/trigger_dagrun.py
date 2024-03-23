@@ -4,10 +4,12 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 class TriggerDagRunOperator(BaseOperator):
     trigger_dag_id: "str"
-    conf: "typing.Union[typing.Dict, NoneType]"
-    execution_date: "typing.Union[str, datetime.datetime, NoneType]"
+    trigger_run_id: "str | None"
+    conf: "dict | None"
+    execution_date: "str | datetime.datetime | None"
     reset_dag_run: "bool"
     wait_for_completion: "bool"
     poke_interval: "int"
-    allowed_states: "typing.Union[typing.List, NoneType]"
-    failed_states: "typing.Union[typing.List, NoneType]"
+    allowed_states: "list[str] | None"
+    failed_states: "list[str] | None"
+    deferrable: "bool"

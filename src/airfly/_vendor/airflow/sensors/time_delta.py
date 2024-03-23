@@ -4,3 +4,7 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 class TimeDeltaSensor(BaseSensorOperator):
     delta: "_empty"
+
+
+class TimeDeltaSensorAsync(TimeDeltaSensor):
+    delta: "_empty"

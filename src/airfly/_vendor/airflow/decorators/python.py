@@ -4,4 +4,6 @@ from airfly._vendor.airflow.operators.python import PythonOperator
 
 
 class _PythonDecoratedOperator(DecoratedOperator, PythonOperator):
-    pass
+    python_callable: "_empty"
+    op_args: "_empty"
+    op_kwargs: "_empty"

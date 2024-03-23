@@ -5,3 +5,4 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 class FileSensor(BaseSensorOperator):
     filepath: "_empty"
     fs_conn_id: "_empty"
+    recursive: "_empty"

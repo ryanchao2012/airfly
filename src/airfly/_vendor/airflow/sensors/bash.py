@@ -6,3 +6,4 @@ class BashSensor(BaseSensorOperator):
     bash_command: "_empty"
     env: "_empty"
     output_encoding: "_empty"
+    retry_exit_code: "int | None"

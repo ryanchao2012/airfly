@@ -6,3 +6,4 @@ class MongoSensor(BaseSensorOperator):
     collection: "str"
     query: "dict"
     mongo_conn_id: "str"
+    mongo_db: "_empty"

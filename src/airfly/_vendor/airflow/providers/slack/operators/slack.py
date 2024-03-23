@@ -3,10 +3,13 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 
 class SlackAPIOperator(BaseOperator):
-    slack_conn_id: "typing.Union[str, NoneType]"
-    token: "typing.Union[str, NoneType]"
-    method: "typing.Union[str, NoneType]"
-    api_params: "typing.Union[typing.Dict, NoneType]"
+    slack_conn_id: "str"
+    method: "str | None"
+    api_params: "dict | None"
+    base_url: "str | None"
+    proxy: "str | None"
+    timeout: "int | None"
+    retry_handlers: "list[RetryHandler] | None"
 
 
 class SlackAPIPostOperator(SlackAPIOperator):
@@ -14,5 +17,15 @@ class SlackAPIPostOperator(SlackAPIOperator):
     username: "str"
     text: "str"
     icon_url: "str"
-    attachments: "typing.Union[typing.List, NoneType]"
-    blocks: "typing.Union[typing.List, NoneType]"
+    blocks: "list | None"
+    attachments: "list | None"
+
+
+class SlackAPIFileOperator(SlackAPIOperator):
+    channels: "str | Sequence[str] | None"
+    initial_comment: "str | None"
+    filename: "str | None"
+    filetype: "str | None"
+    content: "str | None"
+    title: "str | None"
+    method_version: "Literal['v1', 'v2']"

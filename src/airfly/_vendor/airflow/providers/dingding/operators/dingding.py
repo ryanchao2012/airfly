@@ -5,6 +5,6 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 class DingdingOperator(BaseOperator):
     dingding_conn_id: "str"
     message_type: "str"
-    message: "typing.Union[str, dict, NoneType]"
-    at_mobiles: "typing.Union[typing.List[str], NoneType]"
+    message: "str | dict | None"
+    at_mobiles: "list[str] | None"
     at_all: "bool"

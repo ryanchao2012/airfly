@@ -3,10 +3,13 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 
 class SSHOperator(BaseOperator):
-    ssh_hook: "typing.Union[airflow.providers.ssh.hooks.ssh.SSHHook, NoneType]"
-    ssh_conn_id: "typing.Union[str, NoneType]"
-    remote_host: "typing.Union[str, NoneType]"
-    command: "typing.Union[str, NoneType]"
-    timeout: "int"
-    environment: "typing.Union[dict, NoneType]"
+    ssh_hook: "SSHHook | None"
+    ssh_conn_id: "str | None"
+    remote_host: "str | None"
+    command: "str | None"
+    conn_timeout: "int | None"
+    cmd_timeout: "int | ArgNotSet | None"
+    environment: "dict | None"
     get_pty: "bool"
+    banner_timeout: "float"
+    skip_on_exit_code: "int | Container[int] | None"

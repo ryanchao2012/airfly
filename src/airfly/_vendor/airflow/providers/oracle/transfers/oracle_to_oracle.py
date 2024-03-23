@@ -7,5 +7,5 @@ class OracleToOracleOperator(BaseOperator):
     destination_table: "str"
     oracle_source_conn_id: "str"
     source_sql: "str"
-    source_sql_params: "typing.Union[dict, NoneType]"
+    source_sql_params: "dict | None"
     rows_chunk: "int"

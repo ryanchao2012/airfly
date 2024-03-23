@@ -4,10 +4,9 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 class GCSToLocalFilesystemOperator(BaseOperator):
     bucket: "str"
-    object_name: "typing.Union[str, NoneType]"
-    filename: "typing.Union[str, NoneType]"
-    store_to_xcom_key: "typing.Union[str, NoneType]"
+    object_name: "str"
+    filename: "str | None"
+    store_to_xcom_key: "str | None"
     gcp_conn_id: "str"
-    google_cloud_storage_conn_id: "typing.Union[str, NoneType]"
-    delegate_to: "typing.Union[str, NoneType]"
-    impersonation_chain: "typing.Union[str, typing.Sequence[str], NoneType]"
+    impersonation_chain: "str | Sequence[str] | None"
+    file_encoding: "str"

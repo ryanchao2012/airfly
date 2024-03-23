@@ -3,14 +3,14 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 
 class MongoToS3Operator(BaseOperator):
-    s3_conn_id: "typing.Union[str, NoneType]"
     mongo_conn_id: "str"
-    aws_conn_id: "str"
+    aws_conn_id: "str | None"
     mongo_collection: "str"
-    mongo_query: "typing.Union[list, dict]"
+    mongo_query: "list | dict"
     s3_bucket: "str"
     s3_key: "str"
-    mongo_db: "typing.Union[str, NoneType]"
+    mongo_db: "str | None"
+    mongo_projection: "list | dict | None"
     replace: "bool"
     allow_disk_use: "bool"
-    compression: "typing.Union[str, NoneType]"
+    compression: "str | None"

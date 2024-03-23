@@ -6,6 +6,24 @@ class BigQueryTableExistenceSensor(BaseSensorOperator):
     project_id: "str"
     dataset_id: "str"
     table_id: "str"
-    bigquery_conn_id: "str"
-    delegate_to: "typing.Union[str, NoneType]"
-    impersonation_chain: "typing.Union[str, typing.Sequence[str], NoneType]"
+    gcp_conn_id: "str"
+    impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"
+
+
+class BigQueryTablePartitionExistenceSensor(BaseSensorOperator):
+    project_id: "str"
+    dataset_id: "str"
+    table_id: "str"
+    partition_id: "str"
+    gcp_conn_id: "str"
+    impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"
+
+
+class BigQueryTableExistenceAsyncSensor(BigQueryTableExistenceSensor):
+    pass
+
+
+class BigQueryTableExistencePartitionAsyncSensor(BigQueryTablePartitionExistenceSensor):
+    pass

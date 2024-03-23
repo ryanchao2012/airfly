@@ -7,4 +7,5 @@ class GenericTransfer(BaseOperator):
     destination_table: "str"
     source_conn_id: "str"
     destination_conn_id: "str"
-    preoperator: "typing.Union[str, typing.List[str], NoneType]"
+    preoperator: "str | list[str] | None"
+    insert_args: "dict | None"

@@ -3,5 +3,6 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 
 class DayOfWeekSensor(BaseSensorOperator):
-    week_day: "_empty"
-    use_task_execution_day: "_empty"
+    week_day: "str | Iterable[str] | WeekDay | Iterable[WeekDay]"
+    use_task_logical_date: "bool"
+    use_task_execution_day: "bool"

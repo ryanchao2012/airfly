@@ -3,12 +3,13 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 
 class EmailOperator(BaseOperator):
-    to: "typing.Union[typing.List[str], str]"
+    to: "list[str] | str"
     subject: "str"
     html_content: "str"
-    files: "typing.Union[typing.List, NoneType]"
-    cc: "typing.Union[str, typing.List[str], NoneType]"
-    bcc: "typing.Union[str, typing.List[str], NoneType]"
+    files: "list | None"
+    cc: "list[str] | str | None"
+    bcc: "list[str] | str | None"
     mime_subtype: "str"
     mime_charset: "str"
-    conn_id: "typing.Union[str, NoneType]"
+    conn_id: "str | None"
+    custom_headers: "dict[str, Any] | None"

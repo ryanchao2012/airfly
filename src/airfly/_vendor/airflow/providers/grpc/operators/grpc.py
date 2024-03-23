@@ -3,12 +3,12 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 
 class GrpcOperator(BaseOperator):
-    stub_class: "typing.Callable"
+    stub_class: "Callable"
     call_func: "str"
     grpc_conn_id: "str"
-    data: "typing.Union[dict, NoneType]"
-    interceptors: "typing.Union[typing.List[typing.Callable], NoneType]"
-    custom_connection_func: "typing.Union[typing.Callable, NoneType]"
+    data: "dict | None"
+    interceptors: "list[Callable] | None"
+    custom_connection_func: "Callable | None"
     streaming: "bool"
-    response_callback: "typing.Union[typing.Callable, NoneType]"
+    response_callback: "Callable | None"
     log_response: "bool"

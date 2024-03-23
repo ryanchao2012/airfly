@@ -3,9 +3,9 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 
 class DecoratedOperator(BaseOperator):
-    python_callable: "typing.Callable"
+    python_callable: "Callable"
     task_id: "str"
-    op_args: "typing.Tuple[typing.Any]"
-    op_kwargs: "typing.Dict[str, typing.Any]"
+    op_args: "Collection[Any] | None"
+    op_kwargs: "Mapping[str, Any] | None"
     multiple_outputs: "bool"
-    kwargs_to_upstream: "dict"
+    kwargs_to_upstream: "dict[str, Any] | None"

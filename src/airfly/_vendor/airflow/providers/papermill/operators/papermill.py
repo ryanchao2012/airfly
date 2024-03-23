@@ -3,6 +3,9 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 
 class PapermillOperator(BaseOperator):
-    input_nb: "typing.Union[str, NoneType]"
-    output_nb: "typing.Union[str, NoneType]"
-    parameters: "typing.Union[typing.Dict, NoneType]"
+    input_nb: "str | NoteBook | None"
+    output_nb: "str | NoteBook | None"
+    parameters: "dict | None"
+    kernel_name: "str | None"
+    language_name: "str | None"
+    kernel_conn_id: "str | None"

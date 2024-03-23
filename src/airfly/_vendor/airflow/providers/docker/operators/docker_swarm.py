@@ -5,3 +5,8 @@ from airfly._vendor.airflow.providers.docker.operators.docker import DockerOpera
 class DockerSwarmOperator(DockerOperator):
     image: "str"
     enable_logging: "bool"
+    configs: "list[types.ConfigReference] | None"
+    secrets: "list[types.SecretReference] | None"
+    mode: "types.ServiceMode | None"
+    networks: "list[str | types.NetworkAttachmentConfig] | None"
+    placement: "types.Placement | list[types.Placement] | None"

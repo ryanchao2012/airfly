@@ -5,26 +5,32 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 class GCSObjectExistenceSensor(BaseSensorOperator):
     bucket: "str"
     object: "str"
+    use_glob: "bool"
     google_cloud_conn_id: "str"
-    delegate_to: "typing.Union[str, NoneType]"
-    impersonation_chain: "typing.Union[str, typing.Sequence[str], NoneType]"
+    impersonation_chain: "str | Sequence[str] | None"
+    retry: "Retry"
+    deferrable: "bool"
+
+
+class GCSObjectExistenceAsyncSensor(GCSObjectExistenceSensor):
+    pass
+
+
+class GCSObjectUpdateSensor(BaseSensorOperator):
+    bucket: "str"
+    object: "str"
+    ts_func: "Callable"
+    google_cloud_conn_id: "str"
+    impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"
 
 
 class GCSObjectsWithPrefixExistenceSensor(BaseSensorOperator):
     bucket: "str"
     prefix: "str"
     google_cloud_conn_id: "str"
-    delegate_to: "typing.Union[str, NoneType]"
-    impersonation_chain: "typing.Union[str, typing.Sequence[str], NoneType]"
-
-
-class GCSObjectUpdateSensor(BaseSensorOperator):
-    bucket: "str"
-    object: "str"
-    ts_func: "typing.Callable"
-    google_cloud_conn_id: "str"
-    delegate_to: "typing.Union[str, NoneType]"
-    impersonation_chain: "typing.Union[str, typing.Sequence[str], NoneType]"
+    impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"
 
 
 class GCSUploadSessionCompleteSensor(BaseSensorOperator):
@@ -32,8 +38,8 @@ class GCSUploadSessionCompleteSensor(BaseSensorOperator):
     prefix: "str"
     inactivity_period: "float"
     min_objects: "int"
-    previous_objects: "typing.Union[typing.Set[str], NoneType]"
+    previous_objects: "set[str] | None"
     allow_delete: "bool"
     google_cloud_conn_id: "str"
-    delegate_to: "typing.Union[str, NoneType]"
-    impersonation_chain: "typing.Union[str, typing.Sequence[str], NoneType]"
+    impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"

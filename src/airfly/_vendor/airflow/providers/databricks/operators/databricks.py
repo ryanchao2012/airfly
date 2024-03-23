@@ -2,32 +2,77 @@
 from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 
-class DatabricksRunNowOperator(BaseOperator):
-    job_id: "typing.Union[str, NoneType]"
-    json: "typing.Union[typing.Any, NoneType]"
-    notebook_params: "typing.Union[typing.Dict[str, str], NoneType]"
-    python_params: "typing.Union[typing.List[str], NoneType]"
-    spark_submit_params: "typing.Union[typing.List[str], NoneType]"
+class DatabricksCreateJobsOperator(BaseOperator):
+    json: "Any | None"
+    name: "str | None"
+    tags: "dict[str, str] | None"
+    tasks: "list[dict] | None"
+    job_clusters: "list[dict] | None"
+    email_notifications: "dict | None"
+    webhook_notifications: "dict | None"
+    timeout_seconds: "int | None"
+    schedule: "dict | None"
+    max_concurrent_runs: "int | None"
+    git_source: "dict | None"
+    access_control_list: "list[dict] | None"
     databricks_conn_id: "str"
     polling_period_seconds: "int"
     databricks_retry_limit: "int"
     databricks_retry_delay: "int"
-    do_xcom_push: "bool"
+    databricks_retry_args: "dict[Any, Any] | None"
 
 
 class DatabricksSubmitRunOperator(BaseOperator):
-    json: "typing.Union[typing.Any, NoneType]"
-    spark_jar_task: "typing.Union[typing.Dict[str, str], NoneType]"
-    notebook_task: "typing.Union[typing.Dict[str, str], NoneType]"
-    spark_python_task: "typing.Union[typing.Dict[str, typing.Union[str, typing.List[str]]], NoneType]"
-    spark_submit_task: "typing.Union[typing.Dict[str, typing.List[str]], NoneType]"
-    new_cluster: "typing.Union[typing.Dict[str, object], NoneType]"
-    existing_cluster_id: "typing.Union[str, NoneType]"
-    libraries: "typing.Union[typing.List[typing.Dict[str, str]], NoneType]"
-    run_name: "typing.Union[str, NoneType]"
-    timeout_seconds: "typing.Union[int, NoneType]"
+    json: "Any | None"
+    tasks: "list[object] | None"
+    spark_jar_task: "dict[str, str] | None"
+    notebook_task: "dict[str, str] | None"
+    spark_python_task: "dict[str, str | list[str]] | None"
+    spark_submit_task: "dict[str, list[str]] | None"
+    pipeline_task: "dict[str, str] | None"
+    dbt_task: "dict[str, str | list[str]] | None"
+    new_cluster: "dict[str, object] | None"
+    existing_cluster_id: "str | None"
+    libraries: "list[dict[str, Any]] | None"
+    run_name: "str | None"
+    timeout_seconds: "int | None"
     databricks_conn_id: "str"
     polling_period_seconds: "int"
     databricks_retry_limit: "int"
     databricks_retry_delay: "int"
+    databricks_retry_args: "dict[Any, Any] | None"
     do_xcom_push: "bool"
+    idempotency_token: "str | None"
+    access_control_list: "list[dict[str, str]] | None"
+    wait_for_termination: "bool"
+    git_source: "dict[str, str] | None"
+    deferrable: "bool"
+
+
+class DatabricksSubmitRunDeferrableOperator(DatabricksSubmitRunOperator):
+    pass
+
+
+class DatabricksRunNowOperator(BaseOperator):
+    job_id: "str | None"
+    job_name: "str | None"
+    json: "Any | None"
+    notebook_params: "dict[str, str] | None"
+    python_params: "list[str] | None"
+    jar_params: "list[str] | None"
+    spark_submit_params: "list[str] | None"
+    python_named_params: "dict[str, str] | None"
+    idempotency_token: "str | None"
+    databricks_conn_id: "str"
+    polling_period_seconds: "int"
+    databricks_retry_limit: "int"
+    databricks_retry_delay: "int"
+    databricks_retry_args: "dict[Any, Any] | None"
+    do_xcom_push: "bool"
+    wait_for_termination: "bool"
+    deferrable: "bool"
+    repair_run: "bool"
+
+
+class DatabricksRunNowDeferrableOperator(DatabricksRunNowOperator):
+    pass
