@@ -2,7 +2,7 @@ import os
 
 import click
 
-from airfly.model.airflow import AirflowDAG, AirflowTask
+from airfly.model.airflow import AirFly, DAGBuilder
 from airfly.model.base import TaskTree, collect_taskpairs, collect_taskset
 from airfly.utils import load_module_by_name
 
@@ -91,7 +91,7 @@ def main(name, modname, path, exclude_pattern, includes, dag_params):
     taskset = set(
         collect_taskset(
             module,
-            taskclass=AirflowTask,
+            taskclass=AirFly,
             predicate=lambda obj: not should_exclude(obj, exclude_pattern),
         )
     )
@@ -99,7 +99,7 @@ def main(name, modname, path, exclude_pattern, includes, dag_params):
     taskpairs = set(
         collect_taskpairs(
             taskset,
-            taskclass=AirflowTask,
+            taskclass=AirFly,
             predicate=lambda pair: not (
                 should_exclude(pair.up, exclude_pattern, verbose=False)
                 or should_exclude(pair.down, exclude_pattern, verbose=False)
@@ -108,6 +108,6 @@ def main(name, modname, path, exclude_pattern, includes, dag_params):
     )
     tasktree = TaskTree(taskset=taskset, taskpairs=taskpairs)
 
-    dag = AirflowDAG(name, tasktree, includes=includes, dag_params=dag_params)
+    dag = DAGBuilder(name, tasktree, includes=includes, dag_params=dag_params)
 
     print(dag.render(), end="")
