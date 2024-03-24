@@ -4,8 +4,7 @@ from airfly._vendor.airflow.operators.python import BranchPythonVirtualenvOperat
 
 
 class _BranchPythonVirtualenvDecoratedOperator(
-    _PythonDecoratedOperator,
-    BranchPythonVirtualenvOperator,
+    _PythonDecoratedOperator, BranchPythonVirtualenvOperator
 ):
     python_callable: "_empty"
     op_args: "_empty"

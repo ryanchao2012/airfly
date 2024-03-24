@@ -68,16 +68,16 @@ main_dag
 ```
 
 
-### Wrap Airflow operator with `AirflowTask`
+### Wrap Airflow operator with `AirFly`
 
-In order to do codegen, collect the operator's metadata into a `AirflowTask` subclass as following(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/demo.py)):
+In order to do codegen, collect the operator's metadata into a `AirFly` subclass as following(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/demo.py)):
 
 ```python
 # in demo.py
-from airfly.model.airflow import AirflowTask
+from airfly.model import AirFly
 
 
-class print_date(AirflowTask):
+class print_date(AirFly):
     operator_class = "BashOperator" 
     params = dict(bash_command="date")
 ```
@@ -107,14 +107,14 @@ templated_command = dedent(
 """
 )
 
-class templated(AirflowTask):
+class templated(AirFly):
     operator_class = "BashOperator"
     params = dict(depends_on_past=False,
                   bash_command=templated_command,
                   params={"my_param": "Parameter I passed in"})
 
 
-class sleep(AirflowTask):
+class sleep(AirFly):
     operator_class = "BashOperator"
     params = dict(depends_on_past=False, 
                   bash_command="sleep 5",

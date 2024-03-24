@@ -1,6 +1,6 @@
 [project]
 name = "airfly"
-version = "0.9.0"
+version = "0.10.0"
 description = "Auto generate Airflow's dag.py on the fly"
 authors = [
     {name = "ryanchao2012", email = "ryanchao2012@gmail.com"},
@@ -11,6 +11,7 @@ license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
 
 requires-python = ">=3.8"
@@ -22,7 +23,8 @@ dependencies = [
     "black",
     "isort",
     "click",
-    "asttrs>=0.7.0",
+    "libcst",
+    "asttrs",
 ]
 
 [tool.pdm.dev-dependencies]

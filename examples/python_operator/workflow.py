@@ -1,7 +1,7 @@
 import time
 from pprint import pprint
 
-from airfly.model.airflow import AirflowTask
+from airfly.model import AirFly
 
 
 def print_context(ds, **kwargs):
@@ -36,16 +36,16 @@ def callable_virtualenv():
     print("Finished")
 
 
-class run_this(AirflowTask):
+class run_this(AirFly):
     operator_class = "PythonOperator"
     params = dict(python_callable=print_context)
 
 
 # TODO: how to dynamically create task class?
-class sleep_for_0(AirflowTask):
+class sleep_for_0(AirFly):
     operator_class = "PythonOperator"
     params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 0})
-    upstreams = run_this
+    upstream = run_this
 
 
 class sleep_for_1(sleep_for_0):
@@ -64,7 +64,7 @@ class sleep_for_4(sleep_for_0):
     params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 4})
 
 
-class virtualenv_task(AirflowTask):
+class virtualenv_task(AirFly):
     operator_class = "PythonVirtualenvOperator"
     params = dict(
         python_callable=callable_virtualenv,

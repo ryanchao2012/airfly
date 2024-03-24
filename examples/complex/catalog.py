@@ -1,4 +1,4 @@
-from airfly.model.airflow import AirflowTask
+from airfly.model import AirFly
 
 from .entry import (
     create_entry_gcs,
@@ -21,11 +21,11 @@ def _print_catalog():
 
 
 # Search
-class search_catalog(AirflowTask):
+class search_catalog(AirFly):
     operator_class = "PythonOperator"
     params = dict(python_callable=_print_catalog)
 
-    upstreams = (
+    upstream = (
         create_entry_gcs,
         create_entry_group,
         create_tag,
@@ -33,7 +33,7 @@ class search_catalog(AirflowTask):
         create_tag_template_field,
     )
 
-    downstreams = (
+    downstream = (
         delete_entry,
         delete_entry_group,
         delete_tag,
@@ -42,8 +42,8 @@ class search_catalog(AirflowTask):
     )
 
 
-class search_catalog_result(AirflowTask):
+class search_catalog_result(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo search_catalog_result")
 
-    upstreams = search_catalog
+    upstream = search_catalog

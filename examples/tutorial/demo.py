@@ -4,10 +4,10 @@ A simple workflow for demo, fork from https://airflow.apache.org/docs/apache-air
 
 from textwrap import dedent
 
-from airfly.model.airflow import AirflowTask
+from airfly.model import AirFly
 
 
-class print_date(AirflowTask):
+class print_date(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="date")
 
@@ -23,7 +23,7 @@ templated_command = dedent(
 )
 
 
-class templated(AirflowTask):
+class templated(AirFly):
     operator_class = "BashOperator"
     params = dict(
         depends_on_past=False,
@@ -32,9 +32,9 @@ class templated(AirflowTask):
     )
 
 
-class sleep(AirflowTask):
+class sleep(AirFly):
     operator_class = "BashOperator"
     params = dict(depends_on_past=False, bash_command="sleep 5", retries=3)
 
-    upstreams = print_date
-    downstreams = (templated,)
+    upstream = print_date
+    downstream = (templated,)

@@ -2,11 +2,16 @@
 
 
 name = "airfly"
-version = "0.9.0"
+version = "0.10.0"
 description = "Auto generate Airflow's dag.py on the fly"
 authors = [{"name": "ryanchao2012", "email": "ryanchao2012@gmail.com"}]
 readme = "README.md"
 license = {"text": "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
 dependencies = [
     "attrs",
     "cattrs",
@@ -15,6 +20,7 @@ dependencies = [
     "black",
     "isort",
     "click",
+    "libcst",
     "asttrs",
 ]
 scripts = {"airfly": "airfly.cli.main:main"}
