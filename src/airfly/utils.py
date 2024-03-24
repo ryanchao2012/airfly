@@ -10,8 +10,6 @@ from importlib._bootstrap_external import SourceFileLoader
 from types import FunctionType, ModuleType
 from typing import Callable, Generator, Union
 
-from gutt.utils import isorting
-
 
 def qualname(obj: Union[FunctionType, ModuleType, type], level: int = -1) -> str:
     """Return the qualname of a class, a function or a module.
