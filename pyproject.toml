@@ -22,6 +22,7 @@ dependencies = [
     "black",
     "isort",
     "click",
+    "libcst",
     "asttrs>=0.7.0",
 ]
 
