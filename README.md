@@ -287,4 +287,4 @@ The `templated` task is gone.
 
 Please visit [examples](https://github.com/ryanchao2012/airfly/blob/main/examples) to explore more use cases.
 
-<a href="https://github.com/ryanchao2012/airfly/blob/main/examples"><img src="https://github.com/ryanchao2012/airfly/blob/main/assets/view.png?raw=true" width="800"></img></a>
+<a href="https://github.com/ryanchao2012/airfly/blob/main/examples"><img src="https://github.com/ryanchao2012/airfly/blob/main/assets/graph-view.png?raw=true" width="800"></img></a>
