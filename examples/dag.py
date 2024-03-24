@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from airflow.models import DAG
 from airflow.operators.bash import BashOperator
-from airflow.operators.dummy import DummyOperator
+from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator, PythonVirtualenvOperator
 from airflow.utils.dates import days_ago
 
@@ -40,7 +40,7 @@ with DAG("examples", **dag_kwargs) as dag:
     examples_bash_operator_workflow_run_this = BashOperator(
         task_id="examples.bash_operator.workflow.run_this", bash_command="echo 1"
     )
-    examples_bash_operator_workflow_run_this_last = DummyOperator(
+    examples_bash_operator_workflow_run_this_last = EmptyOperator(
         task_id="examples.bash_operator.workflow.run_this_last"
     )
     examples_bash_operator_workflow_runme_0 = BashOperator(

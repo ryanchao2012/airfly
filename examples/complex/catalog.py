@@ -1,4 +1,4 @@
-from airfly.model.airflow import AirflowTask
+from airfly.model import AirFly
 
 from .entry import (
     create_entry_gcs,
@@ -21,7 +21,7 @@ def _print_catalog():
 
 
 # Search
-class search_catalog(AirflowTask):
+class search_catalog(AirFly):
     operator_class = "PythonOperator"
     params = dict(python_callable=_print_catalog)
 
@@ -42,7 +42,7 @@ class search_catalog(AirflowTask):
     )
 
 
-class search_catalog_result(AirflowTask):
+class search_catalog_result(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo search_catalog_result")
 

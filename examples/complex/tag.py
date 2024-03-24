@@ -1,78 +1,78 @@
-from airfly.model.airflow import AirflowTask
+from airfly.model import AirFly
 
 from .entry import create_entry_gcs, delete_entry_group
 
 
 # Create
-class create_tag(AirflowTask):
+class create_tag(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo create_tag")
 
 
-class create_tag_result(AirflowTask):
+class create_tag_result(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo create_tag_result")
     upstream = create_tag
 
 
-class create_tag_result2(AirflowTask):
+class create_tag_result2(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo create_tag_result2")
     upstream = create_tag
 
 
-class create_tag_template(AirflowTask):
+class create_tag_template(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo create_tag_template")
     upstream = create_entry_gcs
 
 
-class create_tag_template_result(AirflowTask):
+class create_tag_template_result(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo create_tag_template_result")
     upstream = create_tag_template
 
 
-class create_tag_template_result2(AirflowTask):
+class create_tag_template_result2(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo create_tag_template_result2")
     upstream = create_tag_template
 
 
-class create_tag_template_field(AirflowTask):
+class create_tag_template_field(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo create_tag_template_field")
     upstream = create_tag_template
 
 
-class create_tag_template_field_result(AirflowTask):
+class create_tag_template_field_result(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo create_tag_template_field_result")
     upstream = create_tag_template_field
 
 
-class create_tag_template_field_result2(AirflowTask):
+class create_tag_template_field_result2(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo create_tag_template_field_result2")
     upstream = create_tag_template_field
 
 
 # Delete
-class delete_tag(AirflowTask):
+class delete_tag(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo delete_tag")
 
     upstream = create_tag
 
 
-class delete_tag_template_field(AirflowTask):
+class delete_tag_template_field(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo delete_tag_template_field")
 
     upstream = (create_tag_template, create_tag_template_field, delete_tag)
 
 
-class delete_tag_template(AirflowTask):
+class delete_tag_template(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo delete_tag_template")
 
@@ -81,35 +81,35 @@ class delete_tag_template(AirflowTask):
 
 
 # Get
-class get_tag_template(AirflowTask):
+class get_tag_template(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo get_tag_template")
     upstream = create_tag_template
     downstream = delete_tag_template
 
 
-class get_tag_template_result(AirflowTask):
+class get_tag_template_result(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo get_tag_template_result")
     upstream = get_tag_template
 
 
 # List
-class list_tags(AirflowTask):
+class list_tags(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo list_tags")
     upstream = create_tag
     downstream = delete_tag
 
 
-class list_tags_result(AirflowTask):
+class list_tags_result(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo list_tags_result")
     upstream = list_tags
 
 
 # Rename
-class rename_tag_template_field(AirflowTask):
+class rename_tag_template_field(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo rename_tag_template_field")
     upstream = create_tag_template_field
@@ -117,21 +117,21 @@ class rename_tag_template_field(AirflowTask):
 
 
 # Update
-class update_tag(AirflowTask):
+class update_tag(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo update_tag")
     upstream = create_tag
     downstream = delete_tag
 
 
-class update_tag_template(AirflowTask):
+class update_tag_template(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo update_tag_template")
     upstream = create_tag_template
     downstream = delete_tag_template
 
 
-class update_tag_template_field(AirflowTask):
+class update_tag_template_field(AirFly):
     operator_class = "BashOperator"
     params = dict(bash_command="echo update_tag_template_field")
     upstream = create_tag_template_field
