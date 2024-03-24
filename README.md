@@ -49,7 +49,7 @@ Options:
 
 ## Usage
 
-`airfly` expects the implementations are populated in a Python module(or package), the task dependencies are declared by assigning `upstreams` and `downstreams` attributes to each object. The task objects are actually wrappers for Airflow operators, when `airfly` walks through the entire module, all tasks are discovered and collected, the dependency tree and the `DAG` context are automatically built, with some `ast` helpers, `airfly` can wrap all these information, convert them into python code, and finally save them to `dag.py`.
+`airfly` expects the implementations are populated in a Python module(or package), the task dependencies are declared by assigning `upstream` and `downstream` attributes to each object. The task objects are actually wrappers for Airflow operators, when `airfly` walks through the entire module, all tasks are discovered and collected, the dependency tree and the `DAG` context are automatically built, with some `ast` helpers, `airfly` can wrap all these information, convert them into python code, and finally save them to `dag.py`.
 
 ```
 main_dag
@@ -57,10 +57,10 @@ main_dag
 ├── mod_a.py
 │   ├── task_a1
 │   └── task_a2
-│       └── upstreams: task_a1
+│       └── upstream: task_a1
 ├── mod_b.py
 │   └── task_b1
-│       └── downstreams: task_a1, task_a2
+│       └── downstream: task_a1, task_a2
 ├── sub_dag
 │   ├── __init__.py
 │   ├── mod_c.py
@@ -89,7 +89,7 @@ class print_date(AirFly):
 
 ### Declare task dependency
 
-Use `upstreams` and `downstreams` to specify task dependencies.
+Use `upstream` and `downstream` to specify task dependencies.
 
 ```python
 # in demo.py
@@ -120,8 +120,8 @@ class sleep(AirFly):
                   bash_command="sleep 5",
                   retries=3)
 
-    upstreams = print_date
-    downstreams = (templated,)
+    upstream = print_date
+    downstream = (templated,)
 ```
 
 
