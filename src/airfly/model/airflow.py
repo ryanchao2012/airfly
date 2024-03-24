@@ -1,6 +1,6 @@
 import ast
 import os
-from types import FunctionType
+from types import FunctionType, ModuleType
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Type, Union
 
 import regex as re
@@ -37,6 +37,7 @@ available_operators = collect_airflow_operators()
 class AirFly(Task):
 
     operator_class: Union[Type, str] = "DummyOperator"
+    operator_module: Union[ModuleType, str] = None
     params: Dict[str, Union[FunctionType, str]] = None
 
     @classmethod
