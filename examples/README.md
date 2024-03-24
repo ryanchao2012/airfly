@@ -7,4 +7,4 @@ $ airfly --name examples --path .. --modname examples -d params.py:dag_kwargs > 
 
 **Graph View in Airflow WebUI**
 
-![](../assets/view.png)
+![](../assets/graph-view.png)
