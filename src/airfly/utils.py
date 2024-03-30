@@ -34,6 +34,7 @@ def qualname(obj: Union[FunctionType, ModuleType, type], level: int = -1) -> str
         name = f"{obj.__name__}"
 
     else:
+        # TODO: logging or exception
         name = ""
 
     return ".".join(name.split(".")[-level:]) if level > 0 else name
