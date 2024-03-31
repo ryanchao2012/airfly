@@ -98,46 +98,9 @@ class AirFly(Task):
         return items[0]
 
     @classmethod
-    def _resolve_dependency_from_params(
-        cls, obj: Union[Dict, List] = None
-    ) -> List[Union[FunctionType, Type]]:
-        # TODO: deprecated, replace by code injection
-
-        deps = []
-
-        if isinstance(obj, type(None)):
-            params = cls._get_attribute("op_params") or {}
-
-            deps.extend(cls._resolve_dependency_from_params(params))
-
-        elif isinstance(obj, str):
-            return []
-
-        elif isinstance(obj, (Sequence, Set, Dict)):
-
-            iterator = (
-                (el for el in obj)
-                if isinstance(obj, (Sequence, Set))
-                else (v for _, v in obj.items())
-            )
-
-            for el in iterator:
-                if isinstance(el, (str, type(None))):
-                    continue
-
-                elif isinstance(el, (Sequence, Set, Dict)):  # NOTE: list, tuple, set
-                    deps.extend(cls._resolve_dependency_from_params(el))
-
-                elif isinstance(el, FunctionType):
-                    deps.append(el)
-
-        return list(set(deps))
-
-    @classmethod
     def collect_dep_stmts(cls) -> List[stmt]:
         """Collect all stmts for all dependencies"""
 
-        param_deps = cls._resolve_dependency_from_params()  # TODO: deprecated
         op_dev = cls._resolve_operator()
 
         # TODO: op_basename collision
@@ -145,13 +108,6 @@ class AirFly(Task):
         op_modname = op_modname.replace("airfly._vendor.", "")
 
         dep_stmts = [ImportFrom(module=op_modname, names=[alias(name=op_basename)])]
-
-        for dep in param_deps:  # TODO: deprecated
-
-            fn_modname, fn_basename = qualname(dep).rsplit(".", 1)
-            dep_stmts.append(
-                ImportFrom(module=fn_modname, names=[alias(name=fn_basename)])
-            )
 
         return dep_stmts
 
