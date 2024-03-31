@@ -298,7 +298,7 @@ class DAGBuilder:
                         ),
                         op=RShift(),
                         right=Name(
-                            id=up.to_varname(),
+                            id=down.to_varname(),
                             ctx=Load(),
                         ),
                     )
