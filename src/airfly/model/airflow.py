@@ -55,8 +55,8 @@ class AirFly(Task):
     op_params: Dict[str, Union[FunctionType, str]] = None
 
     @classmethod
-    def _to_varname(cls):
-        return qualname(cls).replace(".", "_")
+    def to_varname(cls):
+        return (cls._get_attribute("task_id") or qualname(cls)).replace(".", "_")
 
     # TODO: to_cst
 
@@ -289,20 +289,16 @@ class DAGBuilder:
         ):
             up: AirFly = pair.up
             down: AirFly = pair.down
-            up_stmt: Assign = up.to_stmt()  # TODO: seems redundant
-            down_stmt: Assign = down.to_stmt()  # TODO: seems redundant
             body.append(
                 Expr(
                     value=BinOp(
                         left=Name(
-                            # TODO: use up._to_varname()
-                            id=up_stmt.targets[0],
+                            id=up.to_varname(),
                             ctx=Store(),
                         ),
                         op=RShift(),
                         right=Name(
-                            # TODO: use down._to_varname()
-                            id=down_stmt.targets[0],
+                            id=up.to_varname(),
                             ctx=Load(),
                         ),
                     )
