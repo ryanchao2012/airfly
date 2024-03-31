@@ -131,6 +131,7 @@ class AirFly(Task):
 
         params = dict(task_id=task_id)
 
+        # TODO: op_params could be property
         for k, v in (cls.op_params or {}).items():
             if k in avai_params:
                 params.update({k: v})
