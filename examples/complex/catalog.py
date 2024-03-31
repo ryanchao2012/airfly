@@ -22,8 +22,8 @@ def _print_catalog():
 
 # Search
 class search_catalog(AirFly):
-    operator_class = "PythonOperator"
-    params = dict(python_callable=_print_catalog)
+    op_class = "PythonOperator"
+    op_params = dict(python_callable=_print_catalog)
 
     upstream = (
         create_entry_gcs,
@@ -43,7 +43,7 @@ class search_catalog(AirFly):
 
 
 class search_catalog_result(AirFly):
-    operator_class = "BashOperator"
-    params = dict(bash_command="echo search_catalog_result")
+    op_class = "BashOperator"
+    op_params = dict(bash_command="echo search_catalog_result")
 
     upstream = search_catalog

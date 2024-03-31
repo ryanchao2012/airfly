@@ -37,36 +37,36 @@ def callable_virtualenv():
 
 
 class run_this(AirFly):
-    operator_class = "PythonOperator"
-    params = dict(python_callable=print_context)
+    op_class = "PythonOperator"
+    op_params = dict(python_callable=print_context)
 
 
 # TODO: how to dynamically create task class?
 class sleep_for_0(AirFly):
-    operator_class = "PythonOperator"
-    params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 0})
+    op_class = "PythonOperator"
+    op_params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 0})
     upstream = run_this
 
 
 class sleep_for_1(sleep_for_0):
-    params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 1})
+    op_params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 1})
 
 
 class sleep_for_2(sleep_for_0):
-    params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 2})
+    op_params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 2})
 
 
 class sleep_for_3(sleep_for_0):
-    params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 3})
+    op_params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 3})
 
 
 class sleep_for_4(sleep_for_0):
-    params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 4})
+    op_params = dict(python_callable=my_sleeping_function, op_kwargs={"random_base": 4})
 
 
 class virtualenv_task(AirFly):
-    operator_class = "PythonVirtualenvOperator"
-    params = dict(
+    op_class = "PythonVirtualenvOperator"
+    op_params = dict(
         python_callable=callable_virtualenv,
         requirements=["colorama==0.4.0"],
         system_site_packages=False,

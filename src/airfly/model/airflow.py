@@ -37,20 +37,22 @@ available_operators = collect_airflow_operators()
 class AirFly(Task):
     """
 
-    Attributes can be assigned as class variable or property:
+    Attribute can be assigned as class variable or property:
     - task_id:
-    - operator_class:
-    - operator_module:
+    - op_class:
+    - op_module:
+    - op_params:
     - upstream:
     - downstream:
-    - params:
     """
 
-    operator_class: Union[Type, str] = "EmptyOperator"
-    operator_module: Union[ModuleType, str] = (
-        None  # TODO: disambiguate operator as operator_class collision
+    __attributes = ["task_id", "op_class", "op_mudule", "op_params"]
+
+    op_class: Union[Type, str] = "EmptyOperator"
+    op_module: Union[ModuleType, str] = (
+        None  # TODO: disambiguate operator as op_class collision
     )
-    params: Dict[str, Union[FunctionType, str]] = None
+    op_params: Dict[str, Union[FunctionType, str]] = None
 
     @classmethod
     def _to_varname(cls):
@@ -76,7 +78,7 @@ class AirFly(Task):
     def _resolve_operator(cls) -> Optional[Type]:
         # TODO: unittest
 
-        op = cls._get_attribute("operator_class")
+        op = cls._get_attribute("op_class")
 
         if isinstance(op, str):
             basename = op
@@ -104,7 +106,7 @@ class AirFly(Task):
         deps = []
 
         if isinstance(obj, type(None)):
-            params = cls._get_attribute("params") or {}
+            params = cls._get_attribute("op_params") or {}
 
             deps.extend(cls._resolve_dependency_from_params(params))
 
@@ -173,7 +175,7 @@ class AirFly(Task):
 
         params = dict(task_id=task_id)
 
-        for k, v in (cls.params or {}).items():
+        for k, v in (cls.op_params or {}).items():
             if k in avai_params:
                 params.update({k: v})
 
