@@ -209,8 +209,26 @@ class TaskPair:
     up: TaskClass
     down: TaskClass
 
-    @classmethod
-    def _to_ast(cls): ...
+    def _to_ast(self) -> asttrs.AST:
+        """Returns an Abstract Syntax Tree (AST) representation of the TaskPair.
+
+        i.e., an AST to represent an expression: "up_task >> down_task"
+
+        This method generates an AST that represents the TaskPair as a binary operation expression. The left operand of the binary operation is the result of calling the '_to_varname' method on the 'up' task, and the right operand is the result of calling the '_to_varname' method on the 'down' task.
+
+        Returns:
+            asttrs.AST: The AST representation of the TaskPair.
+
+        """
+        from asttrs import BinOp, Expr, Load, Name, RShift, Store
+
+        return Expr(
+            value=BinOp(
+                left=Name(id=self.up._to_varname(), ctx=Store()),
+                op=RShift(),
+                right=Name(id=self.down._to_varname(), ctx=Load()),
+            )
+        )
 
 
 class TaskTree:
