@@ -22,7 +22,7 @@ class TaskAttribute:
     op_module: Optional[str] = None
     op_params: Dict[str, Any] = None
     upstream: Optional[Union[TaskClass, Tuple[TaskClass, ...]]] = None
-    downstream = Optional[Union[TaskClass, Tuple[TaskClass, ...]]] = None
+    downstream: Optional[Union[TaskClass, Tuple[TaskClass, ...]]] = None
 
 
 class Task(TaskAttribute):
