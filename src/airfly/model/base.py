@@ -1,10 +1,23 @@
+from functools import lru_cache
 from types import ModuleType
-from typing import Generator, List, Sequence, Set, Tuple, Type, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 import attr
 import networkx as nx
+import regex as re
 
-from airfly.utils import collect_objects
+from airfly.utils import collect_objects, qualname
 
 immutable = attr.s(auto_attribs=True, slots=True, frozen=True, kw_only=True)
 
@@ -12,10 +25,59 @@ immutable = attr.s(auto_attribs=True, slots=True, frozen=True, kw_only=True)
 TaskClass = Type["Task"]
 
 
-class Task:
+class TaskAttribute:
+    """
+
+    Attribute can be assigned as class variable or property:
+    - task_id:
+    - op_class:
+    - op_module:
+    - op_params:
+    - upstream:
+    - downstream:
+    """
+
     task_id: str = None  # NOTE: if not given, we will use qualname() to assign task_id
+    op_class: Union[Type, str] = "EmptyOperator"
+
+    # TODO: disambiguate operator as op_class collision
+    op_module: Union[ModuleType, str] = None
+    op_params: Dict[str, Any] = None
+
     upstream: Union[TaskClass, Tuple[TaskClass, ...]] = None
     downstream: Union[TaskClass, Tuple[TaskClass, ...]] = None
+
+
+class Task(TaskAttribute):
+
+    @property
+    def task_id(self):
+        return qualname(self.__class__)
+
+    @classmethod
+    def to_varname(cls):
+        return re.sub("\W|^(?=\d)", "_", cls.get_attributes().task_id)
+
+    @classmethod
+    @lru_cache()
+    def get_attributes(cls, **kwargs) -> TaskAttribute:
+
+        self = cls(**kwargs)
+
+        attrs = {}
+        for field in cls.__annotations__:
+            value = getattr(self, field, None) or getattr(cls, field, None)
+
+            if value is None:
+                # TODO: logging
+                ...
+
+            elif isinstance(value, Callable):
+                value = value(**kwargs)
+
+            attrs[field] = value
+
+        return immutable(TaskAttribute)(**attrs)
 
 
 @immutable
@@ -80,8 +142,8 @@ def collect_taskpairs(
     cached = set()
 
     for cls in taskset:
-        # TODO: if upstream is a property, try create task instance(cls()) to get them
-        ups = cls.upstream  # could be None, Task or Tuple[Task, ...]
+
+        ups = cls.get_attributes().upstream
 
         if isinstance(ups, type) and issubclass(ups, taskclass):
             ups = [ups]
@@ -96,8 +158,7 @@ def collect_taskpairs(
 
                 yield pair
 
-        # TODO: if downstream is a property, try create task instance(cls()) to get them
-        downs = cls.downstream  # could be None, Task or Tuple[Task, ...]
+        downs = cls.get_attributes().downstream
 
         if isinstance(downs, type) and issubclass(downs, taskclass):
             downs = [downs]
