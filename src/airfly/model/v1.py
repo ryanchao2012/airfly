@@ -1,6 +1,6 @@
 from functools import lru_cache
 from types import FunctionType, ModuleType
-from typing import Any, Dict, Generator, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, Generator, List, Optional, Set, Tuple, Type, Union
 
 import asttrs
 import attr
@@ -393,6 +393,14 @@ class TaskTree:
                     cached.add(pair)
 
                     yield pair
+
+    def to_dag(
+        self,
+        name: str,
+        includes: Union[str, List[str]] = None,
+        dag_params: Tuple[Optional[str], Optional[str]] = None,
+        formatted: bool = True,
+    ) -> str: ...
 
     def to_source(self, formatted: bool = True) -> str:
         """Generates the source code representation of the task tree.
