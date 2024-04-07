@@ -1,5 +1,8 @@
 from functools import lru_cache
-from typing import Any, Callable, Dict, Optional, Tuple, Type, Union
+from types import FunctionType
+from typing import Any, Dict, Optional, Tuple, Type, Union
+
+import asttrs
 
 from airfly._vendor import collect_airflow_operators
 from airfly.utils import immutable, qualname
@@ -81,7 +84,60 @@ class Task(TaskAttribute):
         return cls._get_taskid().replace(".", "_")
 
     @classmethod
-    def _to_ast(cls): ...
+    def _to_ast(cls) -> asttrs.AST:
+        """
+        Generate an Abstract Syntax Tree (AST) representation of the Task.
+
+        Returns:
+            asttrs.AST: The AST representation of the Task.
+
+        Notes:
+            - This method uses the `asttrs` module for creating the AST nodes.
+            - The AST represents the assignment of a Task instance to a variable.
+            - The Task instance is created by calling the resolved operator class with the appropriate parameters.
+            - The parameters are obtained from the Task's attributes and the operator's available parameters.
+            - The AST node is an assignment statement, where the target is the variable name and the value is the function call.
+
+        TODO:
+            - Add unit tests for this method.
+        """
+        from asttrs import Assign, Call, Constant, Load, Name, Store, keyword
+
+        op = cls._resolve_operator()
+        op_basename = qualname(op, level=1)
+
+        task_id = cls._get_taskid()
+        task_varname = cls._to_varname()
+
+        avai_params = {}
+        for base in op.mro()[::-1]:
+            avai_params.update(getattr(base, "__annotations__", {}))
+
+        params = dict(task_id=task_id)
+
+        for k, v in (cls._get_attributes().op_params or {}).items():
+            if k in avai_params:
+                params.update({k: v})
+
+        assign = Assign(
+            targets=[Name(id=task_varname, ctx=Store())],
+            value=Call(
+                func=Name(id=op_basename, ctx=Load()),
+                keywords=[
+                    keyword(
+                        arg=k,
+                        value=(
+                            Name(id=qualname(v, level=1), ctx=Load())
+                            if isinstance(v, FunctionType)
+                            else Constant(value=v)  # TODO: handle callable and lambda
+                        ),
+                    )
+                    for k, v in params.items()
+                ],
+            ),
+        )
+
+        return assign
 
     @classmethod
     def _resolve_operator(cls) -> Type:
