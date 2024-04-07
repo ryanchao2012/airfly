@@ -38,7 +38,13 @@ class Task(TaskAttribute):
     def _get_attributes(cls): ...
 
     @classmethod
-    def _to_varname(cls): ...
+    def _to_varname(cls) -> str:
+        """Represent the Task as a variable name
+        The variable name is derived from task_id,
+        if you change _get_taskid, you may need to change this method as well.
+        """
+
+        return cls._get_taskid().replace(".", "_")
 
     @classmethod
     def _to_ast(cls): ...
