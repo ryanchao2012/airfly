@@ -29,8 +29,8 @@ class Task(TaskAttribute):
     @classmethod
     def _get_taskid(cls) -> str:
         """Use qualified name as task_id
-        Provide customized logic by overriding this method.
-        However, please make sure the returned value is globally unique.
+        Provide customized logic by overriding this method, and perhaps `_to_varname` as well.
+        Please make sure the returned value is globally unique.
         """
         return qualname(cls)
 
