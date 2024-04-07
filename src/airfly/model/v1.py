@@ -5,9 +5,10 @@ from typing import Any, Dict, Generator, Optional, Set, Tuple, Type, Union
 import asttrs
 import attr
 import networkx as nx
+import regex as re
 
 from airfly._vendor import collect_airflow_operators
-from airfly.utils import collect_objects, immutable, qualname
+from airfly.utils import blacking, collect_objects, immutable, isorting, qualname
 
 TaskClass = Type["Task"]
 
@@ -392,9 +393,33 @@ class TaskTree:
 
                     yield pair
 
-    def to_source(self) -> str: ...
+    def to_source(self, formatted: bool = True) -> str:
+        """Generates the source code representation of the task tree.
 
-    def _to_ast(self): ...
+        This method generates the source code representation of the task tree by converting the abstract syntax tree (AST) of the task tree to source code. The AST is obtained by calling the `_to_ast` method. The source code is then passed through the `blacking` and `isorting` functions to format and sort the code, respectively.
+
+        Parameters:
+            formatted (bool, optional): Specifies whether the generated source code should be formatted. If `True`, the code will be formatted using the `blacking` and `isorting` functions. If `False`, the code will be returned as is. Defaults to `True`.
+
+        Returns:
+            str: The source code representation of the task tree.
+
+        Note:
+            - The `formatted` parameter determines whether the generated source code should be formatted. If `True`, the code will be formatted using the `blacking` and `isorting` functions. If `False`, the code will be returned as is.
+            - The `blacking` function is used to format the code by applying the `black` code formatter.
+            - The `isorting` function is used to sort the imports in the code by applying the `isort` import sorter.
+            - The `re.sub` function is used to remove any consecutive newline characters in the source code.
+
+        Example:
+            >>> task_tree = TaskTree(...)
+            >>> source_code = task_tree.to_source(formatted=True)
+        """
+
+        src = re.sub("\n+", "\n", self._to_ast().to_source())
+
+        return isorting(blacking(src)) if formatted else src
+
+    def _to_ast(self) -> asttrs.AST: ...
 
     def _build_header(self): ...
 
