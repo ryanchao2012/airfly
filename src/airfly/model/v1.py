@@ -1,5 +1,5 @@
 from functools import lru_cache
-from types import FunctionType
+from types import FunctionType, ModuleType
 from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import asttrs
@@ -241,15 +241,15 @@ class TaskTree:
         None
 
     Methods:
-        from_module(cls, modname: str) -> TaskTree: Creates a task tree from a module.
+        from_module(cls, module: ModuleType) -> TaskTree: Creates a task tree from a module.
         to_source(self) -> str: Generates source code from the task tree.
 
     Example:
-    >>> TaskTree.from_module(modname).to_source(formatted=True)
+    >>> TaskTree.from_module(mod).to_source(formatted=True)
     """
 
     @classmethod
-    def from_module(cls, modname: str): ...
+    def from_module(cls, module: ModuleType): ...
 
     @classmethod
     def _collect_taskset(cls): ...
