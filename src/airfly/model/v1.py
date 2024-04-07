@@ -3,6 +3,8 @@ from types import FunctionType, ModuleType
 from typing import Any, Dict, Generator, Optional, Set, Tuple, Type, Union
 
 import asttrs
+import attr
+import networkx as nx
 
 from airfly._vendor import collect_airflow_operators
 from airfly.utils import collect_objects, immutable, qualname
@@ -231,25 +233,72 @@ class TaskPair:
         )
 
 
+@immutable
 class TaskTree:
-    """
-    A class representing a task tree.
+    """A class representing a task tree.
 
-    The TaskTree class provides methods for creating a task tree from a module, collecting task sets and task pairs, and generating source code from the task tree.
+    The TaskTree class represents a task tree, which consists of a set of task classes and a set of task pairs. The task classes are collected from a module based on certain criteria, such as being a subclass of a base task class and satisfying a predicate function. The task pairs represent the dependencies between tasks.
 
     Attributes:
-        None
+        taskset (Set[TaskClass]): The set of task classes in the task tree.
+        taskpairs (Set[TaskPair]): The set of task pairs in the task tree.
 
     Methods:
-        from_module(cls, module: ModuleType) -> TaskTree: Creates a task tree from a module.
-        to_source(self) -> str: Generates source code from the task tree.
+        from_module(module: ModuleType) -> TaskTree:
+            Creates a task tree from a module.
+            This method takes a module as input and creates a task tree from it. The task tree consists of a set of task classes and a set of task pairs. The task classes are collected from the module based on certain criteria, such as being a subclass of a base task class and satisfying a predicate function. The task pairs are generated from the task classes, representing the dependency between tasks.
+
+        to_source() -> str:
+            Generates the source code representation of the task tree.
+            This method generates the source code representation of the task tree, including the import statements, class definition, and task pair expressions.
 
     Example:
-    >>> TaskTree.from_module(mod).to_source(formatted=True)
+    >>> TaskTree.from_module(module).to_source(formatted=True)
+
+    Note:
+        - The TaskTree class is immutable, meaning that its attributes cannot be modified after initialization.
+        - The taskset attribute is a set of task classes, where each task class represents a task in the task tree.
+        - The taskpairs attribute is a set of task pairs, where each task pair represents a dependency between two tasks in the task tree.
+        - The _dag attribute is a directed graph (DiGraph) object from the NetworkX library, which represents the task tree as a directed acyclic graph (DAG).
+        - The from_module method is a class method that creates a task tree from a module.
+        - The to_source method generates the source code representation of the task tree, which can be used to create a Python script or module.
     """
 
+    taskset: Set[TaskClass]
+    taskpairs: Set[TaskPair]
+
+    _dag: nx.DiGraph = attr.ib(init=False)
+
+    @_dag.default
+    def _create_dag(self):
+        dag = nx.DiGraph()
+        dag.add_nodes_from(self.taskset)
+        dag.add_edges_from((pair.up, pair.down) for pair in self.taskpairs)
+
+        return dag
+
     @classmethod
-    def from_module(cls, module: ModuleType): ...
+    def from_module(cls, module: ModuleType) -> "TaskTree":
+        """
+        Creates a task tree from a module.
+
+        This method takes a module as input and creates a task tree from it. The task tree consists of a set of task classes and a set of task pairs. The task classes are collected from the module based on certain criteria, such as being a subclass of a base task class and satisfying a predicate function. The task pairs are generated from the task classes, representing the dependency between tasks.
+
+        Parameters:
+            module (ModuleType): The module from which to create the task tree.
+
+        Returns:
+            TaskTree: The task tree created from the module.
+
+        Example:
+            >>> module = ...
+            >>> task_tree = TaskTree.from_module(module)
+        """
+
+        taskset = set(cls._collect_taskclass(module))
+        taskpairs = set(cls._collect_taskpairs(taskset))
+
+        return cls(taskset=taskset, taskpairs=taskpairs)
 
     @classmethod
     def _collect_taskclass(
