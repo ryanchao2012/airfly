@@ -1,4 +1,5 @@
-from typing import Any, Dict, Optional, Tuple, Type, Union
+from functools import lru_cache
+from typing import Any, Callable, Dict, Optional, Tuple, Type, Union
 
 from airfly.utils import immutable, qualname
 
@@ -35,7 +36,36 @@ class Task(TaskAttribute):
         return qualname(cls)
 
     @classmethod
-    def _get_attributes(cls): ...
+    @lru_cache()
+    def _get_attributes(cls) -> TaskAttribute:
+        """Get and cache all the task's attributes.
+
+        The expected attribute is defined in `TaskAttribute`,
+        each attribute can be assign as a class variable or a @property,
+        property precedes class variable if both are defined.
+
+        In order to get the attribute from property, this method creates the task instance based on the Task class, make sure no positional arguments are required to create the task instance.
+
+        """
+
+        self: Task = None
+        try:
+            # Assume no arguments are required for creating the task instance.
+            self = cls()
+        except Exception:
+            # TODO: logging warning
+            pass
+
+        attrs = {}
+        for field in cls.__annotations__:
+            value = getattr(self, field, None) or getattr(cls, field, None)
+
+            if field == "op_class" and value is None:
+                raise ValueError("op_class cannot be None")
+
+            attrs[field] = value
+
+        return immutable(TaskAttribute)(**attrs)
 
     @classmethod
     def _to_varname(cls) -> str:
