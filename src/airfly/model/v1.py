@@ -1,11 +1,11 @@
 from functools import lru_cache
 from types import FunctionType, ModuleType
-from typing import Any, Dict, Optional, Tuple, Type, Union
+from typing import Any, Dict, Generator, Optional, Tuple, Type, Union
 
 import asttrs
 
 from airfly._vendor import collect_airflow_operators
-from airfly.utils import immutable, qualname
+from airfly.utils import collect_objects, immutable, qualname
 
 TaskClass = Type["Task"]
 
@@ -252,7 +252,35 @@ class TaskTree:
     def from_module(cls, module: ModuleType): ...
 
     @classmethod
-    def _collect_taskset(cls): ...
+    def _collect_taskclass(
+        cls, module: ModuleType, taskclass: TaskClass = Task, predicate=lambda _: True
+    ) -> Generator[TaskClass, None, None]:
+        """
+        Collects task classes from a module.
+
+        This method collects task classes from a given module based on the provided criteria. It returns a generator that yields the task classes.
+
+        Parameters:
+            module (ModuleType): The module from which to collect the task classes.
+            taskclass (Type["Task"], optional): The base task class to filter the task classes. Defaults to Task.
+            predicate (Callable[[Union[FunctionType, type]], bool], optional): A predicate function to further filter the task classes. Defaults to lambda _: True.
+
+        Yields:
+            TaskClass: The task classes that satisfy the filtering criteria.
+
+        Example:
+            >>> module = ...
+            >>> task_classes = list(TaskTree._collect_taskclass(module))
+        """
+        for cls in collect_objects(
+            module,
+            predicate=lambda obj: isinstance(obj, type)
+            and issubclass(obj, taskclass)
+            and predicate(obj),
+        ):
+
+            yield cls
+
     @classmethod
     def _collect_taskpairs(cls): ...
 
