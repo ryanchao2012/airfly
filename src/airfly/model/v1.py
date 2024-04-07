@@ -1,6 +1,6 @@
 from functools import lru_cache
 from types import FunctionType, ModuleType
-from typing import Any, Dict, Generator, Optional, Tuple, Type, Union
+from typing import Any, Dict, Generator, Optional, Set, Tuple, Type, Union
 
 import asttrs
 
@@ -282,7 +282,66 @@ class TaskTree:
             yield cls
 
     @classmethod
-    def _collect_taskpairs(cls): ...
+    def _collect_taskpairs(
+        cls,
+        taskset: Set[TaskClass],
+        taskclass: TaskClass = Task,
+        predicate=lambda _: True,
+    ) -> Generator[TaskPair, None, None]:
+        """
+        Collects task pairs from a given task set.
+
+        This method takes a set of task classes and collects all possible pairs of tasks based on the provided criteria. It returns a generator that yields the task pairs.
+
+        Parameters:
+            taskset (Set[TaskClass]): The set of task classes from which to collect the task pairs.
+            taskclass (TaskClass): The base task class to filter the task pairs. Defaults to Task.
+            predicate (Callable[[TaskPair], bool], optional): A predicate function to further filter the task pairs. Defaults to lambda _: True.
+
+        Yields:
+            TaskPair: The task pairs that satisfy the filtering criteria.
+
+        Example:
+            >>> taskset = {Task1, Task2, Task3}
+            >>> task_pairs = list(TaskTree._collect_taskpairs(taskset))
+        """
+
+        cached = set()
+
+        for cls in taskset:
+            ups = (
+                cls._get_attributes().upstream
+            )  # could be None, Task or Tuple[Task, ...]
+
+            if isinstance(ups, type) and issubclass(ups, taskclass):
+                ups = [ups]
+
+            for u in ups or []:
+
+                pair = TaskPair(up=u, down=cls)
+
+                if (pair not in cached) and predicate(pair):
+
+                    cached.add(pair)
+
+                    yield pair
+
+            downs = (
+                cls._get_attributes().downstream
+            )  # could be None, Task or Tuple[Task, ...]
+
+            if isinstance(downs, type) and issubclass(downs, taskclass):
+                downs = [downs]
+
+            for d in downs or []:
+
+                pair = TaskPair(up=cls, down=d)
+
+                if pair not in cached and predicate(pair):
+
+                    cached.add(pair)
+
+                    yield pair
 
     def to_source(self) -> str: ...
 
