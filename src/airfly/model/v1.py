@@ -27,7 +27,12 @@ class TaskAttribute:
 class Task(TaskAttribute):
 
     @classmethod
-    def _get_taskid(cls): ...
+    def _get_taskid(cls) -> str:
+        """Use qualified name as task_id
+        Provide customized logic by overriding this method.
+        However, please make sure the returned value is globally unique.
+        """
+        return qualname(cls)
 
     @classmethod
     def _get_attributes(cls): ...
