@@ -1,9 +1,13 @@
 from functools import lru_cache
 from typing import Any, Callable, Dict, Optional, Tuple, Type, Union
 
+from airfly._vendor import collect_airflow_operators
 from airfly.utils import immutable, qualname
 
 TaskClass = Type["Task"]
+
+
+AVAILABLE_OPERATORS = collect_airflow_operators()
 
 
 class TaskAttribute:
@@ -80,7 +84,56 @@ class Task(TaskAttribute):
     def _to_ast(cls): ...
 
     @classmethod
-    def _resolve_operator(cls) -> Type: ...
+    def _resolve_operator(cls) -> Type:
+        """Resolve the operator class for the Task.
+
+        Returns:
+            Type: The resolved operator class.
+
+        Raises:
+            ValueError: If the op_class is invalid or not found in the AVAILABLE_OPERATORS.
+            ValueError: If multiple op_class with the same basename are found and op_module is not provided or invalid.
+            ValueError: If the op_class candidates cannot be resolved by the given op_module.
+
+        TODO:
+            - Add unit tests for this method.
+        """
+        # TODO: unittest
+
+        op_class = cls._get_attributes().op_class
+
+        if isinstance(op_class, str):
+            basename = op_class
+
+        elif isinstance(op_class, type):
+            basename = qualname(op_class, level=1)
+
+        else:
+            raise ValueError(f"Invalid op_class, got: {op_class}")
+
+        if basename not in AVAILABLE_OPERATORS:
+            raise ValueError(
+                f"'{basename}' not found. If this is unexpected and the operator should exist, please report the issue."
+            )
+        items = AVAILABLE_OPERATORS[basename]
+
+        if len(items) > 1:
+            # Disambiguate by op_module
+            op_module = cls._get_attributes().op_module
+            if not (op_module and isinstance(op_module, str)):
+                raise ValueError(
+                    f"Multiple op_class('{basename}') found: {items}, but op_module is invalid for resolving the operator, got: {op_module}"
+                )
+
+            for op in items:
+                if op_module in qualname(op):
+                    return op
+
+            raise ValueError(
+                f"Cannot resolve the possible op_class('{items}') by given op_module, got: {op_module}"
+            )
+
+        return items[0]
 
 
 AirFly: Type = Task
