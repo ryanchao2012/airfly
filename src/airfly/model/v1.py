@@ -1,4 +1,5 @@
 import inspect
+import os
 from functools import lru_cache
 from types import FunctionType, ModuleType
 from typing import Any, Dict, Generator, List, Optional, Set, Tuple, Type, Union
@@ -515,3 +516,18 @@ class TaskTree:
     def _build_includes(self): ...
 
     def _build_dag_context(self): ...
+
+    def _build_dag_body(self) -> List[asttrs.stmt]:
+        body = []
+
+        for cls in sorted(self.taskset, key=lambda el: qualname(el)):
+            body.append(Task._to_ast(cls))
+
+        for pair in sorted(
+            self.taskpairs,
+            key=lambda el: f"{qualname(el.up)}{qualname(el.down)}",
+        ):
+
+            body.append(pair._to_ast())
+
+        return body if body else [asttrs.Pass()]
