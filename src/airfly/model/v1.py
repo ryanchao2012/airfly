@@ -107,6 +107,14 @@ class Task(TaskAttribute):
         Provide customized logic by overriding this method, and perhaps `_to_varname` as well.
         Please make sure the returned value is globally unique.
         """
+
+        if (
+            hasattr(cls, "_get_taskid")
+            and
+            # Assume classmethod
+            inspect.ismethod(getattr(cls, "_get_taskid"))
+        ):
+            return cls._get_taskid()
         return qualname(cls)
 
     @staticmethod
@@ -147,6 +155,14 @@ class Task(TaskAttribute):
         The variable name is derived from task_id,
         if you change _get_taskid, you may need to change this method as well.
         """
+
+        if (
+            hasattr(cls, "_to_varname")
+            and
+            # Assume classmethod
+            inspect.ismethod(getattr(cls, "_to_varname"))
+        ):
+            return cls._to_varname()
 
         return Task._get_taskid(cls).replace(".", "_")
 
