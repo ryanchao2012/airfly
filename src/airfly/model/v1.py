@@ -26,8 +26,10 @@ AVAILABLE_OPERATORS = collect_airflow_operators()
 
 class Literal:
 
-    def __init__(self, expr: str):
+    def __init__(self, expr: str, refs: List[Any] = None, aliases: List[str] = None):
         self.expr = expr
+        self.refs = refs if isinstance(refs, List) else [refs]
+        self.aliases = aliases if isinstance(aliases, List) else [aliases]
 
     def __repr__(self):
         return self.expr
