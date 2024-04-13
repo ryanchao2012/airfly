@@ -1,3 +1,4 @@
+import inspect
 from functools import lru_cache
 from types import FunctionType, ModuleType
 from typing import Any, Dict, Generator, List, Optional, Set, Tuple, Type, Union
@@ -33,6 +34,50 @@ class Literal:
 
     def __repr__(self):
         return self.expr
+
+
+@immutable
+class Param:
+    key: str
+    value: Any
+
+    def _to_ast(self):
+        return asttrs.keyword(arg=self.key, value=self._value_ast(self.value))
+
+    @classmethod
+    def _value_ast(cls, value):
+
+        if isinstance(
+            value, (type(None), bool, str, int, float, Literal)
+        ):  # early return
+            asttrs.Constant(value=value)
+
+        if isinstance(value, List):
+            return asttrs.List(
+                elts=[cls._value_ast(el) for el in value], ctx=asttrs.Load()
+            )
+
+        if isinstance(value, Tuple):
+            return asttrs.Tuple(
+                elts=[cls._value_ast(el) for el in value], ctx=asttrs.Load()
+            )
+
+        if isinstance(value, Set):
+            return asttrs.Set(elts=[cls._value_ast(el) for el in value])
+
+        if isinstance(value, Dict):  # assume Dict[str, Any]
+            return asttrs.Dict(
+                keys=list(value.keys()),
+                values=[cls._value_ast(v) for v in value.values()],
+            )
+
+        if isinstance(value, (FunctionType, type)):
+            if value.__name__ == "<lambda>":
+                return cls._value_ast(Literal(inspect.getsource(value)))
+
+            return asttrs.Name(id=qualname(value, level=1), ctx=asttrs.Load())
+
+        return asttrs.Constant(value=value)
 
 
 class TaskAttribute:
@@ -139,24 +184,15 @@ class Task(TaskAttribute):
         for k, v in (Task._get_attributes(cls).op_params or {}).items():
             if k in avai_params:
                 params.update({k: v})
+            else:
+                # TODO: logging
+                ...
 
         assign = asttrs.Assign(
             targets=[asttrs.Name(id=task_varname, ctx=asttrs.Store())],
             value=asttrs.Call(
                 func=asttrs.Name(id=op_basename, ctx=asttrs.Load()),
-                keywords=[
-                    asttrs.keyword(
-                        arg=k,
-                        value=(
-                            asttrs.Name(id=qualname(v, level=1), ctx=asttrs.Load())
-                            if isinstance(v, FunctionType)
-                            else asttrs.Constant(
-                                value=v
-                            )  # TODO: handle callable and lambda
-                        ),
-                    )
-                    for k, v in params.items()
-                ],
+                keywords=[Param(key=k, value=v)._to_ast() for k, v in params.items()],
             ),
         )
 
