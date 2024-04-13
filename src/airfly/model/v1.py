@@ -38,7 +38,7 @@ class TaskAttribute:
 
 class Task(TaskAttribute):
 
-    @classmethod
+    @staticmethod
     def _get_taskid(cls) -> str:
         """Use qualified name as task_id
         Provide customized logic by overriding this method, and perhaps `_to_varname` as well.
@@ -46,7 +46,7 @@ class Task(TaskAttribute):
         """
         return qualname(cls)
 
-    @classmethod
+    @staticmethod
     @lru_cache()
     def _get_attributes(cls) -> TaskAttribute:
         """Get and cache all the task's attributes.
@@ -78,16 +78,16 @@ class Task(TaskAttribute):
 
         return immutable(TaskAttribute)(**attrs)
 
-    @classmethod
+    @staticmethod
     def _to_varname(cls) -> str:
         """Represent the Task as a variable name
         The variable name is derived from task_id,
         if you change _get_taskid, you may need to change this method as well.
         """
 
-        return cls._get_taskid().replace(".", "_")
+        return Task._get_taskid(cls).replace(".", "_")
 
-    @classmethod
+    @staticmethod
     def _to_ast(cls) -> asttrs.AST:
         """
         Generate an Abstract Syntax Tree (AST) representation of the Task.
@@ -106,11 +106,11 @@ class Task(TaskAttribute):
             - Add unit tests for this method.
         """
 
-        op = cls._resolve_operator()
+        op = Task._resolve_operator(cls)
         op_basename = qualname(op, level=1)
 
-        task_id = cls._get_taskid()
-        task_varname = cls._to_varname()
+        task_id = Task._get_taskid(cls)
+        task_varname = Task._to_varname(cls)
 
         avai_params = {}
         for base in op.mro()[::-1]:
@@ -118,7 +118,7 @@ class Task(TaskAttribute):
 
         params = dict(task_id=task_id)
 
-        for k, v in (cls._get_attributes().op_params or {}).items():
+        for k, v in (Task._get_attributes(cls).op_params or {}).items():
             if k in avai_params:
                 params.update({k: v})
 
@@ -144,7 +144,7 @@ class Task(TaskAttribute):
 
         return assign
 
-    @classmethod
+    @staticmethod
     def _resolve_operator(cls) -> Type:
         """Resolve the operator class for the Task.
 
@@ -161,7 +161,7 @@ class Task(TaskAttribute):
         """
         # TODO: unittest
 
-        op_class = cls._get_attributes().op_class
+        op_class = Task._get_attributes(cls).op_class
 
         if isinstance(op_class, str):
             basename = op_class
@@ -180,19 +180,21 @@ class Task(TaskAttribute):
 
         if len(items) > 1:
             # Disambiguate by op_module
-            op_module = cls._get_attributes().op_module
+            op_module = Task._get_attributes(cls).op_module
             if not (op_module and isinstance(op_module, str)):
                 raise ValueError(
                     f"Multiple op_class('{basename}') found: {items}, but op_module is invalid for resolving the operator, got: {op_module}"
                 )
 
-            for op in items:
-                if op_module in qualname(op):
-                    return op
+            cands = [op for op in items if op_module in qualname(op)]
 
-            raise ValueError(
-                f"Cannot resolve the possible op_class('{items}') by given op_module, got: {op_module}"
-            )
+            if len(cands) != 1:
+
+                raise ValueError(
+                    f"Cannot resolve the possible op_class('{basename}') by given op_module('{op_module}'), multiple or no candidates found: {cands}"
+                )
+
+            items = cands
 
         return items[0]
 
@@ -228,9 +230,9 @@ class TaskPair:
 
         return asttrs.Expr(
             value=asttrs.BinOp(
-                left=asttrs.Name(id=self.up._to_varname(), ctx=asttrs.Store()),
+                left=asttrs.Name(id=Task._to_varname(self.up), ctx=asttrs.Store()),
                 op=asttrs.RShift(),
-                right=asttrs.Name(id=self.down._to_varname(), ctx=asttrs.Load()),
+                right=asttrs.Name(id=Task._to_varname(self.down), ctx=asttrs.Load()),
             )
         )
 
@@ -360,9 +362,9 @@ class TaskTree:
         cached = set()
 
         for cls in taskset:
-            ups = (
-                cls._get_attributes().upstream
-            )  # could be None, Task or Tuple[Task, ...]
+            ups = Task._get_attributes(
+                cls
+            ).upstream  # could be None, Task or Tuple[Task, ...]
 
             if isinstance(ups, type) and issubclass(ups, taskclass):
                 ups = [ups]
@@ -377,9 +379,9 @@ class TaskTree:
 
                     yield pair
 
-            downs = (
-                cls._get_attributes().downstream
-            )  # could be None, Task or Tuple[Task, ...]
+            downs = Task._get_attributes(
+                cls
+            ).downstream  # could be None, Task or Tuple[Task, ...]
 
             if isinstance(downs, type) and issubclass(downs, taskclass):
                 downs = [downs]
