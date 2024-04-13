@@ -17,6 +17,15 @@ TaskClass = Type["Task"]
 AVAILABLE_OPERATORS = collect_airflow_operators()
 
 
+class Literal:
+
+    def __init__(self, expr: str):
+        self.expr = expr
+
+    def __repr__(self):
+        return self.expr
+
+
 class TaskAttribute:
     """
     Class representing a task attribute.
