@@ -68,7 +68,7 @@ class Task(TaskAttribute):
             pass
 
         attrs = {}
-        for field in cls.__annotations__:
+        for field in TaskAttribute.__annotations__:
             value = getattr(self, field, None) or getattr(cls, field, None)
 
             if field == "op_class" and value is None:
