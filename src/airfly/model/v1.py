@@ -515,7 +515,36 @@ class TaskTree:
 
     def _build_includes(self): ...
 
-    def _build_dag_context(self): ...
+    def _build_dag_context(
+        self, dag_name: str, dag_params: Tuple[str, str] = None
+    ) -> List[asttrs.stmt]:
+
+        if dag_params:
+            _, param_var = dag_params
+            keywords = [
+                asttrs.keyword(
+                    arg=None,
+                    value=asttrs.Name(id=param_var, ctx=asttrs.Load()),
+                )
+            ]
+        else:
+            keywords = []
+
+        return [
+            asttrs.With(
+                items=[
+                    asttrs.withitem(
+                        context_expr=asttrs.Call(
+                            func=asttrs.Name(id="DAG", ctx=asttrs.Load()),
+                            args=[asttrs.Constant(value=dag_name)],
+                            keywords=keywords,
+                        ),
+                        optional_vars=asttrs.Name(id="dag", ctx=asttrs.Store()),
+                    )
+                ],
+                body=self._build_dag_body(),
+            )
+        ]
 
     def _build_dag_body(self) -> List[asttrs.stmt]:
         body = []
