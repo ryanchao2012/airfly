@@ -43,6 +43,19 @@ def qualname(obj: Union[FunctionType, ModuleType, type], level: int = -1) -> str
     return ".".join(name.split(".")[-level:]) if level > 0 else name
 
 
+def issubclass_by_qualname(cls, class_or_tuple):
+    mro = {qualname(o) for o in cls.mro()}
+
+    if isinstance(class_or_tuple, type):
+        class_or_tuple = (class_or_tuple,)
+
+    for o in class_or_tuple:
+        if qualname(o) in mro:
+            return True
+
+    return False
+
+
 def blacking(source_code: str):
 
     with tempfile.NamedTemporaryFile("w", delete=False) as f:
