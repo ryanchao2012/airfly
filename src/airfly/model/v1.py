@@ -9,7 +9,14 @@ import regex as re
 
 import airfly
 from airfly._vendor import collect_airflow_operators
-from airfly.utils import blacking, collect_objects, immutable, isorting, qualname
+from airfly.utils import (
+    blacking,
+    collect_objects,
+    immutable,
+    isorting,
+    issubclass_by_qualname,
+    qualname,
+)
 
 TaskClass = Type["Task"]
 
@@ -291,7 +298,7 @@ class TaskTree:
         return dag
 
     @classmethod
-    def from_module(cls, module: ModuleType) -> "TaskTree":
+    def from_module(cls, module: ModuleType, taskclass: type = AirFly) -> "TaskTree":
         """
         Creates a task tree from a module.
 
@@ -306,10 +313,12 @@ class TaskTree:
         Example:
             >>> module = ...
             >>> task_tree = TaskTree.from_module(module)
+
+        TODO: add predicate in argument
         """
 
-        taskset = set(cls._collect_taskclass(module))
-        taskpairs = set(cls._collect_taskpairs(taskset))
+        taskset = set(cls._collect_taskclass(module, taskclass))
+        taskpairs = set(cls._collect_taskpairs(taskset, taskclass))
 
         return cls(taskset=taskset, taskpairs=taskpairs)
 
@@ -337,7 +346,7 @@ class TaskTree:
         for cls in collect_objects(
             module,
             predicate=lambda obj: isinstance(obj, type)
-            and issubclass(obj, taskclass)
+            and issubclass_by_qualname(obj, taskclass)
             and predicate(obj),
         ):
 
@@ -375,7 +384,7 @@ class TaskTree:
                 cls
             ).upstream  # could be None, Task or Tuple[Task, ...]
 
-            if isinstance(ups, type) and issubclass(ups, taskclass):
+            if isinstance(ups, type) and issubclass_by_qualname(ups, taskclass):
                 ups = [ups]
 
             for u in ups or []:
@@ -392,7 +401,7 @@ class TaskTree:
                 cls
             ).downstream  # could be None, Task or Tuple[Task, ...]
 
-            if isinstance(downs, type) and issubclass(downs, taskclass):
+            if isinstance(downs, type) and issubclass_by_qualname(downs, taskclass):
                 downs = [downs]
 
             for d in downs or []:
