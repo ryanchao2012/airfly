@@ -74,7 +74,9 @@ class Param:
 
         if isinstance(value, (FunctionType, type)):
             if value.__name__ == "<lambda>":
-                return cls._value_ast(Literal(inspect.getsource(value)))
+                raise NotImplementedError(
+                    "not support lambda, please use regular function"
+                )
 
             return asttrs.Name(id=qualname(value, level=1), ctx=asttrs.Load())
 
