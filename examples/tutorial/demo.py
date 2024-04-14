@@ -8,8 +8,8 @@ from airfly.model import AirFly
 
 
 class print_date(AirFly):
-    operator_class = "BashOperator"
-    params = dict(bash_command="date")
+    op_class = "BashOperator"
+    op_params = dict(bash_command="date")
 
 
 templated_command = dedent(
@@ -24,8 +24,8 @@ templated_command = dedent(
 
 
 class templated(AirFly):
-    operator_class = "BashOperator"
-    params = dict(
+    op_class = "BashOperator"
+    op_params = dict(
         depends_on_past=False,
         bash_command=templated_command,
         params={"my_param": "Parameter I passed in"},
@@ -33,8 +33,8 @@ class templated(AirFly):
 
 
 class sleep(AirFly):
-    operator_class = "BashOperator"
-    params = dict(depends_on_past=False, bash_command="sleep 5", retries=3)
+    op_class = "BashOperator"
+    op_params = dict(depends_on_past=False, bash_command="sleep 5", retries=3)
 
     upstream = print_date
     downstream = (templated,)
