@@ -90,12 +90,12 @@ class ParamDep:
 
         if isinstance(value, Dict):  # assume Dict[str, Any]
             return asttrs.Dict(
-                keys=list(value.keys()),
+                keys=[asttrs.Constant(value=k) for k in value.keys()],
                 values=[
                     (param_ctx.get(el) if param_ctx else ParamDep(el))._target_ast(
                         param_ctx
                     )
-                    for el in value
+                    for el in value.values()
                 ],
             )
 
@@ -115,24 +115,20 @@ class ParamDep:
         value = self.target
 
         if isinstance(value, (List, Tuple, Set)):
-            body.extend(
-                [
+            for el in value:
+                body.extend(
                     (param_ctx.get(el) if param_ctx else ParamDep(el))._import_ast(
                         param_ctx
                     )
-                    for el in value
-                ]
-            )
+                )
 
         elif isinstance(value, Dict):  # assume Dict[str, Any]
-            body.extend(
-                [
+            for v in value.values():
+                body.extend(
                     (param_ctx.get(v) if param_ctx else ParamDep(v))._import_ast(
                         param_ctx
                     )
-                    for v in value.values()
-                ]
-            )
+                )
 
         elif isinstance(value, (MethodType, FunctionType, type)):
             if value.__name__ == "<lambda>":
@@ -276,6 +272,30 @@ class Task(TaskAttribute):
             return cls._to_varname()
 
         return Task._get_taskid(cls).replace(".", "_")
+
+    @staticmethod
+    def _collect_dep_ast(cls, param_ctx: ParamContext = None) -> List[asttrs.stmt]:
+        """Collect all stmts for all dependencies"""
+
+        # param_deps = cls._resolve_dependency_from_params()
+        vendor_op = Task._resolve_operator(cls)
+
+        op_modname, op_basename = qualname(vendor_op).rsplit(".", 1)
+        op_modname = op_modname.replace("airfly._vendor.", "")
+
+        deps = [
+            asttrs.ImportFrom(module=op_modname, names=[asttrs.alias(name=op_basename)])
+        ]
+
+        params = Task._get_attributes(cls).op_params
+
+        deps.extend(
+            (param_ctx.get(params) if param_ctx else ParamDep(params))._import_ast(
+                param_ctx
+            )
+        )
+
+        return deps
 
     @staticmethod
     def _to_ast(cls, param_ctx: ParamContext = None) -> asttrs.AST:
@@ -593,11 +613,9 @@ class TaskTree:
         self,
         name: str,
         includes: Union[str, List[str]] = None,
-        dag_params: Tuple[Optional[str], Optional[str]] = None,
+        dag_params: Tuple[str, str] = None,
         formatted: bool = True,
-    ) -> str: ...
-
-    def to_source(self, formatted: bool = True) -> str:
+    ) -> str:
         """Generates the source code representation of the task tree.
 
         This method generates the source code representation of the task tree by converting the abstract syntax tree (AST) of the task tree to source code. The AST is obtained by calling the `_to_ast` method. The source code is then passed through the `blacking` and `isorting` functions to format and sort the code, respectively.
@@ -619,11 +637,28 @@ class TaskTree:
             >>> source_code = task_tree.to_source(formatted=True)
         """
 
-        src = re.sub("\n+", "\n", self._to_ast().to_source())
+        src = re.sub("\n+", "\n", self._to_ast(name, dag_params, includes).to_source())
 
         return isorting(blacking(src)) if formatted else src
 
-    def _to_ast(self) -> asttrs.AST: ...
+    def _to_ast(
+        self,
+        dag_name,
+        dag_params,
+        includes,
+    ) -> asttrs.AST:
+
+        ctx = ParamContext()
+        body = (
+            self._build_header()
+            + self._build_imports(ctx)
+            + self._build_includes(includes)
+            + self._build_dag_context(
+                dag_name=dag_name, dag_params=dag_params, param_ctx=ctx
+            )
+        )
+
+        return asttrs.Module(body=body)
 
     def _build_header(self) -> List[asttrs.stmt]:
 
@@ -633,8 +668,18 @@ class TaskTree:
             )
         ]
 
-    def _build_imports(self) -> List[asttrs.stmt]:
-        return []
+    def _build_imports(self, param_ctx: ParamContext = None) -> List[asttrs.stmt]:
+
+        imports = [
+            asttrs.ImportFrom(module="airflow.models", names=[asttrs.alias(name="DAG")])
+        ]
+
+        for cls in self.taskset:
+            for st in Task._collect_dep_ast(cls, param_ctx):
+                if st not in imports:
+                    imports.append(st)
+
+        return imports
 
     def _build_includes(
         self, includes: Union[str, List[str]] = None
@@ -660,6 +705,8 @@ class TaskTree:
                 + [asttrs.Comment(body="<" * 10 + " End of code insertion")]
             )
 
+            return body
+
         return []
 
     def _insert_from_pyfile(self, path: str) -> List[asttrs.stmt]:
@@ -681,7 +728,7 @@ class TaskTree:
         return []
 
     def _build_dag_context(
-        self, dag_name: str, dag_params: Tuple[str, str] = None
+        self, dag_name: str, dag_params: Tuple[str, str] = None, param_ctx=None
     ) -> List[asttrs.stmt]:
 
         if dag_params:
@@ -707,15 +754,15 @@ class TaskTree:
                         optional_vars=asttrs.Name(id="dag", ctx=asttrs.Store()),
                     )
                 ],
-                body=self._build_dag_body(),
+                body=self._build_dag_body(param_ctx=param_ctx),
             )
         ]
 
-    def _build_dag_body(self) -> List[asttrs.stmt]:
+    def _build_dag_body(self, param_ctx=None) -> List[asttrs.stmt]:
         body = []
 
         for cls in sorted(self.taskset, key=lambda el: qualname(el)):
-            body.append(Task._to_ast(cls))
+            body.append(Task._to_ast(cls, param_ctx))
 
         for pair in sorted(
             self.taskpairs,
