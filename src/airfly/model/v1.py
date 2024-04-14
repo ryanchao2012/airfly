@@ -636,7 +636,48 @@ class TaskTree:
     def _build_imports(self) -> List[asttrs.stmt]:
         return []
 
-    def _build_includes(self) -> List[asttrs.stmt]:
+    def _build_includes(
+        self, includes: Union[str, List[str]] = None
+    ) -> List[asttrs.stmt]:
+        if includes:
+            if isinstance(includes, str):
+                includes = [includes]
+
+            imports = []
+            statements = []
+
+            for path in includes:
+                for st in self._insert_from_pyfile(path):
+                    if isinstance(st, (asttrs.Import, asttrs.ImportFrom)):
+                        if st not in imports:
+                            imports.append(st)
+                    else:
+                        statements.append(st)
+
+            body = (
+                imports
+                + statements
+                + [asttrs.Comment(body="<" * 10 + " End of code insertion")]
+            )
+
+        return []
+
+    def _insert_from_pyfile(self, path: str) -> List[asttrs.stmt]:
+
+        try:
+
+            if os.path.isfile(path):
+                mod: asttrs.Module = asttrs.AST.from_file(path)
+                mod.body.insert(
+                    0, asttrs.Comment(body=">" * 10 + f" Include from '{path}'")
+                )
+
+                return mod.body
+
+        except Exception:
+            # TODO: logging?
+            pass
+
         return []
 
     def _build_dag_context(
