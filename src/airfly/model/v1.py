@@ -1,7 +1,7 @@
 import inspect
 import os
 from functools import lru_cache
-from types import FunctionType, ModuleType
+from types import FunctionType, MethodType, ModuleType
 from typing import Any, Dict, Generator, List, Optional, Set, Tuple, Type, Union
 
 import asttrs
@@ -37,50 +37,158 @@ class Literal:
         return self.expr
 
 
-@immutable
-class Param:
-    key: str
-    value: Any
+class ParamDep:
+    def __init__(
+        self, target: Union[FunctionType, MethodType, Type], alias: str = None
+    ):
+        self.target = target
+        self.alias = alias or (
+            target.__qualname__.split(".")[0]
+            if hasattr(target, "__qualname__")
+            else None
+        )
+        self.conflicts = 0
 
-    def _to_ast(self):
-        return asttrs.keyword(arg=self.key, value=self._value_ast(self.value))
-
-    @classmethod
-    def _value_ast(cls, value):
-
+    def _target_ast(self, param_ctx: "ParamContext" = None) -> asttrs.stmt:
+        value = self.target
         if isinstance(
             value, (type(None), bool, str, int, float, Literal)
         ):  # early return
-            asttrs.Constant(value=value)
+            return asttrs.Constant(value=value)
 
         if isinstance(value, List):
             return asttrs.List(
-                elts=[cls._value_ast(el) for el in value], ctx=asttrs.Load()
+                elts=[
+                    (param_ctx.get(el) if param_ctx else ParamDep(el))._target_ast(
+                        param_ctx
+                    )
+                    for el in value
+                ],
+                ctx=asttrs.Load(),
             )
 
         if isinstance(value, Tuple):
             return asttrs.Tuple(
-                elts=[cls._value_ast(el) for el in value], ctx=asttrs.Load()
+                elts=[
+                    (param_ctx.get(el) if param_ctx else ParamDep(el))._target_ast(
+                        param_ctx
+                    )
+                    for el in value
+                ],
+                ctx=asttrs.Load(),
             )
 
         if isinstance(value, Set):
-            return asttrs.Set(elts=[cls._value_ast(el) for el in value])
+            return asttrs.Set(
+                elts=[
+                    (param_ctx.get(el) if param_ctx else ParamDep(el))._target_ast(
+                        param_ctx
+                    )
+                    for el in value
+                ],
+            )
 
         if isinstance(value, Dict):  # assume Dict[str, Any]
             return asttrs.Dict(
                 keys=list(value.keys()),
-                values=[cls._value_ast(v) for v in value.values()],
+                values=[
+                    (param_ctx.get(el) if param_ctx else ParamDep(el))._target_ast(
+                        param_ctx
+                    )
+                    for el in value
+                ],
             )
 
-        if isinstance(value, (FunctionType, type)):
+        if isinstance(value, (MethodType, FunctionType, type)):
             if value.__name__ == "<lambda>":
-                raise NotImplementedError(
-                    "not support lambda, please use regular function"
-                )
+                raise NotImplementedError("not support lambda, use function instead")
 
-            return asttrs.Name(id=qualname(value, level=1), ctx=asttrs.Load())
+            name = value.__name__.split(".")
+            name[0] = self.alias
+
+            return asttrs.Name(id=".".join(name), ctx=asttrs.Load())
 
         return asttrs.Constant(value=value)
+
+    def _import_ast(self, param_ctx: "ParamContext" = None) -> List[asttrs.stmt]:
+        body = []
+        value = self.target
+
+        if isinstance(value, (List, Tuple, Set)):
+            body.extend(
+                [
+                    (param_ctx.get(el) if param_ctx else ParamDep(el))._import_ast(
+                        param_ctx
+                    )
+                    for el in value
+                ]
+            )
+
+        elif isinstance(value, Dict):  # assume Dict[str, Any]
+            body.extend(
+                [
+                    (param_ctx.get(v) if param_ctx else ParamDep(v))._import_ast(
+                        param_ctx
+                    )
+                    for v in value.values()
+                ]
+            )
+
+        elif isinstance(value, (MethodType, FunctionType, type)):
+            if value.__name__ == "<lambda>":
+                raise NotImplementedError("not support lambda, use function instead")
+
+            modname = value.__module__
+            name = value.__qualname__.split(".")[0]
+
+            body.append(
+                asttrs.ImportFrom(
+                    module=modname,
+                    names=[
+                        asttrs.alias(
+                            name=name, asname=None if name == self.alias else self.alias
+                        )
+                    ],
+                )
+            )
+
+        return body
+
+
+class ParamContext:
+
+    def __init__(self):
+        self.targets: Dict[str, ParamDep] = {}
+        self.aliases: Dict[str, ParamDep] = {}
+
+    def get(self, obj: Any) -> ParamDep:
+        if not isinstance(obj, (type, FunctionType, MethodType)):
+            if isinstance(obj, (List, Tuple, Set)):
+                for el in obj:
+                    self.get(el)
+            elif isinstance(obj, Dict):
+                for el in obj.values():
+                    self.get(el)
+
+            return ParamDep(obj)
+
+        alias_name = obj.__qualname__.split(".")[0]
+        target_name = qualname(obj)
+
+        if target_name in self.targets:
+            return self.targets[target_name]
+
+        if alias_name in self.aliases:
+            # conflict occurred
+            dep = self.aliases[alias_name]
+            dep.conflicts += 1
+            alias_name = f"{dep.alias}_{dep.conflicts}"
+
+        dep = ParamDep(target=obj, alias=alias_name)
+        self.targets[target_name] = dep
+        self.aliases[alias_name] = dep
+
+        return dep
 
 
 class TaskAttribute:
@@ -170,7 +278,7 @@ class Task(TaskAttribute):
         return Task._get_taskid(cls).replace(".", "_")
 
     @staticmethod
-    def _to_ast(cls) -> asttrs.AST:
+    def _to_ast(cls, param_ctx: ParamContext = None) -> asttrs.AST:
         """
         Generate an Abstract Syntax Tree (AST) representation of the Task.
 
@@ -207,11 +315,21 @@ class Task(TaskAttribute):
                 # TODO: logging
                 ...
 
+        keywords = []
+        for k, v in params.items():
+
+            if param_ctx:
+                par = param_ctx.get(v)
+            else:
+                par = ParamDep(target=v)
+
+            keywords.append(asttrs.keyword(arg=k, value=par._target_ast(param_ctx)))
+
         assign = asttrs.Assign(
             targets=[asttrs.Name(id=task_varname, ctx=asttrs.Store())],
             value=asttrs.Call(
                 func=asttrs.Name(id=op_basename, ctx=asttrs.Load()),
-                keywords=[Param(key=k, value=v)._to_ast() for k, v in params.items()],
+                keywords=keywords,
             ),
         )
 
