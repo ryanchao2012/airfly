@@ -37,7 +37,7 @@ class Literal:
         return self.expr
 
 
-class ParamDep:
+class Param:
     def __init__(
         self, target: Union[FunctionType, MethodType, Type], alias: str = None
     ):
@@ -59,7 +59,7 @@ class ParamDep:
         if isinstance(value, List):
             return asttrs.List(
                 elts=[
-                    (param_ctx.get(el) if param_ctx else ParamDep(el))._target_ast(
+                    (param_ctx.get(el) if param_ctx else Param(el))._target_ast(
                         param_ctx
                     )
                     for el in value
@@ -70,7 +70,7 @@ class ParamDep:
         if isinstance(value, Tuple):
             return asttrs.Tuple(
                 elts=[
-                    (param_ctx.get(el) if param_ctx else ParamDep(el))._target_ast(
+                    (param_ctx.get(el) if param_ctx else Param(el))._target_ast(
                         param_ctx
                     )
                     for el in value
@@ -81,7 +81,7 @@ class ParamDep:
         if isinstance(value, Set):
             return asttrs.Set(
                 elts=[
-                    (param_ctx.get(el) if param_ctx else ParamDep(el))._target_ast(
+                    (param_ctx.get(el) if param_ctx else Param(el))._target_ast(
                         param_ctx
                     )
                     for el in value
@@ -92,7 +92,7 @@ class ParamDep:
             return asttrs.Dict(
                 keys=[asttrs.Constant(value=k) for k in value.keys()],
                 values=[
-                    (param_ctx.get(el) if param_ctx else ParamDep(el))._target_ast(
+                    (param_ctx.get(el) if param_ctx else Param(el))._target_ast(
                         param_ctx
                     )
                     for el in value.values()
@@ -103,7 +103,7 @@ class ParamDep:
             if value.__name__ == "<lambda>":
                 raise NotImplementedError("not support lambda, use function instead")
 
-            name = value.__name__.split(".")
+            name = value.__qualname__.split(".")
             name[0] = self.alias
 
             return asttrs.Name(id=".".join(name), ctx=asttrs.Load())
@@ -117,7 +117,7 @@ class ParamDep:
         if isinstance(value, (List, Tuple, Set)):
             for el in value:
                 body.extend(
-                    (param_ctx.get(el) if param_ctx else ParamDep(el))._import_ast(
+                    (param_ctx.get(el) if param_ctx else Param(el))._import_ast(
                         param_ctx
                     )
                 )
@@ -125,9 +125,7 @@ class ParamDep:
         elif isinstance(value, Dict):  # assume Dict[str, Any]
             for v in value.values():
                 body.extend(
-                    (param_ctx.get(v) if param_ctx else ParamDep(v))._import_ast(
-                        param_ctx
-                    )
+                    (param_ctx.get(v) if param_ctx else Param(v))._import_ast(param_ctx)
                 )
 
         elif isinstance(value, (MethodType, FunctionType, type)):
@@ -154,10 +152,10 @@ class ParamDep:
 class ParamContext:
 
     def __init__(self):
-        self.targets: Dict[str, ParamDep] = {}
-        self.aliases: Dict[str, ParamDep] = {}
+        self.targets: Dict[str, Param] = {}
+        self.aliases: Dict[str, Param] = {}
 
-    def get(self, obj: Any) -> ParamDep:
+    def get(self, obj: Any) -> Param:
         if not isinstance(obj, (type, FunctionType, MethodType)):
             if isinstance(obj, (List, Tuple, Set)):
                 for el in obj:
@@ -166,7 +164,7 @@ class ParamContext:
                 for el in obj.values():
                     self.get(el)
 
-            return ParamDep(obj)
+            return Param(obj)
 
         alias_name = obj.__qualname__.split(".")[0]
         target_name = qualname(obj)
@@ -180,7 +178,7 @@ class ParamContext:
             dep.conflicts += 1
             alias_name = f"{dep.alias}_{dep.conflicts}"
 
-        dep = ParamDep(target=obj, alias=alias_name)
+        dep = Param(target=obj, alias=alias_name)
         self.targets[target_name] = dep
         self.aliases[alias_name] = dep
 
@@ -290,7 +288,7 @@ class Task(TaskAttribute):
         params = Task._get_attributes(cls).op_params
 
         deps.extend(
-            (param_ctx.get(params) if param_ctx else ParamDep(params))._import_ast(
+            (param_ctx.get(params) if param_ctx else Param(params))._import_ast(
                 param_ctx
             )
         )
@@ -341,7 +339,7 @@ class Task(TaskAttribute):
             if param_ctx:
                 par = param_ctx.get(v)
             else:
-                par = ParamDep(target=v)
+                par = Param(target=v)
 
             keywords.append(asttrs.keyword(arg=k, value=par._target_ast(param_ctx)))
 
