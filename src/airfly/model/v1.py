@@ -38,9 +38,7 @@ class Literal:
 
 
 class Param:
-    def __init__(
-        self, target: Union[FunctionType, MethodType, Type], alias: str = None
-    ):
+    def __init__(self, target: Any, alias: str = None):
         self.target = target
         self.alias = alias or (
             target.__qualname__.split(".")[0]
