@@ -57,9 +57,7 @@ class Param:
         if isinstance(value, List):
             return asttrs.List(
                 elts=[
-                    (param_ctx.get(el) if param_ctx else Param(el))._target_ast(
-                        param_ctx
-                    )
+                    ParamContext.get(el, param_ctx)._target_ast(param_ctx)
                     for el in value
                 ],
                 ctx=asttrs.Load(),
@@ -68,9 +66,7 @@ class Param:
         if isinstance(value, Tuple):
             return asttrs.Tuple(
                 elts=[
-                    (param_ctx.get(el) if param_ctx else Param(el))._target_ast(
-                        param_ctx
-                    )
+                    ParamContext.get(el, param_ctx)._target_ast(param_ctx)
                     for el in value
                 ],
                 ctx=asttrs.Load(),
@@ -79,9 +75,7 @@ class Param:
         if isinstance(value, Set):
             return asttrs.Set(
                 elts=[
-                    (param_ctx.get(el) if param_ctx else Param(el))._target_ast(
-                        param_ctx
-                    )
+                    ParamContext.get(el, param_ctx)._target_ast(param_ctx)
                     for el in value
                 ],
             )
@@ -90,9 +84,7 @@ class Param:
             return asttrs.Dict(
                 keys=[asttrs.Constant(value=k) for k in value.keys()],
                 values=[
-                    (param_ctx.get(el) if param_ctx else Param(el))._target_ast(
-                        param_ctx
-                    )
+                    ParamContext.get(el, param_ctx)._target_ast(param_ctx)
                     for el in value.values()
                 ],
             )
@@ -114,15 +106,11 @@ class Param:
 
         if isinstance(value, (List, Tuple, Set)):
             for el in value:
-                body.extend(
-                    (param_ctx.get(el) if param_ctx else Param(el))._dep_ast(param_ctx)
-                )
+                body.extend(ParamContext.get(el, param_ctx)._dep_ast(param_ctx))
 
         elif isinstance(value, Dict):  # assume Dict[str, Any]
             for v in value.values():
-                body.extend(
-                    (param_ctx.get(v) if param_ctx else Param(v))._dep_ast(param_ctx)
-                )
+                body.extend(ParamContext.get(el, param_ctx)._dep_ast(param_ctx))
 
         elif isinstance(value, (MethodType, FunctionType, type)):
             if value.__name__ == "<lambda>":
@@ -151,7 +139,12 @@ class ParamContext:
         self.targets: Dict[str, Param] = {}
         self.aliases: Dict[str, Param] = {}
 
-    def get(self, obj: Any) -> Param:
+    @classmethod
+    def get(cls, obj: Any, param_ctx: "ParamContext" = None) -> Param:
+
+        return param_ctx._get(obj) if param_ctx else Param(obj)
+
+    def _get(self, obj: Any) -> Param:
         if not isinstance(obj, (type, FunctionType, MethodType)):
             if isinstance(obj, (List, Tuple, Set)):
                 for el in obj:
@@ -283,9 +276,7 @@ class Task(TaskAttribute):
 
         params = Task._get_attributes(cls).op_params
 
-        deps.extend(
-            (param_ctx.get(params) if param_ctx else Param(params))._dep_ast(param_ctx)
-        )
+        deps.extend(ParamContext.get(params, param_ctx)._dep_ast(param_ctx))
 
         return deps
 
@@ -330,10 +321,7 @@ class Task(TaskAttribute):
         keywords = []
         for k, v in params.items():
 
-            if param_ctx:
-                par = param_ctx.get(v)
-            else:
-                par = Param(target=v)
+            par = ParamContext.get(v, param_ctx)
 
             keywords.append(asttrs.keyword(arg=k, value=par._target_ast(param_ctx)))
 
