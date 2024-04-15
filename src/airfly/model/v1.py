@@ -108,22 +108,20 @@ class Param:
 
         return asttrs.Constant(value=value)
 
-    def _import_ast(self, param_ctx: "ParamContext" = None) -> List[asttrs.stmt]:
+    def _dep_ast(self, param_ctx: "ParamContext" = None) -> List[asttrs.stmt]:
         body = []
         value = self.target
 
         if isinstance(value, (List, Tuple, Set)):
             for el in value:
                 body.extend(
-                    (param_ctx.get(el) if param_ctx else Param(el))._import_ast(
-                        param_ctx
-                    )
+                    (param_ctx.get(el) if param_ctx else Param(el))._dep_ast(param_ctx)
                 )
 
         elif isinstance(value, Dict):  # assume Dict[str, Any]
             for v in value.values():
                 body.extend(
-                    (param_ctx.get(v) if param_ctx else Param(v))._import_ast(param_ctx)
+                    (param_ctx.get(v) if param_ctx else Param(v))._dep_ast(param_ctx)
                 )
 
         elif isinstance(value, (MethodType, FunctionType, type)):
@@ -286,9 +284,7 @@ class Task(TaskAttribute):
         params = Task._get_attributes(cls).op_params
 
         deps.extend(
-            (param_ctx.get(params) if param_ctx else Param(params))._import_ast(
-                param_ctx
-            )
+            (param_ctx.get(params) if param_ctx else Param(params))._dep_ast(param_ctx)
         )
 
         return deps
