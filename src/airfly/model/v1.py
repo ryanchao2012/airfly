@@ -91,7 +91,7 @@ class Param:
 
         if isinstance(value, (MethodType, FunctionType, type)):
             if value.__name__ == "<lambda>":
-                raise NotImplementedError("not support lambda, use function instead")
+                raise NotImplementedError("can't support lambda, use function instead")
 
             name = value.__qualname__.split(".")
             name[0] = self.alias
@@ -110,7 +110,7 @@ class Param:
 
         elif isinstance(value, Dict):  # assume Dict[str, Any]
             for v in value.values():
-                body.extend(ParamContext.get(el, param_ctx)._dep_ast(param_ctx))
+                body.extend(ParamContext.get(v, param_ctx)._dep_ast(param_ctx))
 
         elif isinstance(value, (MethodType, FunctionType, type)):
             if value.__name__ == "<lambda>":
@@ -137,41 +137,57 @@ class ParamContext:
 
     def __init__(self):
         self.targets: Dict[str, Param] = {}
-        self.aliases: Dict[str, Param] = {}
+        self.aliases: Dict[str, int] = {}
+        self.imports: Dict[str, str] = {}
 
     @classmethod
     def get(cls, obj: Any, param_ctx: "ParamContext" = None) -> Param:
-
         return param_ctx._get(obj) if param_ctx else Param(obj)
 
     def _get(self, obj: Any) -> Param:
         if not isinstance(obj, (type, FunctionType, MethodType)):
             if isinstance(obj, (List, Tuple, Set)):
                 for el in obj:
-                    self.get(el)
+                    self._get(el)
             elif isinstance(obj, Dict):
                 for el in obj.values():
-                    self.get(el)
+                    self._get(el)
 
             return Param(obj)
 
-        alias_name = obj.__qualname__.split(".")[0]
+        elif isinstance(obj, ModuleType):
+            # TODO:
+            raise TypeError(f"don't support ModuleType, got: {obj}")
+
         target_name = qualname(obj)
+        qual_name = obj.__qualname__
+        alias_name = qual_name.split(".")[0]
+        import_name = f"{obj.__module__}.{alias_name}"
 
         if target_name in self.targets:
             return self.targets[target_name]
 
-        if alias_name in self.aliases:
-            # conflict occurred
-            dep = self.aliases[alias_name]
-            dep.conflicts += 1
-            alias_name = f"{dep.alias}_{dep.conflicts}"
+        if import_name in self.imports:
+            alias_name = self.imports[import_name]
 
-        dep = Param(target=obj, alias=alias_name)
-        self.targets[target_name] = dep
-        self.aliases[alias_name] = dep
+        else:
+            # TODO: refactor
+            if alias_name in self.aliases:
+                avai_name = alias_name
+                while avai_name in self.aliases:
+                    conflicts = self.aliases[avai_name] + 1
+                    alias_name = avai_name
+                    avai_name = f"{avai_name}_{conflicts}"
 
-        return dep
+                self.aliases[alias_name] += 1
+                alias_name = avai_name
+
+            self.aliases[alias_name] = 0
+            self.imports[import_name] = alias_name
+
+        self.targets[target_name] = Param(target=obj, alias=alias_name)
+
+        return self.targets[target_name]
 
 
 class TaskAttribute:
@@ -390,7 +406,7 @@ class Task(TaskAttribute):
         return items[0]
 
 
-AirFly: Type = Task
+class AirFly(Task): ...
 
 
 @immutable
