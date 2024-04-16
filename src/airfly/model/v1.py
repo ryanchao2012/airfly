@@ -156,7 +156,7 @@ class ParamContext:
             return Param(obj)
 
         elif isinstance(obj, ModuleType):
-            # TODO:
+            # TODO: module doesn't have __qualname__
             raise TypeError(f"can't support ModuleType, got: {obj}")
 
         target_name = qualname(obj)
@@ -171,23 +171,24 @@ class ParamContext:
             alias_name = self.aliases[import_name]
 
         else:
-            # TODO: refactor
-            if alias_name in self.conflicts:
-                avai_name = alias_name
-                while avai_name in self.conflicts:
-                    cnt = self.conflicts[avai_name] + 1
-                    alias_name = avai_name
-                    avai_name = f"{avai_name}_{cnt}"
-
-                self.conflicts[alias_name] += 1
-                alias_name = avai_name
-
+            alias_name = self._find_alias_without_conflict(alias_name)
             self.conflicts[alias_name] = 0
             self.aliases[import_name] = alias_name
 
         self.params[target_name] = Param(target=obj, alias=alias_name)
 
         return self.params[target_name]
+
+    def _find_alias_without_conflict(self, name: str):
+        curr, last = name, None
+        while curr in self.conflicts:
+            last = curr
+            curr = f"{curr}_{self.conflicts[curr] + 1}"
+
+        if last:
+            self.conflicts[last] += 1
+
+        return curr
 
 
 class TaskAttribute:
