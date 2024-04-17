@@ -179,7 +179,7 @@ class ParamContext:
 
         return self.params[target_name]
 
-    def _find_alias_without_conflict(self, name: str):
+    def _find_alias_without_conflict(self, name: str) -> str:
         curr, last = name, None
         while curr in self.conflicts:
             last = curr
@@ -490,7 +490,9 @@ class TaskTree:
         return dag
 
     @classmethod
-    def from_module(cls, module: ModuleType, taskclass: type = AirFly) -> "TaskTree":
+    def from_module(
+        cls, module: ModuleType, taskclass: type = AirFly, exclude_pattern: str = None
+    ) -> "TaskTree":
         """
         Creates a task tree from a module.
 
@@ -509,10 +511,44 @@ class TaskTree:
         TODO: add predicate in argument
         """
 
-        taskset = set(cls._collect_taskclass(module, taskclass))
-        taskpairs = set(cls._collect_taskpairs(taskset, taskclass))
+        taskset = set(
+            cls._collect_taskclass(
+                module,
+                taskclass,
+                predicate=lambda obj: not cls._should_exclude(obj, exclude_pattern),
+            )
+        )
+        taskpairs = set(
+            cls._collect_taskpairs(
+                taskset,
+                taskclass,
+                predicate=lambda pair: not (
+                    cls._should_exclude(
+                        pair.up,
+                        exclude_pattern,
+                    )
+                    or cls._should_exclude(
+                        pair.down,
+                        exclude_pattern,
+                    )
+                ),
+            )
+        )
 
         return cls(taskset=taskset, taskpairs=taskpairs)
+
+    @classmethod
+    def _should_exclude(
+        cls,
+        obj: Union[FunctionType, type],
+        pattern: Optional[str] = None,
+    ):
+        if pattern and isinstance(pattern, str):
+            obj_name = qualname(obj)
+            if re.search(pattern, obj_name):
+                return True
+
+        return False
 
     @classmethod
     def _collect_taskclass(
