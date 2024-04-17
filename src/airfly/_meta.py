@@ -2,7 +2,7 @@
 
 
 name = "airfly"
-version = "0.10.0"
+version = "1.0.0"
 description = "Auto generate Airflow's dag.py on the fly"
 authors = [{"name": "ryanchao2012", "email": "ryanchao2012@gmail.com"}]
 readme = "README.md"
