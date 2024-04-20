@@ -27,6 +27,9 @@ dependencies = [
     "asttrs",
 ]
 
+[tool.pdm]
+distribution = true
+
 [tool.pdm.dev-dependencies]
 dev = [
     "ipython>=8.12.3",
@@ -35,14 +38,12 @@ dev = [
     "pytest-cov>=4.1.0",
     "gutt>=1.1.0",
     "toml>=0.10.2",
+    "pytest-mock>=3.14.0",
 ]
 
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
-[tool.pdm]
-distribution = true
 
 [project.scripts]
 airfly = "airfly.cli.main:main"
