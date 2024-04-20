@@ -371,6 +371,13 @@ class Task(TaskAttribute):
 
         op_class = Task._get_attributes(cls).op_class
 
+        if isinstance(op_class, type):
+
+            if issubclass_by_qualname(op_class, AVAILABLE_OPERATORS["BaseOperator"]):
+                return op_class
+
+            raise TypeError(f"Not a valid operator type, got: {op_class}")
+
         if isinstance(op_class, str):
             basename = op_class
 
