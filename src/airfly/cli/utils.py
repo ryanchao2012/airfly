@@ -1,16 +1,12 @@
 import os
 import sys
 from contextlib import contextmanager
-from types import FunctionType
-from typing import Optional, Union
 
 import click
-import regex as re
-from airfly.utils import qualname
 
 
 def print_version(ctx, param, value):
-    if not value or ctx.resilient_parsing:
+    if (not value) or ctx.resilient_parsing:
         return
 
     from airfly import __version__
@@ -18,20 +14,6 @@ def print_version(ctx, param, value):
     click.echo(f"Version: {__version__}")
 
     ctx.exit()
-
-
-def should_exclude(
-    obj: Union[FunctionType, type], pattern: Optional[str] = None, verbose: bool = True
-):
-    if pattern and isinstance(pattern, str):
-        obj_name = qualname(obj)
-        if re.search(pattern, obj_name):
-            if verbose:
-                click.secho("excluding ", err=True, nl=False, fg="bright_white")
-                click.secho(obj_name, err=True, fg="bright_black")
-            return True
-
-    return False
 
 
 @contextmanager

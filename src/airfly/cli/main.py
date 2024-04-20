@@ -10,7 +10,6 @@ from .utils import (
     convert_dag_params,
     expand_sys_path,
     print_version,
-    should_exclude,
     validate_includes,
 )
 
