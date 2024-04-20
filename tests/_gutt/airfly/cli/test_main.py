@@ -21,7 +21,9 @@ def test_main(mocker, runner):
     assert result.exit_code == 1
     assert isinstance(result.exception, InvalidModule)
 
-    result = runner.invoke(main, ["--modname", "airfly"])
+    dag_name = "my_dag"
+    result = runner.invoke(main, ["--name", dag_name, "--modname", "airfly"])
     assert result.exit_code == 0
     assert mock_TaskTree.from_module.called
     assert mock_tree.to_dag.called
+    assert dag_name in mock_tree.to_dag.call_args.args
