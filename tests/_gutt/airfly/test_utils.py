@@ -66,12 +66,6 @@ def test_collect_objects(mocker):
     )
 
 
-def test_load_module_by_name():
-    from airfly.utils import load_module_by_name
-
-    assert load_module_by_name
-
-
 def test_qualname():
     from airfly.utils import qualname
 

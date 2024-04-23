@@ -1,8 +1,6 @@
 import pytest
 from click.testing import CliRunner
 
-from airfly.cli.utils import InvalidModule
-
 
 @pytest.fixture()
 def runner():
@@ -19,7 +17,7 @@ def test_main(mocker, runner):
 
     result = runner.invoke(main, ["--modname", "not_existent_module"])
     assert result.exit_code == 1
-    assert isinstance(result.exception, InvalidModule)
+    assert isinstance(result.exception, ModuleNotFoundError)
 
     dag_name = "my_dag"
     result = runner.invoke(main, ["--name", dag_name, "--modname", "airfly"])

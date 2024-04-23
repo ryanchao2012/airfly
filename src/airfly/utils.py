@@ -6,8 +6,6 @@ import subprocess as sp
 import sys
 import tempfile
 from contextlib import contextmanager
-from importlib._bootstrap import ModuleSpec
-from importlib.util import find_spec, module_from_spec
 from types import FunctionType, ModuleType
 from typing import Callable, Generator, Union
 
@@ -91,11 +89,6 @@ def isorting(source_code: str):
         pass
 
     return out.decode()
-
-
-def load_module_by_name(modname: str) -> ModuleType:
-    spec: ModuleSpec = find_spec(modname)
-    return module_from_spec(spec)
 
 
 def collect_objects(

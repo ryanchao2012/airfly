@@ -1,17 +1,11 @@
+import importlib
 import os
 
 import click
 
 from airfly.model import TaskTree
-from airfly.utils import load_module_by_name
 
-from .utils import (
-    InvalidModule,
-    convert_dag_params,
-    expand_sys_path,
-    print_version,
-    validate_includes,
-)
+from .utils import convert_dag_params, expand_sys_path, print_version, validate_includes
 
 
 @click.command()
@@ -73,10 +67,7 @@ from .utils import (
 def main(name, modname, path, exclude_pattern, includes, dag_params):
 
     with expand_sys_path(*path):
-        try:
-            module = load_module_by_name(modname)
-        except Exception:
-            raise InvalidModule(f'got: "{modname}"')
+        module = importlib.import_module(modname)
 
     name = name or f"{modname}_dag"
 
