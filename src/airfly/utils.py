@@ -1,3 +1,4 @@
+import importlib
 import io
 import os
 import pathlib
@@ -140,15 +141,14 @@ def _collect_from_package(
     for obj in _collect_from_module(package):
         yield obj
 
-    for finder, name, _ in pkgutil.walk_packages(
-        package.__path__, package.__name__ + "."
-    ):
+    for _, name, _ in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
 
         with _escape_any_commandline_parser():
             try:
-                mod = finder.find_module(name).load_module(name)
+                mod = importlib.import_module(name)
 
             except BaseException:
+                # TODO: logging
                 continue
 
         for obj in _collect_from_module(mod):
