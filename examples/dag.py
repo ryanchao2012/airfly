@@ -246,13 +246,7 @@ with DAG("examples", **dag_kwargs) as dag:
     examples_tutorial_demo_templated = BashOperator(
         task_id="examples.tutorial.demo.templated",
         depends_on_past=False,
-        bash_command="""
-{% for i in range(5) %}
-    echo "{{ ds }}"
-    echo "{{ macros.ds_add(ds, 7)}}"
-    echo "{{ params.my_param }}"
-{% endfor %}
-""",
+        bash_command='\n{% for i in range(5) %}\n    echo "{{ ds }}"\n    echo "{{ macros.ds_add(ds, 7)}}"\n    echo "{{ params.my_param }}"\n{% endfor %}\n',
         params={"my_param": "Parameter I passed in"},
     )
     (
