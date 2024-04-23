@@ -754,7 +754,7 @@ class TaskTree:
         try:
 
             if os.path.isfile(path):
-                mod: asttrs.Module = asttrs.AST.from_file(path)
+                mod: asttrs.Module = asttrs.Module.from_file(path)
                 mod.body.insert(
                     0, asttrs.Comment(body=">" * 10 + f" Include from '{path}'")
                 )
