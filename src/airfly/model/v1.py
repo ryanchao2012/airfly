@@ -281,9 +281,7 @@ class Task(TaskAttribute):
     def _collect_dep_ast(cls, param_ctx: ParamContext = None) -> List[asttrs.stmt]:
         """Collect all stmts for all dependencies"""
 
-        # param_deps = cls._resolve_dependency_from_params()
         vendor_op = Task._resolve_operator(cls)
-
         op_modname, op_basename = qualname(vendor_op).rsplit(".", 1)
         op_modname = op_modname.replace("airfly._vendor.", "")
 
@@ -471,7 +469,9 @@ class TaskGroup:
             keywords.append(
                 asttrs.keyword(
                     arg="parent_group",
-                    value=asttrs.Constant(value=self.parent_group._to_varname()),
+                    value=asttrs.Name(
+                        id=self.parent_group._to_varname(), ctx=asttrs.Load()
+                    ),
                 )
             )
 
