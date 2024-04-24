@@ -863,11 +863,11 @@ class TaskTree:
             )
         ]
 
-    def _build_dag_body(self, param_ctx=None) -> List[asttrs.stmt]:
+    def _build_dag_body(self, param_ctx=None, task_group=True) -> List[asttrs.stmt]:
         body = []
 
         for cls in sorted(self.taskset, key=lambda el: qualname(el)):
-            body.append(Task._to_ast(cls, param_ctx))
+            body.append(Task._to_ast(cls, param_ctx, task_group))
 
         for pair in sorted(
             self.taskpairs,
