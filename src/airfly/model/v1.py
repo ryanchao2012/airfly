@@ -453,6 +453,41 @@ class TaskPair:
 
 
 @immutable
+class TaskGroup:
+    group_id: str
+    parent_group: Optional["TaskGroup"] = None
+
+    @property
+    def prefix(self):
+        return "group"
+
+    def _to_ast(self) -> asttrs.stmt:
+        keywords = [
+            asttrs.keyword(arg="group_id", value=asttrs.Constant(value=self.group_id)),
+            asttrs.keyword(arg="prefix_group_id", value=asttrs.Constant(value=False)),
+        ]
+
+        if self.parent_group:
+            keywords.append(
+                asttrs.keyword(
+                    arg="parent_group",
+                    value=asttrs.Constant(value=self.parent_group._to_varname()),
+                )
+            )
+
+        return asttrs.Assign(
+            targets=[asttrs.Name(id=self._to_varname(), ctx=asttrs.Store())],
+            value=asttrs.Call(
+                func=asttrs.Name(id="TaskGroup", ctx=asttrs.Load()),
+                keywords=keywords,
+            ),
+        )
+
+    def _to_varname(self) -> str:
+        return self.prefix + "_" + self.group_id.replace(".", "_")
+
+
+@immutable
 class TaskTree:
     """A class representing a task tree.
 
