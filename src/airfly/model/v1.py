@@ -229,6 +229,25 @@ class Task(TaskAttribute):
         return qualname(cls)
 
     @staticmethod
+    def _get_taskgroup(cls) -> "TaskGroup":
+        if (
+            hasattr(cls, "_get_taskgroup")
+            and
+            # Assume classmethod
+            inspect.ismethod(getattr(cls, "_get_taskgroup"))
+        ):
+            return cls._get_taskid()
+
+        group_id = Task._get_taskid(cls).rsplit(".", 1)[0]
+        if "." in group_id:
+            parent_group_id = group_id.rsplit(".", 1)[0]
+            parent_group = TaskGroup(group_id=parent_group_id)
+        else:
+            parent_group = None
+
+        return TaskGroup(group_id=group_id, parent_group=parent_group)
+
+    @staticmethod
     @lru_cache()
     def _get_attributes(cls) -> TaskAttribute:
         """Get and cache all the task's attributes.
@@ -296,7 +315,9 @@ class Task(TaskAttribute):
         return deps
 
     @staticmethod
-    def _to_ast(cls, param_ctx: ParamContext = None) -> asttrs.AST:
+    def _to_ast(
+        cls, param_ctx: ParamContext = None, task_group: bool = True
+    ) -> asttrs.AST:
         """
         Generate an Abstract Syntax Tree (AST) representation of the Task.
 
@@ -334,10 +355,19 @@ class Task(TaskAttribute):
                 ...
 
         keywords = []
+        if task_group:
+            keywords.append(
+                asttrs.keyword(
+                    arg="task_group",
+                    value=asttrs.Name(
+                        id=Task._get_taskgroup(cls)._to_varname(), ctx=asttrs.Load()
+                    ),
+                )
+            )
+
         for k, v in params.items():
 
             par = ParamContext.get(v, param_ctx)
-
             keywords.append(asttrs.keyword(arg=k, value=par._target_ast(param_ctx)))
 
         assign = asttrs.Assign(
