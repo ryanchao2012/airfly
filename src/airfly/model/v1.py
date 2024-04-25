@@ -229,25 +229,6 @@ class Task(TaskAttribute):
         return qualname(cls)
 
     @staticmethod
-    def _get_taskgroup(cls) -> "TaskGroup":
-        if (
-            hasattr(cls, "_get_taskgroup")
-            and
-            # Assume classmethod
-            inspect.ismethod(getattr(cls, "_get_taskgroup"))
-        ):
-            return cls._get_taskid()
-
-        group_id = Task._get_taskid(cls).rsplit(".", 1)[0]
-        if "." in group_id:
-            parent_group_id = group_id.rsplit(".", 1)[0]
-            parent_group = TaskGroup(group_id=parent_group_id)
-        else:
-            parent_group = None
-
-        return TaskGroup(group_id=group_id, parent_group=parent_group)
-
-    @staticmethod
     @lru_cache()
     def _get_attributes(cls) -> TaskAttribute:
         """Get and cache all the task's attributes.
@@ -355,20 +336,21 @@ class Task(TaskAttribute):
                 ...
 
         keywords = []
-        if task_group:
-            keywords.append(
-                asttrs.keyword(
-                    arg="task_group",
-                    value=asttrs.Name(
-                        id=Task._get_taskgroup(cls)._to_varname(), ctx=asttrs.Load()
-                    ),
-                )
-            )
 
         for k, v in params.items():
 
             par = ParamContext.get(v, param_ctx)
             keywords.append(asttrs.keyword(arg=k, value=par._target_ast(param_ctx)))
+
+        if task_group and "." in task_id:
+            group_id = task_id.rsplit(".", 1)[0]
+            group_var = TaskGroup._to_varname(group_id)
+            keywords.append(
+                asttrs.keyword(
+                    arg="task_group",
+                    value=asttrs.Name(id=group_var, ctx=asttrs.Load()),
+                )
+            )
 
         assign = asttrs.Assign(
             targets=[asttrs.Name(id=task_varname, ctx=asttrs.Store())],
@@ -395,12 +377,10 @@ class Task(TaskAttribute):
         TODO:
             - Add unit tests for this method.
         """
-        # TODO: unittest
 
         op_class = Task._get_attributes(cls).op_class
 
         if isinstance(op_class, type):
-
             if issubclass_by_qualname(op_class, AVAILABLE_OPERATORS["BaseOperator"]):
                 return op_class
 
@@ -485,10 +465,6 @@ class TaskGroup:
     group_id: str
     parent_group: Optional["TaskGroup"] = None
 
-    @property
-    def prefix(self):
-        return "group"
-
     def _to_ast(self) -> asttrs.stmt:
         keywords = [
             asttrs.keyword(arg="group_id", value=asttrs.Constant(value=self.group_id)),
@@ -500,21 +476,25 @@ class TaskGroup:
                 asttrs.keyword(
                     arg="parent_group",
                     value=asttrs.Name(
-                        id=self.parent_group._to_varname(), ctx=asttrs.Load()
+                        id=self.parent_group._to_varname(self.group_id),
+                        ctx=asttrs.Load(),
                     ),
                 )
             )
 
         return asttrs.Assign(
-            targets=[asttrs.Name(id=self._to_varname(), ctx=asttrs.Store())],
+            targets=[
+                asttrs.Name(id=self._to_varname(self.group_id), ctx=asttrs.Store())
+            ],
             value=asttrs.Call(
                 func=asttrs.Name(id="TaskGroup", ctx=asttrs.Load()),
                 keywords=keywords,
             ),
         )
 
-    def _to_varname(self) -> str:
-        return self.prefix + "_" + self.group_id.replace(".", "_")
+    @classmethod
+    def _to_varname(cls, group_id) -> str:
+        return "group_" + group_id.replace(".", "_")
 
 
 @immutable
