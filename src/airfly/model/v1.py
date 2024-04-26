@@ -823,7 +823,7 @@ class TaskTree:
         self, dag_name: str, dag_params: Tuple[str, str] = None, param_ctx=None
     ) -> List[asttrs.stmt]:
 
-        if dag_params:
+        if dag_params and dag_params[1]:
             _, param_var = dag_params
             keywords = [
                 asttrs.keyword(
