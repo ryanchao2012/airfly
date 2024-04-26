@@ -253,6 +253,7 @@ class Task(TaskAttribute):
         attrs = {}
         for field in TaskAttribute.__annotations__:
             value = getattr(self, field, None) or getattr(cls, field, None)
+            value = None if isinstance(value, property) else value
 
             if field == "op_class" and value is None:
                 raise ValueError("op_class cannot be None")
