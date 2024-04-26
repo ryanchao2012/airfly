@@ -64,10 +64,23 @@ from .utils import convert_dag_params, expand_sys_path, print_version, validate_
         " which will be passed to DAG as keyword arguments."
     ),
 )
-def main(name, modname, path, exclude_pattern, includes, dag_params):
+@click.option(
+    "--task-class",
+    default="airfly.model.AirFly",
+    help=(
+        """
+        default: "airfly.model.AirFly"
+"""
+    ),
+)
+def main(name, modname, path, exclude_pattern, includes, dag_params, task_class):
 
     with expand_sys_path(*path):
         module = importlib.import_module(modname)
+
+        taskmodule, taskname = task_class.rsplit(".", 1)
+        taskmodule = importlib.import_module(taskmodule)
+        taskclass = taskmodule.__dict__[taskname]
 
     name = name or f"{modname}_dag"
 
@@ -77,6 +90,8 @@ def main(name, modname, path, exclude_pattern, includes, dag_params):
         else:
             includes = [dag_params[0]]
 
-    tree = TaskTree.from_module(module, exclude_pattern=exclude_pattern)
+    tree = TaskTree.from_module(
+        module, taskclass=taskclass, exclude_pattern=exclude_pattern
+    )
 
     print(tree.to_dag(name, includes=includes, dag_params=dag_params), end="")
