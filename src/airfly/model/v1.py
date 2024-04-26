@@ -1,5 +1,6 @@
 import inspect
 import os
+from collections import deque
 from functools import lru_cache
 from types import FunctionType, MethodType, ModuleType
 from typing import Any, Dict, Generator, List, Optional, Set, Tuple, Type, Union
@@ -342,7 +343,7 @@ class Task(TaskAttribute):
             par = ParamContext.get(v, param_ctx)
             keywords.append(asttrs.keyword(arg=k, value=par._target_ast(param_ctx)))
 
-        if task_group and "." in task_id:
+        if task_group:
             group_id = task_id.rsplit(".", 1)[0]
             group_var = TaskGroup._to_varname(group_id)
             keywords.append(
@@ -463,7 +464,7 @@ class TaskPair:
 @immutable
 class TaskGroup:
     group_id: str
-    parent_group: Optional["TaskGroup"] = None
+    parent_id: str = None
 
     def _to_ast(self) -> asttrs.stmt:
         keywords = [
@@ -471,13 +472,12 @@ class TaskGroup:
             asttrs.keyword(arg="prefix_group_id", value=asttrs.Constant(value=False)),
         ]
 
-        if self.parent_group:
+        if self.parent_id:
             keywords.append(
                 asttrs.keyword(
                     arg="parent_group",
                     value=asttrs.Name(
-                        id=self.parent_group._to_varname(self.group_id),
-                        ctx=asttrs.Load(),
+                        id=self._to_varname(self.parent_id), ctx=asttrs.Load()
                     ),
                 )
             )
@@ -756,7 +756,13 @@ class TaskTree:
     def _build_imports(self, param_ctx: ParamContext = None) -> List[asttrs.stmt]:
 
         imports = [
-            asttrs.ImportFrom(module="airflow.models", names=[asttrs.alias(name="DAG")])
+            asttrs.ImportFrom(
+                module="airflow.models", names=[asttrs.alias(name="DAG")]
+            ),
+            asttrs.ImportFrom(
+                module="airflow.utils.task_group",
+                names=[asttrs.alias(name="TaskGroup")],
+            ),
         ]
 
         for cls in self.taskset:
@@ -846,6 +852,9 @@ class TaskTree:
     def _build_dag_body(self, param_ctx=None, task_group=True) -> List[asttrs.stmt]:
         body = []
 
+        if task_group:
+            body.extend(self._build_task_group())
+
         for cls in sorted(self.taskset, key=lambda el: qualname(el)):
             body.append(Task._to_ast(cls, param_ctx, task_group))
 
@@ -857,3 +866,32 @@ class TaskTree:
             body.append(pair._to_ast())
 
         return body if body else [asttrs.Pass()]
+
+    def _build_task_group(self) -> List[asttrs.stmt]:
+
+        body = []
+        group_ids = {Task._get_taskid(cls).rsplit(".", 1)[0] for cls in self.taskset}
+
+        tree = {}
+        for gid in group_ids:
+            node = tree
+            for path in gid.split("."):
+                if path not in node:
+                    node[path] = {}
+                node = node[path]
+
+        todo = deque([(tree, [])])
+        while todo:
+            root, prefix = todo.popleft()
+
+            for k, node in root.items():
+                gid = ".".join(prefix + [k])
+                body.append(
+                    TaskGroup(
+                        group_id=gid, parent_id=".".join(prefix) if prefix else None
+                    )._to_ast()
+                )
+
+                todo.append((node, prefix + [k]))
+
+        return body
