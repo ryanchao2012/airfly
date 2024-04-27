@@ -3,7 +3,18 @@ import os
 from collections import deque
 from functools import lru_cache
 from types import FunctionType, MethodType, ModuleType
-from typing import Any, Dict, Generator, List, Optional, Set, Tuple, Type, Union
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    Iterable,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 import asttrs
 import attr
@@ -200,15 +211,15 @@ class TaskAttribute:
         op_class (str | Type): The operator class associated with the task attribute. Defaults to "EmptyOperator".
         op_module (str): The module containing the operator class. Defaults to None.
         op_params (Dict[str, Any]): The parameters for the operator. Defaults to None.
-        upstream (TaskClass | Tuple[TaskClass, ...]): The upstream task(s) for this attribute. Defaults to None.
-        downstream (TaskClass, Tuple[TaskClass, ...]): The downstream task(s) for this attribute. Defaults to None.
+        upstream (TaskClass | Iterable[TaskClass]): The upstream task(s) for this attribute. Defaults to None.
+        downstream (TaskClass, Iterable[TaskClass]): The downstream task(s) for this attribute. Defaults to None.
     """
 
     op_class: Union[str, Type] = None
     op_module: Optional[str] = None
     op_params: Dict[str, Any] = None
-    upstream: Optional[Union[TaskClass, Tuple[TaskClass, ...]]] = None
-    downstream: Optional[Union[TaskClass, Tuple[TaskClass, ...]]] = None
+    upstream: Optional[Union[TaskClass, Iterable[TaskClass]]] = None
+    downstream: Optional[Union[TaskClass, Iterable[TaskClass]]] = None
 
 
 class Task(TaskAttribute):
@@ -663,20 +674,20 @@ class TaskTree:
         for cls in taskset:
             ups = Task._get_attributes(
                 cls
-            ).upstream  # could be None, Task or Tuple[Task, ...]
+            ).upstream  # could be None, Task or Iterable[Task, ...]
 
             if isinstance(ups, type) and issubclass_by_qualname(ups, taskclass):
                 ups = [ups]
 
             for u in ups or []:
 
-                pair = TaskPair(up=u, down=cls)
+                if isinstance(u, type) and issubclass_by_qualname(u, taskclass):
+                    pair = TaskPair(up=u, down=cls)
 
-                if (pair not in cached) and predicate(pair):
+                    if (pair not in cached) and predicate(pair):
+                        cached.add(pair)
 
-                    cached.add(pair)
-
-                    yield pair
+                        yield pair
 
             downs = Task._get_attributes(
                 cls
@@ -687,13 +698,13 @@ class TaskTree:
 
             for d in downs or []:
 
-                pair = TaskPair(up=cls, down=d)
+                if isinstance(d, type) and issubclass_by_qualname(d, taskclass):
+                    pair = TaskPair(up=cls, down=d)
 
-                if pair not in cached and predicate(pair):
+                    if pair not in cached and predicate(pair):
+                        cached.add(pair)
 
-                    cached.add(pair)
-
-                    yield pair
+                        yield pair
 
     def to_dag(
         self,
