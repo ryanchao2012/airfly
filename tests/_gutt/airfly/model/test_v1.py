@@ -563,22 +563,10 @@ class TestTaskTree:
         assert isinstance(header, asttrs.Comment)
         assert airfly.__version__ in header.body
 
-    def test__build_imports(self, mocker):
+    def test__build_imports(self):
 
-        mock_Task = mocker.patch("airfly.model.v1.Task")
-
-        class Task1: ...
-
-        class Task2: ...
-
-        class Task3: ...
-
-        class Task4: ...
-
-        tree = self.TaskTree(taskset={Task1, Task2, Task3, Task4}, taskpairs=set())
+        tree = self.TaskTree(taskset={}, taskpairs=set())
         _imports = tree._build_imports()
-
-        assert mock_Task._collect_dep_ast.call_count == len(tree.taskset)
 
         assert (
             asttrs.ImportFrom(module="airflow.models", names=[asttrs.alias(name="DAG")])
@@ -652,6 +640,7 @@ class TestTaskTree:
         _ = tree._build_dag_body()
 
         assert mock_Task._to_ast.call_count == len(taskset)
+        assert mock_Task._collect_dep_ast.call_count == len(taskset)
 
         for pair in taskpairs:
             assert pair._to_ast.call_count == 1

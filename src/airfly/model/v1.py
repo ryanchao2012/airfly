@@ -784,11 +784,6 @@ class TaskTree:
             ),
         ]
 
-        for cls in self.taskset:
-            for st in Task._collect_dep_ast(cls, param_ctx):
-                if st not in imports:
-                    imports.append(st)
-
         return imports
 
     def _build_includes(
@@ -870,6 +865,11 @@ class TaskTree:
 
     def _build_dag_body(self, param_ctx=None, task_group=True) -> List[asttrs.stmt]:
         body = []
+
+        for cls in self.taskset:
+            for st in Task._collect_dep_ast(cls, param_ctx):
+                if st not in body:
+                    body.append(st)
 
         if task_group:
             body.extend(self._build_task_group())
