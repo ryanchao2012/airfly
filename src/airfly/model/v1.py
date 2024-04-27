@@ -62,9 +62,7 @@ class Param:
 
     def _target_ast(self, param_ctx: "ParamContext" = None) -> asttrs.stmt:
         value = self.target
-        if isinstance(
-            value, (type(None), bool, str, int, float, Literal)
-        ):  # early return
+        if isinstance(value, (type(None), bool, str, int, float)):  # early return
             return asttrs.Constant(value=value)
 
         if isinstance(value, List):
