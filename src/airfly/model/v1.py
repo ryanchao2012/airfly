@@ -111,6 +111,9 @@ class Param:
 
             return asttrs.Name(id=".".join(name), ctx=asttrs.Load())
 
+        if isinstance(value, Literal):
+            return asttrs.Name(id=repr(value), ctx=asttrs.Load())
+
         return asttrs.Constant(value=value)
 
     def _dep_ast(self, param_ctx: "ParamContext" = None) -> List[asttrs.stmt]:
