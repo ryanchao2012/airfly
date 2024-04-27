@@ -889,7 +889,9 @@ class TaskTree:
     def _build_task_group(self) -> List[asttrs.stmt]:
 
         body = []
-        group_ids = {Task._get_taskid(cls).rsplit(".", 1)[0] for cls in self.taskset}
+        group_ids = sorted(
+            {Task._get_taskid(cls).rsplit(".", 1)[0] for cls in self.taskset}
+        )
 
         tree = {}
         for gid in group_ids:
