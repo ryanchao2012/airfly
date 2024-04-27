@@ -25,6 +25,7 @@ dependencies = [
     "click",
     "libcst",
     "asttrs",
+    "loguru",
 ]
 
 [tool.pdm]
