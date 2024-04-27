@@ -655,3 +655,30 @@ class TestTaskTree:
 
         for pair in taskpairs:
             assert pair._to_ast.call_count == 1
+
+    def test__build_task_group(self):
+        pass
+
+
+class TestTaskGroup:
+    @classmethod
+    def setup_class(cls):
+        from airfly.model.v1 import TaskGroup
+
+        assert TaskGroup
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def setup_method(self, method):
+        pass
+
+    def teardown_method(self, method):
+        pass
+
+    def test__to_ast(self):
+        pass
+
+    def test__to_varname(self):
+        pass
