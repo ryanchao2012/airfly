@@ -46,7 +46,7 @@ def validate_includes(ctx, param, value):
 def convert_dag_params(ctx, param, value):
 
     if not value:
-        return (None, None)
+        return None
 
     elif isinstance(value, tuple):
         return value
@@ -57,7 +57,3 @@ def convert_dag_params(ctx, param, value):
 
     except ValueError:
         raise click.BadParameter("format must be '<python-file>:<variable>'")
-
-
-class InvalidModule(Exception):
-    pass

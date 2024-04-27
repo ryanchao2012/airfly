@@ -18,6 +18,7 @@ from typing import (
 
 import asttrs
 import attr
+import loguru
 import networkx as nx
 import regex as re
 
@@ -103,7 +104,7 @@ class Param:
 
         if isinstance(value, (MethodType, FunctionType, type)):
             if value.__name__ == "<lambda>":
-                raise NotImplementedError("can't support lambda, use function instead")
+                raise TypeError("lambda is not supported, please use function instead")
 
             name = value.__qualname__.split(".")
             name[0] = self.alias
@@ -126,7 +127,7 @@ class Param:
 
         elif isinstance(value, (MethodType, FunctionType, type)):
             if value.__name__ == "<lambda>":
-                raise NotImplementedError("not support lambda, use function instead")
+                raise TypeError("lambda is not supported, please use function instead")
 
             modname = value.__module__
             name = value.__qualname__.split(".")[0]
@@ -169,7 +170,7 @@ class ParamContext:
 
         elif isinstance(obj, ModuleType):
             # TODO: module doesn't have __qualname__
-            raise TypeError(f"can't support ModuleType, got: {obj}")
+            raise TypeError(f"ModuleType is not supported, got: {obj}")
 
         target_name = qualname(obj)
         qual_name = obj.__qualname__
@@ -258,9 +259,10 @@ class Task(TaskAttribute):
             # Assume no arguments are required for creating the task instance.
             self = cls()
         except Exception:
-            # TODO: logging warning
+            loguru.logger.warning(
+                f"Cannot initialize {cls}, assume attributes are defined in class-var."
+            )
             self = cls
-            pass
 
         attrs = {}
         for field in TaskAttribute.__annotations__:
@@ -345,8 +347,7 @@ class Task(TaskAttribute):
             if k in avai_params:
                 params.update({k: v})
             else:
-                # TODO: logging
-                ...
+                loguru.logger.warning(f"Ingore invalid param: {k} in {cls}.")
 
         keywords = []
 
@@ -387,8 +388,7 @@ class Task(TaskAttribute):
             ValueError: If multiple op_class with the same basename are found and op_module is not provided or invalid.
             ValueError: If the op_class candidates cannot be resolved by the given op_module.
 
-        TODO:
-            - Add unit tests for this method.
+        TODO: support Operator not provided in _vendor
         """
 
         op_class = Task._get_attributes(cls).op_class
@@ -402,8 +402,8 @@ class Task(TaskAttribute):
         if isinstance(op_class, str):
             basename = op_class
 
-        elif isinstance(op_class, type):
-            basename = qualname(op_class, level=1)
+        # elif isinstance(op_class, type):
+        #     basename = qualname(op_class, level=1)
 
         else:
             raise ValueError(f"Invalid op_class, got: {op_class}")
@@ -425,7 +425,6 @@ class Task(TaskAttribute):
             cands = [op for op in items if op_module in qualname(op)]
 
             if len(cands) != 1:
-
                 raise ValueError(
                     f"Cannot resolve the possible op_class('{basename}') by given op_module('{op_module}'), multiple or no candidates found: {cands}"
                 )
@@ -575,6 +574,9 @@ class TaskTree:
         TODO: add predicate in argument
         """
 
+        loguru.logger.info(
+            f"Collecting '{qualname(taskclass)}' from '{qualname(module)}' ..."
+        )
         taskset = set(
             cls._collect_taskclass(
                 module,
@@ -734,6 +736,10 @@ class TaskTree:
             >>> source_code = task_tree.to_source(formatted=True)
         """
 
+        loguru.logger.info(
+            f"Generating code of dag.py: name='{name}', includes={includes}, dag_params={dag_params}"
+        )
+
         src = re.sub("\n+", "\n", self._to_ast(name, dag_params, includes).to_source())
 
         return isorting(blacking(src)) if formatted else src
@@ -824,8 +830,8 @@ class TaskTree:
 
                 return mod.body
 
-        except Exception:
-            # TODO: logging?
+        except Exception as e:
+            loguru.logger.warning(f"Ignore failed insert from '{path}': {e}")
             pass
 
         return []

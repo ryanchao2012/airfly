@@ -91,7 +91,7 @@ class TestParam:
             ctx=asttrs.Load(),
         )
 
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(TypeError):
             self.Param(lambda: True)._target_ast()
 
         assert isinstance(self.Param(object())._target_ast(), asttrs.Constant)

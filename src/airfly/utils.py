@@ -11,6 +11,7 @@ from types import FunctionType, ModuleType
 from typing import Callable, Generator, Union
 
 import attr
+import loguru
 
 immutable = attr.s(auto_attribs=True, slots=True, frozen=True, kw_only=True)
 
@@ -68,6 +69,7 @@ def blacking(source_code: str):
 
     try:
         pathlib.Path(fname).unlink()
+
     except FileNotFoundError:
         pass
 
@@ -86,6 +88,7 @@ def isorting(source_code: str):
 
     try:
         pathlib.Path(fname).unlink()
+
     except FileNotFoundError:
         pass
 
@@ -147,28 +150,27 @@ def _collect_from_package(
             try:
                 mod = importlib.import_module(name)
 
-            except BaseException:
-                # TODO: logging
+            except Exception as e:
+                loguru.logger.warning(f"Ignore invalid module: '{name}'. Reason: {e}")
                 continue
 
         for obj in _collect_from_module(mod):
-
             yield obj
 
 
 def _collect_from_module(
     module: ModuleType,
 ) -> Generator[Union[FunctionType, type], None, None]:
-    for _, obj in module.__dict__.items():
-        if isinstance(obj, (type, FunctionType)):
 
+    for _, obj in module.__dict__.items():
+
+        if isinstance(obj, (type, FunctionType)):
             yield obj
 
 
 def makefile(fullpath: str, content: Union[str, bytes] = "", overwrite: bool = False):
 
     if not os.path.isfile(fullpath):
-
         dirpath = os.path.dirname(fullpath)
 
         if not os.path.isdir(dirpath):
@@ -177,7 +179,6 @@ def makefile(fullpath: str, content: Union[str, bytes] = "", overwrite: bool = F
         _writefile(fullpath, content)
 
     elif overwrite:
-
         _writefile(fullpath, content)
 
 

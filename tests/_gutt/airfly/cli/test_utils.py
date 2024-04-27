@@ -22,7 +22,7 @@ class TestInvalidModule:
 def test_convert_dag_params():
     from airfly.cli.utils import convert_dag_params
 
-    assert isinstance(convert_dag_params(None, None, None), tuple)
+    assert convert_dag_params(None, None, None) is None
 
     value = "path:varname"
     param = convert_dag_params(None, None, value)

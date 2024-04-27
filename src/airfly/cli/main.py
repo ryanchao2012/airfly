@@ -84,7 +84,7 @@ def main(name, modname, path, exclude_pattern, includes, dag_params, task_class)
 
     name = name or f"{modname}_dag"
 
-    if dag_params[0]:
+    if dag_params and dag_params[0]:
         if includes:
             includes.append(dag_params[0])
         else:
