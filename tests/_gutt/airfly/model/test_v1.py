@@ -212,6 +212,7 @@ class TestTask:
         from airfly.model.v1 import TaskAttribute
         from airfly.utils import immutable
 
+        # Base case
         class Task1: ...
 
         class Task2: ...
@@ -225,7 +226,7 @@ class TestTask:
             downstream=Task3,
         )
 
-        class MyTask:
+        class Task4:
             op_class = task_attr.op_class
 
             @property
@@ -238,12 +239,120 @@ class TestTask:
 
             downstream = task_attr.downstream
 
-        cache = self.Task._get_attributes(MyTask)
+        cache = self.Task._get_attributes(Task4)
 
-        assert self.Task._get_attributes(MyTask) is cache
+        assert self.Task._get_attributes(Task4) is cache
 
         for a in attr.fields(task_attr.__class__):
             assert getattr(cache, a.name) == getattr(task_attr, a.name)
+
+        # Test attribute inherience
+
+        parent_module = "parent_module"
+        parent_params = None
+        parent_upstream = Task1
+        parent_downstream = None
+        child_module = "child_module"
+        child_params = dict(child=2)
+        child_upstream = Task2
+        child_downstream = Task3
+
+        class Task5:
+            op_class = "ParamOperator"
+
+            # defined class-var
+            op_module = parent_module
+
+            # None class-var
+            op_params = parent_params
+
+            # defined property
+            @property
+            def upstream(self):
+                return parent_upstream
+
+            # None property
+            @property
+            def downstream(self):
+                return parent_downstream
+
+        class Task6(Task5):
+            """Implement nothing
+            Expect inherient attributes from parent for all cases.
+            """
+
+            ...
+
+        attr6 = self.Task._get_attributes(Task6)
+        assert attr6.op_module == parent_module
+        assert attr6.op_params is parent_params is None
+        assert attr6.upstream == parent_upstream
+        assert attr6.downstream is parent_downstream is None
+
+        class Task7(Task5):
+            """Define(override) all attributes with class-var"""
+
+            op_module = child_module
+            op_params = child_params
+            upstream = child_upstream
+            downstream = child_downstream
+
+        attr7 = self.Task._get_attributes(Task7)
+        assert attr7.op_module == child_module
+        assert attr7.op_params == child_params
+        assert attr7.upstream == child_upstream
+        assert attr7.downstream == child_downstream
+
+        class Task8(Task5):
+            """Reset defined attributs to None with class-var"""
+
+            op_module = None
+            upstream = None
+
+        attr8 = self.Task._get_attributes(Task8)
+        assert attr8.op_module is None
+        assert attr8.upstream is None
+
+        class Task9(Task5):
+            """Define(override) all attributes with property"""
+
+            @property
+            def op_module(self):
+                return child_module
+
+            @property
+            def op_params(self):
+                return child_params
+
+            @property
+            def upstream(self):
+                return child_upstream
+
+            @property
+            def downstream(self):
+                return child_downstream
+
+        attr9 = self.Task._get_attributes(Task9)
+        assert attr9.op_module == child_module
+        assert attr9.op_params == child_params
+        assert attr9.upstream == child_upstream
+        assert attr9.downstream == child_downstream
+
+        class Task10(Task5):
+            """Reset defined attributs to None with property"""
+
+            @property
+            def op_module(self):
+                return None
+
+            @property
+            def upstream(self):
+                return None
+
+        attr10 = self.Task._get_attributes(Task10)
+
+        assert attr10.op_module is None
+        assert attr10.upstream is None
 
     def test__to_varname(self):
         assert self.Task._to_varname(self.Task) == qualname(self.Task).replace(".", "_")
