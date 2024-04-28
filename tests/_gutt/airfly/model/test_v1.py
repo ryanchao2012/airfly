@@ -29,6 +29,22 @@ class TestLiteral:
 
         assert repr(self.Literal(expected)) == expected
 
+    def test__to_ast(self):
+
+        assert self.Literal("any expression")._to_ast() == asttrs.Name(
+            id="any expression", ctx=asttrs.Load()
+        )
+
+    def test__dep_ast(self):
+
+        assert (
+            #
+            self.Literal("any expression", deps=self.Literal)._dep_ast()[0]
+            == asttrs.ImportFrom(
+                module=self.Literal.__module__, names=[asttrs.alias(name="Literal")]
+            )
+        )
+
 
 class TestParam:
     @classmethod
@@ -73,6 +89,7 @@ class TestParam:
         self.Param(obj)._target_ast() == expected
 
     def test__target_ast_other_cases(self):
+        from airfly.model import Literal
 
         assert self.Param(self.Param)._target_ast() == asttrs.Name(
             id="Param", ctx=asttrs.Load()
@@ -91,10 +108,16 @@ class TestParam:
             ctx=asttrs.Load(),
         )
 
+        # Literal cases
+        assert self.Param(Literal("any expression"))._target_ast() == asttrs.Name(
+            id="any expression", ctx=asttrs.Load()
+        )
+
         with pytest.raises(TypeError):
             self.Param(lambda: True)._target_ast()
 
-        assert isinstance(self.Param(object())._target_ast(), asttrs.Constant)
+        with pytest.raises(TypeError):
+            self.Param(object())._target_ast()
 
     @pytest.mark.parametrize(
         "obj", [123, "abc", [123], {"abc"}, dict(abc=123), object()]
@@ -102,6 +125,24 @@ class TestParam:
     def test__dep_ast(self, obj):
 
         assert self.Param(obj)._dep_ast() == []
+
+    def test__dep_ast_other_cases(self):
+        from airfly.model import Literal
+
+        assert (
+            self.Param(Literal("Literal('any expression')", deps=Literal))._dep_ast()
+            == self.Param(Literal)._dep_ast()
+        )
+
+        assert (
+            #
+            self.Param(
+                Literal(
+                    "Literal('any expression')", deps=Literal("any import expression")
+                )
+            )._dep_ast()
+            == asttrs.Name(id="any import expression", ctx=asttrs.Load())
+        )
 
     def test__dep_ast_other_cases(self):
 
@@ -136,17 +177,22 @@ class TestParamContext:
 
     def test_get(self):
 
-        par = self.ParamContext.get(self.ParamContext)
-        assert par.target == self.ParamContext
+        assert self.ParamContext.get(self.ParamContext).target == self.ParamContext
 
     def test__get(self):
 
         ctx = self.ParamContext()
-        par = ctx._get(self.ParamContext)
+        par1 = ctx._get(self.ParamContext)
 
-        key = qualname(self.ParamContext)
-        assert key in ctx.params
-        assert ctx.params[key] == par
+        key1 = qualname(self.ParamContext)
+        assert key1 in ctx.params
+        assert ctx.params[key1] == par1
+
+        _ = ctx._get([self.ParamContext])
+        assert len(ctx.params) == 1
+
+        _ = ctx._get(dict(param_ctx=self.ParamContext))
+        assert len(ctx.params) == 1
 
     def test__find_alias_without_conflict(self):
 

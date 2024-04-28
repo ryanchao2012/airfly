@@ -41,16 +41,27 @@ AVAILABLE_OPERATORS = collect_airflow_operators()
 
 class Literal:
 
-    def __init__(self, expr: str, refs: List[Any] = None, aliases: List[str] = None):
+    def __init__(self, expr: str, deps: List[Any] = None):
         self.expr = expr
-        self.refs = refs if isinstance(refs, List) else [refs]
-        self.aliases = aliases if isinstance(aliases, List) else [aliases]
+        self.deps = deps if isinstance(deps, List) else [deps]
 
     def __repr__(self):
         return self.expr
 
     def _to_ast(self):
         return asttrs.Name(id=self.expr, ctx=asttrs.Load())
+
+    def _dep_ast(self, param_ctx: "ParamContext" = None) -> List[asttrs.stmt]:
+        body = []
+
+        for d in self.deps:
+
+            if isinstance(d, Literal):
+                body.append(d._to_ast())  # NOTE: alias conflict may occur
+            else:
+                body.extend(ParamContext.get(d, param_ctx)._dep_ast(param_ctx))
+
+        return body
 
 
 class Param:
@@ -115,7 +126,7 @@ class Param:
         if isinstance(value, Literal):
             return value._to_ast()
 
-        return asttrs.Constant(value=value)
+        raise TypeError(f"{type(value)} is not supported, got: {value}")
 
     def _dep_ast(self, param_ctx: "ParamContext" = None) -> List[asttrs.stmt]:
         body = []
@@ -146,6 +157,10 @@ class Param:
                     ],
                 )
             )
+
+        elif isinstance(value, Literal):
+
+            body.extend(value._dep_ast(param_ctx))
 
         return body
 
