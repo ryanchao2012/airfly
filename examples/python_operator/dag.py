@@ -2,9 +2,7 @@
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.python import PythonOperator, PythonVirtualenvOperator
-
-from workflow import callable_virtualenv, my_sleeping_function, print_context
+from airflow.utils.task_group import TaskGroup
 
 # >>>>>>>>>> Include from 'params.py'
 dag_kwargs = dict(
@@ -15,39 +13,52 @@ dag_kwargs = dict(
 )
 # <<<<<<<<<< End of code insertion
 with DAG("example_python_operator", **dag_kwargs) as dag:
+    from airflow.operators.python import PythonOperator, PythonVirtualenvOperator
+
+    from workflow import callable_virtualenv, my_sleeping_function, print_context
+
+    group_workflow = TaskGroup(group_id="workflow", prefix_group_id=False)
     workflow_run_this = PythonOperator(
-        task_id="workflow.run_this", python_callable=print_context
+        task_id="workflow.run_this",
+        python_callable=print_context,
+        task_group=group_workflow,
     )
     workflow_sleep_for_0 = PythonOperator(
         task_id="workflow.sleep_for_0",
         python_callable=my_sleeping_function,
         op_kwargs={"random_base": 0},
+        task_group=group_workflow,
     )
     workflow_sleep_for_1 = PythonOperator(
         task_id="workflow.sleep_for_1",
         python_callable=my_sleeping_function,
         op_kwargs={"random_base": 1},
+        task_group=group_workflow,
     )
     workflow_sleep_for_2 = PythonOperator(
         task_id="workflow.sleep_for_2",
         python_callable=my_sleeping_function,
         op_kwargs={"random_base": 2},
+        task_group=group_workflow,
     )
     workflow_sleep_for_3 = PythonOperator(
         task_id="workflow.sleep_for_3",
         python_callable=my_sleeping_function,
         op_kwargs={"random_base": 3},
+        task_group=group_workflow,
     )
     workflow_sleep_for_4 = PythonOperator(
         task_id="workflow.sleep_for_4",
         python_callable=my_sleeping_function,
         op_kwargs={"random_base": 4},
+        task_group=group_workflow,
     )
     workflow_virtualenv_task = PythonVirtualenvOperator(
         task_id="workflow.virtualenv_task",
         python_callable=callable_virtualenv,
         requirements=["colorama==0.4.0"],
         system_site_packages=False,
+        task_group=group_workflow,
     )
     workflow_run_this >> workflow_sleep_for_0
     workflow_run_this >> workflow_sleep_for_1
