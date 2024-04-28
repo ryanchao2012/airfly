@@ -54,7 +54,8 @@ Options:
                               with <python-file>:<variable> form, the
                               <variable> should be the dictionary which will
                               be passed to DAG as keyword arguments.
-  --task-class TEXT           default: "airfly.model.AirFly"
+  -t, --task-class TEXT       Target task class to search, default:
+                              'airfly.model.v1.AirFly'
   --help                      Show this message and exit.
 ```
 

@@ -3,7 +3,8 @@ import os
 
 import click
 
-from airfly.model import TaskTree
+from airfly.model import AirFly, TaskTree
+from airfly.utils import qualname
 
 from .utils import convert_dag_params, expand_sys_path, print_version, validate_includes
 
@@ -66,12 +67,9 @@ from .utils import convert_dag_params, expand_sys_path, print_version, validate_
 )
 @click.option(
     "--task-class",
+    "-t",
     default="airfly.model.AirFly",
-    help=(
-        """
-        default: "airfly.model.AirFly"
-"""
-    ),
+    help=(f"Target task class to search, default: '{qualname(AirFly)}'"),
 )
 def main(name, modname, path, exclude_pattern, includes, dag_params, task_class):
 
