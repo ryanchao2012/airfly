@@ -6,13 +6,24 @@
 
 # AirFly: Auto Generate Airflow's `dag.py` On The Fly
 
-Pipeline management is essential for data operation in company, many engineering teams rely on tools like Airflow to help them organize workflows, such as ETL, data analytic jobs or machine learning projects.
 
-Airflow provides rich extensibility to let developers arrange workloads into a sequence of "operators", then they declare the task dependencies within a `DAG` context while writing the `dag.py` file. 
+Pipeline management is crucial for efficient data operations within a company. Many engineering teams rely on tools like Airflow to help them organize workflows, including ETL processes, data analytics tasks, and machine learning projects.
 
-As workflow grows progressively, the increasing complexity of task relations prones to messing up the dag structure, leads to decrease of code maintainability, especially in collaborative scenarios.
+Airflow offers extensive extensibility, allowing developers to arrange workloads into a sequence of tasks. These tasks are then declared within a `DAG` context in the `dag.py` file, specifying task dependencies.
 
-`airfly` tries to mitigate such pain-points and brings automation to this development life cycle, it assumes all tasks are managed in certain python module, developers specify the dependencies while defining the task objects. During deployment, `airfly` can resolve the dependency tree and automatically build the `dag.py` for you.
+As workflows grow in complexity, the increasing intricacy of task relations can lead to confusion and disrupt the DAG structure. This complexity often results in decreased code maintainability, particularly in collaborative scenarios.
+
+`airfly` aims to alleviate these pain points and streamline the development life cycle. It operates under the assumption that all tasks are managed within a certain Python module. Developers define task dependencies while creating task objects. During deployment, `airfly` can resolve the dependency tree and automatically generate the `dag.py` file for you.
+
+
+
+
+## Key Features
+
+* dag.py automation: focus on your task, let airfly handle the rest.
+* No need to install Airflow: keep your environment lean.
+* support task group: a nice feature from Airflow 2.0+
+* support duck typing: free the class inheritance.
 
 ## Install
 
@@ -43,15 +54,15 @@ Options:
                               with <python-file>:<variable> form, the
                               <variable> should be the dictionary which will
                               be passed to DAG as keyword arguments.
+  --task-class TEXT           default: "airfly.model.AirFly"
   --help                      Show this message and exit.
-
 ```
 
-## Usage
+## Assumptions
 
-`airfly` expects the implementations are populated in a Python module(or package), the task dependencies are declared by assigning `upstream` and `downstream` attributes to each object. The task objects are actually wrappers for Airflow operators, when `airfly` walks through the entire module, all tasks are discovered and collected, the dependency tree and the `DAG` context are automatically built, with some `ast` helpers, `airfly` can wrap all these information, convert them into python code, and finally save them to `dag.py`.
+`airfly` assumes the tasks are populated in a Python module(or a package, e.g., `man_dag` in the below example), the dependencies are declared by assigning `upstream` and `downstream` attributes to each task. A task holds some attributes corresponding to an airflow operator, when `airfly` walks through the entire module, all tasks are discovered and collected, the dependency tree and the `DAG` context are auto-built, with some `ast` helpers, `airfly` can wrap the information, convert it into python code, and finally save them to `dag.py`.
 
-```
+```sh
 main_dag
 ├── __init__.py
 ├── mod_a.py
@@ -68,9 +79,9 @@ main_dag
 ```
 
 
-### Wrap Airflow operator with `AirFly`
+### Define your task with `AirFly`
 
-In order to do codegen, collect the operator's metadata into a `AirFly` subclass as following(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/demo.py)):
+Declare a task as following(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/demo.py)):
 
 ```python
 # in demo.py
@@ -78,18 +89,52 @@ from airfly.model import AirFly
 
 
 class print_date(AirFly):
-    op_class = "BashOperator" 
+    op_class = "BashOperator"
     op_params = dict(bash_command="date")
+
+
+# render to airflow operator
+print_date._to_ast(print_date).show()
+# examples_tutorial_demo_print_date = BashOperator(
+#     task_id='examples.tutorial.demo.print_date',
+#     bash_command='date',
+#     task_group=group_examples_tutorial_demo
+# )
+
 ```
 
-* `op_class` specifies the class of the Airflow operator.
-* The class name(`print_date`) will be mapped to `task_id` to the applied operator after code generation.
-* `params` will be passed to operator as keyword argument.
+* `op_class (str)`: specifies the airflow operator to this task.
+* `op_params`: define the keyword arguments which will be passed to the airflow operator(`op_class`), a parameter (i.e., value in the dictionary) could be in one of [primitive types](https://docs.python.org/3/library/stdtypes.html), function or class object. 
+
+By default, the class name(`print_date`) will be mapped to `task_id` to the applied operator after code generation. you can change this behavior by overriding `_get_taskid` as a classmethod, you have to make sure the task id is globally unique:
+
+```python
+
+from airfly.model import AirFly
 
 
-### Declare task dependency
+class print_date(AirFly):
+    @classmethod
+    def _get_taskid(cls):
+        # customize the task id
+        return f"my_task_{cls.__qualname__}"
+    op_class = "BashOperator" 
+    op_params = dict(bash_command="date")
 
-Use `upstream` and `downstream` to specify task dependencies.
+
+print_date._to_ast(print_date).show()
+# my_task_print_date = BashOperator(
+#     task_id='my_task_print_date',
+#     bash_command='date',
+#     task_group=group_my_task_print_date
+# )
+
+```
+
+
+### Define task dependency
+
+Specifying task dependencies with `upstream` and `downstream`.
 
 ```python
 # in demo.py
@@ -127,42 +172,75 @@ class sleep(AirFly):
 
 ### Generate the `dag.py` file
 With commandline interface:
-```
+```sh
 $ airfly --name demo_dag --modname demo > dag.py
 ```
 
-The outputs in `dag.py`:
+Output in `dag.py`:
 
 ```python
-# This file is auto-generated by airfly 0.6.0
+# This file is auto-generated by airfly 1.0.0
 from airflow.models import DAG
-from airflow.operators.bash import BashOperator
+from airflow.utils.task_group import TaskGroup
 
 with DAG("demo_dag") as dag:
-    demo_print_date = BashOperator(task_id="demo.print_date", bash_command="date")
+    from airflow.operators.bash import BashOperator
+
+    group_demo = TaskGroup(group_id="demo", prefix_group_id=False)
+    demo_print_date = BashOperator(
+        task_id="demo.print_date", bash_command="date", task_group=group_demo
+    )
     demo_sleep = BashOperator(
-        task_id="demo.sleep", depends_on_past=False, bash_command="sleep 5", retries=3
+        task_id="demo.sleep",
+        depends_on_past=False,
+        bash_command="sleep 5",
+        retries=3,
+        task_group=group_demo,
     )
     demo_templated = BashOperator(
         task_id="demo.templated",
         depends_on_past=False,
-        bash_command="""
-{% for i in range(5) %}
-    echo "{{ ds }}"
-    echo "{{ macros.ds_add(ds, 7)}}"
-    echo "{{ params.my_param }}"
-{% endfor %}
-""",
+        bash_command='\n{% for i in range(5) %}\n    echo "{{ ds }}"\n    echo "{{ macros.ds_add(ds, 7)}}"\n    echo "{{ params.my_param }}"\n{% endfor %}\n',
         params={"my_param": "Parameter I passed in"},
+        task_group=group_demo,
     )
     demo_print_date >> demo_sleep
     demo_sleep >> demo_templated
 ```
 
+Make sure the `demo` module is in the current environment so that airfly can find it.
+If it's not the case, you can use `--path/-p` to add the location of the module into `sys.path`, e.g.,
+
+```sh
+.
+├── folder
+│   └── subfolder
+│       └── demo.py   # Assume this is the target module
+:
+
+$ airfly --name demo_dag --path folder/subfolder --modname demo > dag.py
+```
+
+The target module can be a package as well, e.g.,
+
+```sh
+.
+├── folder
+│   └── subfolder
+│       └── demo   # Assume this is the target package
+│           ├── __init__.py
+│           ├── module_a.py
+:           :
+
+$ airfly --name demo_dag --path folder/subfolder --modname demo > dag.py
+```
+
+
+
 
 ## Inject parameters to `DAG`
 
-If any additional arguments are needed, write and manage those configurations in a python file(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/params.py)), `airfly` can pass them to `DAG` during codegen.
+Manage the DAG arguments in a python file(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/params.py)), then pass them to `airfly`.
 
 ```python
 # in params.py
@@ -203,19 +281,20 @@ dag_kwargs = dict(
 )
 ```
 
-Inject those arguments with `--dag-params` option:
+Inject the arguments with `--dag-params` option in `<python-file>:<variable>` form:
 ```
 $ airfly --name demo_dag --modname demo --dag-params params.py:dag_kwargs > dag.py
 ```
 
-The outputs in `dag.py`:
+Output in `dag.py`:
+
 ```python
-# This file is auto-generated by airfly 0.6.0
+# This file is auto-generated by airfly 1.0.0
 from datetime import timedelta
 
 from airflow.models import DAG
-from airflow.operators.bash import BashOperator
 from airflow.utils.dates import days_ago
+from airflow.utils.task_group import TaskGroup
 
 # >>>>>>>>>> Include from 'params.py'
 default_args = {
@@ -236,24 +315,29 @@ dag_kwargs = dict(
 )
 # <<<<<<<<<< End of code insertion
 with DAG("demo_dag", **dag_kwargs) as dag:
-    demo_print_date = BashOperator(task_id="demo.print_date", bash_command="date")
+    from airflow.operators.bash import BashOperator
+
+    group_demo = TaskGroup(group_id="demo", prefix_group_id=False)
+    demo_print_date = BashOperator(
+        task_id="demo.print_date", bash_command="date", task_group=group_demo
+    )
     demo_sleep = BashOperator(
-        task_id="demo.sleep", depends_on_past=False, bash_command="sleep 5", retries=3
+        task_id="demo.sleep",
+        depends_on_past=False,
+        bash_command="sleep 5",
+        retries=3,
+        task_group=group_demo,
     )
     demo_templated = BashOperator(
         task_id="demo.templated",
         depends_on_past=False,
-        bash_command="""
-{% for i in range(5) %}
-    echo "{{ ds }}"
-    echo "{{ macros.ds_add(ds, 7)}}"
-    echo "{{ params.my_param }}"
-{% endfor %}
-""",
+        bash_command='\n{% for i in range(5) %}\n    echo "{{ ds }}"\n    echo "{{ macros.ds_add(ds, 7)}}"\n    echo "{{ params.my_param }}"\n{% endfor %}\n',
         params={"my_param": "Parameter I passed in"},
+        task_group=group_demo,
     )
     demo_print_date >> demo_sleep
     demo_sleep >> demo_templated
+
 ```
 
 `airfly` wraps required information including variables and imports into output python script, and pass the specified value to `DAG` object.
@@ -261,30 +345,139 @@ with DAG("demo_dag", **dag_kwargs) as dag:
 
 ## Exclude tasks from codegen
 By passing `--exclude-pattern` to match any unwanted objects with their `__qualname__`. then filter them out.
+
 ```
 $ airfly --name demo_dag --modname demo --exclude-pattern templated > dag.py
 ```
 
-The outputs in `dag.py`:
+Output in `dag.py`:
 
 ```python
-# This file is auto-generated by airfly 0.6.0
+# This file is auto-generated by airfly 1.0.0
 from airflow.models import DAG
-from airflow.operators.bash import BashOperator
+from airflow.utils.task_group import TaskGroup
 
 with DAG("demo_dag") as dag:
-    demo_print_date = BashOperator(task_id="demo.print_date", bash_command="date")
+    from airflow.operators.bash import BashOperator
+
+    group_demo = TaskGroup(group_id="demo", prefix_group_id=False)
+    demo_print_date = BashOperator(
+        task_id="demo.print_date", bash_command="date", task_group=group_demo
+    )
     demo_sleep = BashOperator(
-        task_id="demo.sleep", depends_on_past=False, bash_command="sleep 5", retries=3
+        task_id="demo.sleep",
+        depends_on_past=False,
+        bash_command="sleep 5",
+        retries=3,
+        task_group=group_demo,
     )
     demo_print_date >> demo_sleep
+
 ```
 
 The `templated` task is gone.
 
 
+## Duct typing
+
+In fact, there's no need to inherite from `AirFly`, you can have your own task class definition, as long as it provides certain attributes, `airfly` can still work for you.
+
+
+```python
+# my_task_model.py
+from typing import Any, Dict, Iterable, Type, Union
+
+TaskClass = Type["MyTask"]
+
+
+class MyTask:
+    # airfly assumes these attributes exist
+    op_class: str = "BashOperator"
+    op_params: Dict[str, Any] = None
+    op_module: str = None
+    upstream: Union[TaskClass, Iterable[TaskClass]] = None
+    downstream: Union[TaskClass, Iterable[TaskClass]] = None
+
+    # other stuff
+
+
+# in demo2.py
+from textwrap import dedent
+
+from my_task_model import MyTask
+
+
+class print_date(MyTask):
+    op_params = dict(bash_command="date")
+
+
+templated_command = dedent(
+    """
+{% for i in range(5) %}
+    echo "{{ ds }}"
+    echo "{{ macros.ds_add(ds, 7)}}"
+    echo "{{ params.my_param }}"
+{% endfor %}
+"""
+)
+
+
+class templated(MyTask):
+    op_params = dict(
+        depends_on_past=False,
+        bash_command=templated_command,
+        params={"my_param": "Parameter I passed in"},
+    )
+
+
+class sleep(MyTask):
+    op_params = dict(depends_on_past=False, bash_command="sleep 5", retries=3)
+
+    upstream = print_date
+    downstream = (templated,)
+```
+
+Pass the task definition with `--task-class`
+
+```
+$ airfly --name demo_dag --modname demo2 --task-class my_task_model.MyTask > dag.py
+```
+
+Output in `dag.py`:
+
+```python
+# This file is auto-generated by airfly 1.0.0
+from airflow.models import DAG
+from airflow.utils.task_group import TaskGroup
+
+with DAG("demo_dag") as dag:
+    from airflow.operators.bash import BashOperator
+
+    group_demo2 = TaskGroup(group_id="demo2", prefix_group_id=False)
+    demo2_print_date = BashOperator(
+        task_id="demo2.print_date", bash_command="date", task_group=group_demo2
+    )
+    demo2_sleep = BashOperator(
+        task_id="demo2.sleep",
+        depends_on_past=False,
+        bash_command="sleep 5",
+        retries=3,
+        task_group=group_demo2,
+    )
+    demo2_templated = BashOperator(
+        task_id="demo2.templated",
+        depends_on_past=False,
+        bash_command='\n{% for i in range(5) %}\n    echo "{{ ds }}"\n    echo "{{ macros.ds_add(ds, 7)}}"\n    echo "{{ params.my_param }}"\n{% endfor %}\n',
+        params={"my_param": "Parameter I passed in"},
+        task_group=group_demo2,
+    )
+    demo2_print_date >> demo2_sleep
+    demo2_sleep >> demo2_templated
+```
+
+
 ## Examples
 
-Please visit [examples](https://github.com/ryanchao2012/airfly/blob/main/examples) to explore more use cases.
+Please visit [examples](https://github.com/ryanchao2012/airfly/blob/main/examples) to explore other examples.
 
 <a href="https://github.com/ryanchao2012/airfly/blob/main/examples"><img src="https://github.com/ryanchao2012/airfly/blob/main/assets/graph-view.png?raw=true" width="800"></img></a>
