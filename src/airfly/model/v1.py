@@ -49,6 +49,9 @@ class Literal:
     def __repr__(self):
         return self.expr
 
+    def _to_ast(self):
+        return asttrs.Name(id=self.expr, ctx=asttrs.Load())
+
 
 class Param:
     def __init__(self, target: Any, alias: str = None):
@@ -110,7 +113,7 @@ class Param:
             return asttrs.Name(id=".".join(name), ctx=asttrs.Load())
 
         if isinstance(value, Literal):
-            return asttrs.Name(id=repr(value), ctx=asttrs.Load())
+            return value._to_ast()
 
         return asttrs.Constant(value=value)
 
