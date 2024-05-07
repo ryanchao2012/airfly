@@ -6,24 +6,26 @@
 
 # AirFly: Auto Generate Airflow's `dag.py` On The Fly
 
+Pipeline management is crucial for efficient data operations within a company. Many engineering teams rely on tools like Airflow to help them organize workflows, including ETL processes, reporting pipelines, or machine learning projects.
 
-Pipeline management is crucial for efficient data operations within a company. Many engineering teams rely on tools like Airflow to help them organize workflows, including ETL processes, data analytics tasks, and machine learning projects.
+Airflow offers rich extensibility, allowing developers to arrange workloads into a sequence of tasks. These tasks are then declared within a `DAG` context in a `dag.py` file, specifying task dependencies.
 
-Airflow offers extensive extensibility, allowing developers to arrange workloads into a sequence of tasks. These tasks are then declared within a `DAG` context in the `dag.py` file, specifying task dependencies.
+As a workflow grows in complexity, the increasing intricacy of task relations can lead to confusion and disrupt the DAG structure. This complexity often results in decreased code maintainability, particularly in collaborative scenarios.
 
-As workflows grow in complexity, the increasing intricacy of task relations can lead to confusion and disrupt the DAG structure. This complexity often results in decreased code maintainability, particularly in collaborative scenarios.
+`airfly` tries to alleviate such pain points and streamline the development life cycle. It operates under the assumption that all tasks are managed within a certain Python module. Developers define task dependencies while creating task objects. During deployment, `airfly` can resolve the dependency tree and automatically generate the `dag.py` for you.
 
-`airfly` aims to alleviate these pain points and streamline the development life cycle. It operates under the assumption that all tasks are managed within a certain Python module. Developers define task dependencies while creating task objects. During deployment, `airfly` can resolve the dependency tree and automatically generate the `dag.py` file for you.
+<img src="https://github.com/ryanchao2012/airfly/blob/main/assets/graph-view.png?raw=true" width="800"></img>
+***airfly** helps you build complex dags*
 
 
 
 
 ## Key Features
 
-* dag.py automation: focus on your task, let airfly handle the rest.
+* `dag.py` automation: focus on your task, let airfly handle the rest.
 * No need to install Airflow: keep your environment lean.
 * support task group: a nice feature from Airflow 2.0+
-* support duck typing: free the class inheritance.
+* support duck typing: flexible class inheritance.
 
 ## Install
 
@@ -59,9 +61,9 @@ Options:
   --help                      Show this message and exit.
 ```
 
-## Assumptions
+## How It Works
 
-`airfly` assumes the tasks are populated in a Python module(or a package, e.g., `man_dag` in the below example), the dependencies are declared by assigning `upstream` and `downstream` attributes to each task. A task holds some attributes corresponding to an airflow operator, when `airfly` walks through the entire module, all tasks are discovered and collected, the dependency tree and the `DAG` context are auto-built, with some `ast` helpers, `airfly` can wrap the information, convert it into python code, and finally save them to `dag.py`.
+`airfly` assumes the tasks are populated in a Python module(or a package, e.g., `man_dag` in the below example), the dependencies are declared by assigning `upstream` or `downstream` attributes to each task. A task holds some attributes corresponding to an airflow operator, when `airfly` walks through the entire module, all tasks are discovered and collected, the dependency tree and the `DAG` context are auto-built, with some `ast` helpers, `airfly` can wrap the information, convert it into python code, and finally save them to `dag.py`.
 
 ```sh
 main_dag
@@ -94,7 +96,8 @@ class print_date(AirFly):
     op_params = dict(bash_command="date")
 
 
-# render to airflow operator
+# during code generation,
+# this class will be converted to airflow operator
 print_date._to_ast(print_date).show()
 # examples_tutorial_demo_print_date = BashOperator(
 #     task_id='examples.tutorial.demo.print_date',
@@ -105,9 +108,33 @@ print_date._to_ast(print_date).show()
 ```
 
 * `op_class (str)`: specifies the airflow operator to this task.
-* `op_params`: define the keyword arguments which will be passed to the airflow operator(`op_class`), a parameter (i.e., value in the dictionary) could be in one of [primitive types](https://docs.python.org/3/library/stdtypes.html), function or class object. 
+* `op_params`: keyword arguments which will be passed to the airflow operator(`op_class`), a parameter (i.e., value in the dictionary) could be one of the [primitive types](https://docs.python.org/3/library/stdtypes.html), a function or a class.
 
-By default, the class name(`print_date`) will be mapped to `task_id` to the applied operator after code generation. you can change this behavior by overriding `_get_taskid` as a classmethod, you have to make sure the task id is globally unique:
+You can also define the attributes by `property`:
+```python
+from airfly.model import AirFly
+
+
+class print_date(AirFly):
+
+    @property
+    def op_class(self):
+        return "BashOperator"
+
+    @property
+    def op_params(self):
+        return dict(bash_command="date")
+
+print_date._to_ast(print_date).show()
+# examples_tutorial_demo_print_date = BashOperator(
+#     task_id='examples.tutorial.demo.print_date',
+#     bash_command='date',
+#     task_group=group_examples_tutorial_demo
+# )
+
+```
+
+By default, the class name(`print_date`) maps to `task_id` to the applied operator after code generation. You can change this behavior by overriding `_get_taskid` as a classmethod, you have to make sure the task id is globally unique:
 
 ```python
 
@@ -135,7 +162,7 @@ print_date._to_ast(print_date).show()
 
 ### Define task dependency
 
-Specifying task dependencies with `upstream` and `downstream`.
+Specifying task dependencies with `upstream` or `downstream`.
 
 ```python
 # in demo.py
@@ -167,12 +194,17 @@ class sleep(AirFly):
                   retries=3)
 
     upstream = print_date
-    downstream = (templated,)
+
+    @property   # property also works
+    def downstream(self):
+        return (templated,)
 ```
 
+`upstream`/`downstream`: return a task class or a iterable such as list or tuple.
 
-### Generate the `dag.py` file
-With commandline interface:
+
+### Generate `dag.py`
+Via commandline interface:
 ```sh
 $ airfly --name demo_dag --modname demo > dag.py
 ```
@@ -237,8 +269,6 @@ $ airfly --name demo_dag --path folder/subfolder --modname demo > dag.py
 ```
 
 
-
-
 ## Inject parameters to `DAG`
 
 Manage the DAG arguments in a python file(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/params.py)), then pass them to `airfly`.
@@ -282,7 +312,7 @@ dag_kwargs = dict(
 )
 ```
 
-Inject the arguments with `--dag-params` option in `<python-file>:<variable>` form:
+Inject the arguments by passing `--dag-params` option, with the format of `<python-file>:<variable>`:
 ```
 $ airfly --name demo_dag --modname demo --dag-params params.py:dag_kwargs > dag.py
 ```
@@ -379,7 +409,13 @@ with DAG("demo_dag") as dag:
 The `templated` task is gone.
 
 
-## Duct typing
+### Task Group
+
+`airfly`  defines `TaskGroup` in the DAG context and assigns `task_group` to each operator for you.
+It maps the module hierarchy to the nested group structure,
+so the tasks in the same python module will be grouped closer.
+
+## Duck Typing
 
 In fact, there's no need to inherite from `AirFly`, you can have your own task class definition, as long as it provides certain attributes, `airfly` can still work for you.
 
@@ -399,7 +435,7 @@ class MyTask:
     upstream: Union[TaskClass, Iterable[TaskClass]] = None
     downstream: Union[TaskClass, Iterable[TaskClass]] = None
 
-    # other stuff
+    # other stuffs
 
 
 # in demo2.py
@@ -479,6 +515,5 @@ with DAG("demo_dag") as dag:
 
 ## Examples
 
-Please visit [examples](https://github.com/ryanchao2012/airfly/blob/main/examples) to explore other examples.
+Please explore more examples [here](https://github.com/ryanchao2012/airfly/blob/main/examples).
 
-<a href="https://github.com/ryanchao2012/airfly/blob/main/examples"><img src="https://github.com/ryanchao2012/airfly/blob/main/assets/graph-view.png?raw=true" width="800"></img></a>
