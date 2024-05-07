@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:460a8d9a4ef35b9587cb31113544cc1c561cb4c92f4b4a83367d039e70608e70"
+content_hash = "sha256:7e6bff72ff89e3177e89ccb3eebd17cc4c00820512f684ec38a4a84a07ff58b8"
 
 [[package]]
 name = "appnope"
@@ -41,7 +41,7 @@ files = [
 
 [[package]]
 name = "asttrs"
-version = "1.0.1"
+version = "1.3.0"
 requires_python = ">=3.7"
 summary = "A attrs-style wrapper for python ast"
 dependencies = [
@@ -52,8 +52,8 @@ dependencies = [
     "isort",
 ]
 files = [
-    {file = "asttrs-1.0.1-py3-none-any.whl", hash = "sha256:58cd85a8ae2d9df9294d2c9cbabc4dda7bd34378a169031de58ed3b955d21d01"},
-    {file = "asttrs-1.0.1.tar.gz", hash = "sha256:dbe74c79ecc6d57515ba5f776371bc44bd9c3937cadd850a3f3c1b059e08df6a"},
+    {file = "asttrs-1.3.0-py3-none-any.whl", hash = "sha256:d671b985da21ac4981951a6e0474839d346d5ad58aca513c95f71e884e70b128"},
+    {file = "asttrs-1.3.0.tar.gz", hash = "sha256:39f3cd8bbecdeecff6c851d9cdb59e600a22611967cb2a0e1c5988d01a23233d"},
 ]
 
 [[package]]
