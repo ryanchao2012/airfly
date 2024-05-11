@@ -732,6 +732,7 @@ class TaskTree:
         name: str,
         includes: Union[str, List[str]] = None,
         dag_params: Tuple[str, str] = None,
+        task_group: bool = True,
         formatted: bool = True,
     ) -> str:
         """Generates the source code representation of the task tree.
@@ -759,7 +760,11 @@ class TaskTree:
             f"Generating code of dag.py: name='{name}', includes={includes}, dag_params={dag_params}"
         )
 
-        src = re.sub("\n+", "\n", self._to_ast(name, dag_params, includes).to_source())
+        src = re.sub(
+            "\n+",
+            "\n",
+            self._to_ast(name, dag_params, includes, task_group).to_source(),
+        )
 
         return isorting(blacking(src)) if formatted else src
 
@@ -768,15 +773,19 @@ class TaskTree:
         dag_name,
         dag_params,
         includes,
+        task_group=True,
     ) -> asttrs.AST:
 
         ctx = ParamContext()
         body = (
             self._build_header()
-            + self._build_imports(ctx)
+            + self._build_imports(task_group)
             + self._build_includes(includes)
             + self._build_dag_context(
-                dag_name=dag_name, dag_params=dag_params, param_ctx=ctx
+                dag_name=dag_name,
+                dag_params=dag_params,
+                param_ctx=ctx,
+                task_group=task_group,
             )
         )
 
@@ -790,17 +799,19 @@ class TaskTree:
             )
         ]
 
-    def _build_imports(self, param_ctx: ParamContext = None) -> List[asttrs.stmt]:
+    def _build_imports(self, task_group=True) -> List[asttrs.stmt]:
 
         imports = [
-            asttrs.ImportFrom(
-                module="airflow.models", names=[asttrs.alias(name="DAG")]
-            ),
-            asttrs.ImportFrom(
-                module="airflow.utils.task_group",
-                names=[asttrs.alias(name="TaskGroup")],
-            ),
+            asttrs.ImportFrom(module="airflow.models", names=[asttrs.alias(name="DAG")])
         ]
+
+        if task_group:
+            imports.append(
+                asttrs.ImportFrom(
+                    module="airflow.utils.task_group",
+                    names=[asttrs.alias(name="TaskGroup")],
+                )
+            )
 
         return imports
 
@@ -851,7 +862,11 @@ class TaskTree:
         return []
 
     def _build_dag_context(
-        self, dag_name: str, dag_params: Tuple[str, str] = None, param_ctx=None
+        self,
+        dag_name: str,
+        dag_params: Tuple[str, str] = None,
+        param_ctx=None,
+        task_group=True,
     ) -> List[asttrs.stmt]:
 
         if dag_params and dag_params[1]:
@@ -877,7 +892,7 @@ class TaskTree:
                         optional_vars=asttrs.Name(id="dag", ctx=asttrs.Store()),
                     )
                 ],
-                body=self._build_dag_body(param_ctx=param_ctx),
+                body=self._build_dag_body(param_ctx=param_ctx, task_group=task_group),
             )
         ]
 

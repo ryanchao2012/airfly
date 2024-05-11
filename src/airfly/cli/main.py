@@ -6,7 +6,13 @@ import click
 from airfly.model import AirFly, TaskTree
 from airfly.utils import qualname
 
-from .utils import convert_dag_params, expand_sys_path, print_version, validate_includes
+from .utils import (
+    convert_dag_params,
+    convert_task_group,
+    expand_sys_path,
+    print_version,
+    validate_includes,
+)
 
 
 @click.command()
@@ -69,9 +75,18 @@ from .utils import convert_dag_params, expand_sys_path, print_version, validate_
     "--task-class",
     "-t",
     default="airfly.model.AirFly",
-    help=(f"Target task class to search, default: '{qualname(AirFly)}'"),
+    help=f"Target task class to search, default: '{qualname(AirFly)}'",
 )
-def main(name, modname, path, exclude_pattern, includes, dag_params, task_class):
+@click.option(
+    "--task-group",
+    "-g",
+    callback=convert_task_group,
+    default=True,
+    help="Whether to enable TaskGroup, default: True",
+)
+def main(
+    name, modname, path, exclude_pattern, includes, dag_params, task_class, task_group
+):
 
     with expand_sys_path(*path):
         module = importlib.import_module(modname)
@@ -92,4 +107,9 @@ def main(name, modname, path, exclude_pattern, includes, dag_params, task_class)
         module, taskclass=taskclass, exclude_pattern=exclude_pattern
     )
 
-    print(tree.to_dag(name, includes=includes, dag_params=dag_params), end="")
+    print(
+        tree.to_dag(
+            name, includes=includes, dag_params=dag_params, task_group=task_group
+        ),
+        end="",
+    )

@@ -57,3 +57,17 @@ def convert_dag_params(ctx, param, value):
 
     except ValueError:
         raise click.BadParameter("format must be '<python-file>:<variable>'")
+
+
+def convert_task_group(ctx, param, value):
+
+    if isinstance(value, bool):
+        return value
+
+    if isinstance(value, int):
+        return value == 1
+
+    if isinstance(value, str):
+        return value.lower() == "true" or value == "1"
+
+    return False
