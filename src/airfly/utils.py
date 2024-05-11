@@ -1,3 +1,4 @@
+import importlib
 import io
 import os
 import pathlib
@@ -6,9 +7,13 @@ import subprocess as sp
 import sys
 import tempfile
 from contextlib import contextmanager
-from importlib._bootstrap_external import SourceFileLoader
 from types import FunctionType, ModuleType
 from typing import Callable, Generator, Union
+
+import attr
+import loguru
+
+immutable = attr.s(auto_attribs=True, slots=True, frozen=True, kw_only=True)
 
 
 def qualname(obj: Union[FunctionType, ModuleType, type], level: int = -1) -> str:
@@ -39,18 +44,32 @@ def qualname(obj: Union[FunctionType, ModuleType, type], level: int = -1) -> str
     return ".".join(name.split(".")[-level:]) if level > 0 else name
 
 
+def issubclass_by_qualname(cls, class_or_tuple):
+    mro = {qualname(o) for o in cls.mro()}
+
+    if isinstance(class_or_tuple, type):
+        class_or_tuple = (class_or_tuple,)
+
+    for o in class_or_tuple:
+        if qualname(o) in mro:
+            return True
+
+    return False
+
+
 def blacking(source_code: str):
 
     with tempfile.NamedTemporaryFile("w", delete=False) as f:
         f.write(source_code)
         fname = f.name
 
-    with sp.Popen(f"cat {fname}".split(), stdout=sp.PIPE) as p:
+    with sp.Popen(["cat", fname], stdout=sp.PIPE) as p:
         cmd = [sys.executable, "-m", "black", "-q", "-"]
         out = sp.check_output(cmd, stdin=p.stdout)
 
     try:
         pathlib.Path(fname).unlink()
+
     except FileNotFoundError:
         pass
 
@@ -63,21 +82,17 @@ def isorting(source_code: str):
         f.write(source_code)
         fname = f.name
 
-    with sp.Popen(f"cat {fname}".split(), stdout=sp.PIPE) as p:
+    with sp.Popen(["cat", fname], stdout=sp.PIPE) as p:
         cmd = [sys.executable, "-m", "isort", "--profile", "black", "-q", "-"]
         out = sp.check_output(cmd, stdin=p.stdout)
 
     try:
         pathlib.Path(fname).unlink()
+
     except FileNotFoundError:
         pass
 
     return out.decode()
-
-
-def load_module_by_name(modname: str) -> ModuleType:
-    loader: SourceFileLoader = pkgutil.get_loader(modname)
-    return loader.load_module(modname)
 
 
 def collect_objects(
@@ -129,35 +144,33 @@ def _collect_from_package(
     for obj in _collect_from_module(package):
         yield obj
 
-    for finder, name, _ in pkgutil.walk_packages(
-        package.__path__, package.__name__ + "."
-    ):
+    for _, name, _ in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
 
         with _escape_any_commandline_parser():
             try:
-                mod = finder.find_module(name).load_module(name)
+                mod = importlib.import_module(name)
 
-            except BaseException:
+            except Exception as e:
+                loguru.logger.warning(f"Ignore invalid module: '{name}'. Reason: {e}")
                 continue
 
         for obj in _collect_from_module(mod):
-
             yield obj
 
 
 def _collect_from_module(
     module: ModuleType,
 ) -> Generator[Union[FunctionType, type], None, None]:
-    for _, obj in module.__dict__.items():
-        if isinstance(obj, (type, FunctionType)):
 
+    for _, obj in module.__dict__.items():
+
+        if isinstance(obj, (type, FunctionType)):
             yield obj
 
 
 def makefile(fullpath: str, content: Union[str, bytes] = "", overwrite: bool = False):
 
     if not os.path.isfile(fullpath):
-
         dirpath = os.path.dirname(fullpath)
 
         if not os.path.isdir(dirpath):
@@ -166,7 +179,6 @@ def makefile(fullpath: str, content: Union[str, bytes] = "", overwrite: bool = F
         _writefile(fullpath, content)
 
     elif overwrite:
-
         _writefile(fullpath, content)
 
 

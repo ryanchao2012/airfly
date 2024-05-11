@@ -1,14 +1,15 @@
+import importlib
 from functools import lru_cache
 from typing import Dict, Type
 
 from airfly._vendor import airflow
-from airfly.utils import collect_objects, load_module_by_name, qualname
+from airfly.utils import collect_objects, qualname
 
 
 @lru_cache()
 def collect_airflow_operators() -> Dict[str, Type]:
 
-    vendor = load_module_by_name(qualname(airflow))
+    vendor = importlib.import_module(qualname(airflow))
     collected = {}
 
     for item in collect_objects(vendor, lambda obj: isinstance(obj, type)):

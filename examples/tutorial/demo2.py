@@ -1,14 +1,9 @@
-"""
-A simple workflow for demo, fork from https://airflow.apache.org/docs/apache-airflow/stable/tutorial.html
-"""
-
 from textwrap import dedent
 
-from airfly.model import AirFly
+from my_task_model import MyTask
 
 
-class print_date(AirFly):
-    op_class = "BashOperator"
+class print_date(MyTask):
     op_params = dict(bash_command="date")
 
 
@@ -23,8 +18,7 @@ templated_command = dedent(
 )
 
 
-class templated(AirFly):
-    op_class = "BashOperator"
+class templated(MyTask):
     op_params = dict(
         depends_on_past=False,
         bash_command=templated_command,
@@ -32,8 +26,7 @@ class templated(AirFly):
     )
 
 
-class sleep(AirFly):
-    op_class = "BashOperator"
+class sleep(MyTask):
     op_params = dict(depends_on_past=False, bash_command="sleep 5", retries=3)
 
     upstream = print_date
