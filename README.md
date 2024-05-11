@@ -58,6 +58,7 @@ Options:
                               be passed to DAG as keyword arguments.
   -t, --task-class TEXT       Target task class to search, default:
                               'airfly.model.v1.AirFly'
+  -g, --task-group BOOLEAN    Whether to enable TaskGroup, default: True
   --help                      Show this message and exit.
 ```
 
@@ -96,7 +97,7 @@ class print_date(AirFly):
     op_params = dict(bash_command="date")
 
 
-# during code generation,
+# during dag generation,
 # this class will be converted to airflow operator
 print_date._to_ast(print_date).show()
 # examples_tutorial_demo_print_date = BashOperator(
@@ -134,7 +135,7 @@ print_date._to_ast(print_date).show()
 
 ```
 
-By default, the class name(`print_date`) maps to `task_id` to the applied operator after code generation. You can change this behavior by overriding `_get_taskid` as a classmethod, you have to make sure the task id is globally unique:
+By default, the class name(`print_date`) maps to `task_id` to the applied operator after dag generation. You can change this behavior by overriding `_get_taskid` as a classmethod, you have to make sure the task id is globally unique:
 
 ```python
 
@@ -162,7 +163,7 @@ print_date._to_ast(print_date).show()
 
 ### Define task dependency
 
-Specifying task dependencies with `upstream` or `downstream`.
+Specifying task dependency with `upstream` or `downstream`.
 
 ```python
 # in demo.py
@@ -204,7 +205,7 @@ class sleep(AirFly):
 
 
 ### Generate `dag.py`
-Via commandline interface:
+Generate the dag by the command:
 ```sh
 $ airfly --name demo_dag --modname demo > dag.py
 ```
@@ -241,7 +242,7 @@ with DAG("demo_dag") as dag:
     demo_sleep >> demo_templated
 ```
 
-Make sure the `demo` module is in the current environment so that airfly can find it.
+Make sure the `demo` module is in the current environment so that `airfly` can find it.
 If it's not the case, you can use `--path/-p` to add the location of the module into `sys.path`, e.g.,
 
 ```sh
@@ -414,6 +415,8 @@ The `templated` task is gone.
 `airfly`  defines `TaskGroup` in the DAG context and assigns `task_group` to each operator for you.
 It maps the module hierarchy to the nested group structure,
 so the tasks in the same python module will be grouped closer.
+If you don't like this feature, pass `--task-group`/`-g` with `False` to disable it. 
+
 
 ## Duck Typing
 
