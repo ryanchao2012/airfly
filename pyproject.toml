@@ -33,7 +33,7 @@ dependencies = [
 [tool.pdm]
 distribution = true
 
-[tool.pdm.dev-dependencies]
+[project.optional-dependencies]
 dev = [
     "ipython>=8.12.3",
     "pytest>=8.1.1",
