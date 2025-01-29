@@ -346,8 +346,7 @@ class Task(TaskAttribute):
             - The parameters are obtained from the Task's attributes and the operator's available parameters.
             - The AST node is an assignment statement, where the target is the variable name and the value is the function call.
 
-        TODO:
-            - Add unit tests for this method.
+        # TODO: Add unit tests for this method.
         """
 
         op = Task._resolve_operator(cls)
@@ -407,7 +406,7 @@ class Task(TaskAttribute):
             ValueError: If multiple op_class with the same basename are found and op_module is not provided or invalid.
             ValueError: If the op_class candidates cannot be resolved by the given op_module.
 
-        TODO: support Operator not provided in _vendor
+        # TODO: support Operator not provided in _vendor
         """
 
         op_class = Task._get_attributes(cls).op_class
@@ -590,7 +589,7 @@ class TaskTree:
             >>> module = ...
             >>> task_tree = TaskTree.from_module(module)
 
-        TODO: add predicate in argument
+        # TODO: add predicate in argument
         """
 
         loguru.logger.info(
