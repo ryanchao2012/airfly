@@ -317,7 +317,10 @@ class Task(TaskAttribute):
 
         vendor_op = Task._resolve_operator(cls)
         op_modname, op_basename = qualname(vendor_op).rsplit(".", 1)
-        op_modname = op_modname.replace("airfly._vendor.", "")
+        # NOTE: if user doesn't define op_module, resolve op_modname from the `qualname` of the operator
+        op_modname = Task._get_attributes(cls).op_module or op_modname.replace(
+            "airfly._vendor.", ""
+        )
 
         deps = [
             asttrs.ImportFrom(module=op_modname, names=[asttrs.alias(name=op_basename)])
