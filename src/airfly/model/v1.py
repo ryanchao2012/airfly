@@ -356,6 +356,7 @@ class Task(TaskAttribute):
         task_varname = Task._to_varname(cls)
 
         avai_params = {}
+        # TODO: support multiple inheritance
         for base in op.mro()[::-1]:
             avai_params.update(getattr(base, "__annotations__", {}))
 
@@ -412,6 +413,7 @@ class Task(TaskAttribute):
         op_class = Task._get_attributes(cls).op_class
 
         if isinstance(op_class, type):
+            # TODO: support multiple inheritance
             if issubclass_by_qualname(op_class, BUILTIN_OPERATORS["BaseOperator"]):
                 return op_class
 
