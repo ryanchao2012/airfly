@@ -420,9 +420,6 @@ class Task(TaskAttribute):
         if isinstance(op_class, str):
             basename = op_class
 
-        # elif isinstance(op_class, type):
-        #     basename = qualname(op_class, level=1)
-
         else:
             raise ValueError(f"Invalid op_class, got: {op_class}")
 
