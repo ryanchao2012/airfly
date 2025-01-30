@@ -317,10 +317,7 @@ class Task(TaskAttribute):
 
         vendor_op = Task._resolve_operator(cls)
         op_modname, op_basename = qualname(vendor_op).rsplit(".", 1)
-        # NOTE: if user doesn't define op_module, resolve op_modname from the `qualname` of the operator
-        op_modname = Task._get_attributes(cls).op_module or op_modname.replace(
-            "airfly._vendor.", ""
-        )
+        op_modname = op_modname.replace("airfly._vendor.", "")
 
         deps = [
             asttrs.ImportFrom(module=op_modname, names=[asttrs.alias(name=op_basename)])
@@ -331,6 +328,42 @@ class Task(TaskAttribute):
         deps.extend(ParamContext.get(params, param_ctx)._dep_ast(param_ctx))
 
         return deps
+
+    @staticmethod
+    @lru_cache()
+    def _collect_op_annotations(op: Type) -> Dict[str, Any]:
+        """Collect annotations for the operator."""
+        avai_params = {}
+
+        if Task._is_builtin_op(op):
+            for base in op.mro()[::-1]:
+                avai_params.update(getattr(base, "__annotations__", {}))
+
+        elif Task._is_private_op(op):
+            for base in op.mro()[::-1]:
+                signature = inspect.signature(base)
+                for k, v in signature.parameters.items():
+
+                    anno = v.annotation
+                    if isinstance(anno, type):
+                        typename = qualname(anno, level=1)
+                    elif hasattr(anno, "__module__") and anno.__module__ == "typing":
+                        typename = str(anno)
+                    elif isinstance(anno, str):
+                        typename = anno
+                    else:
+                        raise TypeError(f"got: {anno}")
+
+                    if v.kind not in [
+                        inspect._ParameterKind.VAR_KEYWORD,
+                        inspect._ParameterKind.VAR_POSITIONAL,
+                    ]:
+
+                        avai_params.update({k: typename})
+        else:
+            raise ValueError(f"Operator {op} is not supported.")
+
+        return avai_params
 
     @staticmethod
     def _to_ast(
@@ -358,14 +391,12 @@ class Task(TaskAttribute):
         task_id = Task._get_taskid(cls)
         task_varname = Task._to_varname(cls)
 
-        avai_params = {}
-        # TODO: support multiple inheritance
-        for base in op.mro()[::-1]:
-            avai_params.update(getattr(base, "__annotations__", {}))
-
+        avai_params = Task._collect_op_annotations(op)
         params = dict(task_id=task_id)
 
         for k, v in (Task._get_attributes(cls).op_params or {}).items():
+            if k in params:
+                loguru.logger.warning(f"Overwrite param {k}={params[k]} with value {v}")
             if k in avai_params:
                 params.update({k: v})
             else:
@@ -374,7 +405,6 @@ class Task(TaskAttribute):
         keywords = []
 
         for k, v in params.items():
-
             par = ParamContext.get(v, param_ctx)
             keywords.append(asttrs.keyword(arg=k, value=par._target_ast(param_ctx)))
 
@@ -399,6 +429,24 @@ class Task(TaskAttribute):
         return assign
 
     @staticmethod
+    @lru_cache()
+    def _is_builtin_op(op: Type) -> bool:
+        return issubclass_by_qualname(op, BUILTIN_OPERATORS["BaseOperator"])
+
+    @staticmethod
+    @lru_cache()
+    def _is_private_op(op: Type) -> bool:
+        try:
+            from airflow.models.baseoperator import BaseOperator
+
+            return issubclass_by_qualname(op, BaseOperator)
+        except Exception as err:
+            loguru.logger.warning(f"{err.__class__}: {err}")
+            pass
+
+        return False
+
+    @staticmethod
     def _resolve_operator(cls) -> Type:
         """Resolve the operator class for the Task.
 
@@ -409,19 +457,18 @@ class Task(TaskAttribute):
             ValueError: If the op_class is invalid or not found in the BUILTIN_OPERATORS.
             ValueError: If multiple op_class with the same basename are found and op_module is not provided or invalid.
             ValueError: If the op_class candidates cannot be resolved by the given op_module.
-
-        # TODO: support Operator not provided in _vendor
         """
 
         op_class = Task._get_attributes(cls).op_class
 
         if isinstance(op_class, type):
-            # TODO: support multiple inheritance
-            if issubclass_by_qualname(op_class, BUILTIN_OPERATORS["BaseOperator"]):
+
+            if Task._is_builtin_op(op_class) or Task._is_private_op(op_class):
                 return op_class
 
             raise TypeError(f"Not a valid operator type, got: {op_class}")
 
+        # NOTE: if op_class is str, assume it's a builtin operator
         if isinstance(op_class, str):
             basename = op_class
 
