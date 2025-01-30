@@ -13,7 +13,7 @@ class CloudDatastoreExportEntitiesOperator(GoogleCloudBaseOperator):
     labels: "dict | None"
     polling_interval_in_seconds: "int"
     overwrite_existing: "bool"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -25,41 +25,41 @@ class CloudDatastoreImportEntitiesOperator(GoogleCloudBaseOperator):
     labels: "dict | None"
     datastore_conn_id: "str"
     polling_interval_in_seconds: "float"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
 class CloudDatastoreAllocateIdsOperator(GoogleCloudBaseOperator):
     partial_keys: "list"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
 class CloudDatastoreBeginTransactionOperator(GoogleCloudBaseOperator):
     transaction_options: "dict[str, Any]"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
 class CloudDatastoreCommitOperator(GoogleCloudBaseOperator):
     body: "dict[str, Any]"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
 class CloudDatastoreRollbackOperator(GoogleCloudBaseOperator):
     transaction: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
 class CloudDatastoreRunQueryOperator(GoogleCloudBaseOperator):
     body: "dict[str, Any]"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 

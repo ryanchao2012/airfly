@@ -5,11 +5,11 @@ from airfly._vendor.airflow.providers.common.sql.operators.sql import (
 )
 
 
-class OracleOperator(SQLExecuteQueryOperator):
-    pass
-
-
 class OracleStoredProcedureOperator(BaseOperator):
     procedure: "str"
     oracle_conn_id: "str"
     parameters: "dict | list | None"
+
+
+class OracleOperator(SQLExecuteQueryOperator):
+    pass

@@ -8,7 +8,7 @@ class DockerOperator(BaseOperator):
     command: "str | list[str] | None"
     container_name: "str | None"
     cpus: "float"
-    docker_url: "str"
+    docker_url: "str | list[str] | None"
     environment: "dict | None"
     private_environment: "dict | None"
     env_file: "str | None"
@@ -49,3 +49,4 @@ class DockerOperator(BaseOperator):
     skip_on_exit_code: "int | Container[int] | None"
     port_bindings: "dict | None"
     ulimits: "list[Ulimit] | None"
+    skip_exit_code: "int | Container[int] | ArgNotSet"

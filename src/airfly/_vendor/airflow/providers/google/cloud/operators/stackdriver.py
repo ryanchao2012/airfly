@@ -13,7 +13,7 @@ class StackdriverListAlertPoliciesOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -23,7 +23,7 @@ class StackdriverEnableAlertPoliciesOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -33,7 +33,7 @@ class StackdriverDisableAlertPoliciesOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -43,7 +43,7 @@ class StackdriverUpsertAlertOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -53,7 +53,7 @@ class StackdriverDeleteAlertOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -66,7 +66,7 @@ class StackdriverListNotificationChannelsOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -76,7 +76,7 @@ class StackdriverEnableNotificationChannelsOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -86,7 +86,7 @@ class StackdriverDisableNotificationChannelsOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -96,7 +96,7 @@ class StackdriverUpsertNotificationChannelOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -106,5 +106,5 @@ class StackdriverDeleteNotificationChannelOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     impersonation_chain: "str | Sequence[str] | None"

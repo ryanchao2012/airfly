@@ -31,6 +31,8 @@ class CreateBatchPredictionJobOperator(GoogleCloudBaseOperator):
     batch_size: "int | None"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"
+    poll_interval: "int"
 
 
 class DeleteBatchPredictionJobOperator(GoogleCloudBaseOperator):

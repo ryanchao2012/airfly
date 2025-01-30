@@ -7,3 +7,4 @@ class AirbyteJobSensor(BaseSensorOperator):
     deferrable: "bool"
     airbyte_conn_id: "str"
     api_version: "str"
+    api_type: "Literal['config', 'cloud']"

@@ -51,6 +51,8 @@ class CreateAutoMLForecastingTrainingJobOperator(AutoMLTrainingJobBaseOperator):
     region: "str"
     impersonation_chain: "str | Sequence[str] | None"
     parent_model: "str | None"
+    window_stride_length: "int | None"
+    window_max_count: "int | None"
 
 
 class CreateAutoMLImageTrainingJobOperator(AutoMLTrainingJobBaseOperator):

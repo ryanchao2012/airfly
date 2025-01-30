@@ -7,7 +7,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 class AutoMLTrainModelOperator(GoogleCloudBaseOperator):
     model: "dict"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"
@@ -16,11 +16,13 @@ class AutoMLTrainModelOperator(GoogleCloudBaseOperator):
 
 
 class AutoMLPredictOperator(GoogleCloudBaseOperator):
-    model_id: "str"
+    model_id: "str | None"
+    endpoint_id: "str | None"
     location: "str"
     payload: "dict"
     operation_params: "dict[str, str] | None"
-    project_id: "str | None"
+    instances: "list[str] | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"
@@ -33,7 +35,7 @@ class AutoMLBatchPredictOperator(GoogleCloudBaseOperator):
     input_config: "dict"
     output_config: "dict"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     prediction_params: "dict[str, str] | None"
     metadata: "MetaData"
     timeout: "float | None"
@@ -45,7 +47,7 @@ class AutoMLBatchPredictOperator(GoogleCloudBaseOperator):
 class AutoMLCreateDatasetOperator(GoogleCloudBaseOperator):
     dataset: "dict"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"
@@ -57,7 +59,7 @@ class AutoMLImportDataOperator(GoogleCloudBaseOperator):
     dataset_id: "str"
     location: "str"
     input_config: "dict"
-    project_id: "str | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"
@@ -72,7 +74,7 @@ class AutoMLTablesListColumnSpecsOperator(GoogleCloudBaseOperator):
     field_mask: "dict | None"
     filter_: "str | None"
     page_size: "int | None"
-    project_id: "str | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"
@@ -94,7 +96,7 @@ class AutoMLTablesUpdateDatasetOperator(GoogleCloudBaseOperator):
 class AutoMLGetModelOperator(GoogleCloudBaseOperator):
     model_id: "str"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"
@@ -105,7 +107,7 @@ class AutoMLGetModelOperator(GoogleCloudBaseOperator):
 class AutoMLDeleteModelOperator(GoogleCloudBaseOperator):
     model_id: "str"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"
@@ -116,7 +118,7 @@ class AutoMLDeleteModelOperator(GoogleCloudBaseOperator):
 class AutoMLDeployModelOperator(GoogleCloudBaseOperator):
     model_id: "str"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     image_detection_metadata: "dict | None"
     metadata: "Sequence[tuple[str, str]]"
     timeout: "float | None"
@@ -130,7 +132,7 @@ class AutoMLTablesListTableSpecsOperator(GoogleCloudBaseOperator):
     location: "str"
     page_size: "int | None"
     filter_: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"
@@ -140,7 +142,7 @@ class AutoMLTablesListTableSpecsOperator(GoogleCloudBaseOperator):
 
 class AutoMLListDatasetOperator(GoogleCloudBaseOperator):
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"
@@ -151,7 +153,7 @@ class AutoMLListDatasetOperator(GoogleCloudBaseOperator):
 class AutoMLDeleteDatasetOperator(GoogleCloudBaseOperator):
     dataset_id: "str | list[str]"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     metadata: "MetaData"
     timeout: "float | None"
     retry: "Retry | _MethodDefault"

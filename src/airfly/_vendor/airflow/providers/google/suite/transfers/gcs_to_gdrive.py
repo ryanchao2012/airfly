@@ -10,3 +10,4 @@ class GCSToGoogleDriveOperator(BaseOperator):
     move_object: "bool"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
+    delegate_to: "str | None"

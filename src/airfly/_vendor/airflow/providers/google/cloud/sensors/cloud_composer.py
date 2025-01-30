@@ -4,3 +4,16 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 class CloudComposerEnvironmentSensor(BaseSensorOperator):
     pass
+
+
+class CloudComposerDAGRunSensor(BaseSensorOperator):
+    project_id: "str"
+    region: "str"
+    environment_id: "str"
+    composer_dag_id: "str"
+    allowed_states: "Iterable[str] | None"
+    execution_range: "timedelta | list[datetime] | None"
+    gcp_conn_id: "str"
+    impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"
+    poll_interval: "int"

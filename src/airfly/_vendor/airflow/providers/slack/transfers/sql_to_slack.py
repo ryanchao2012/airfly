@@ -20,6 +20,7 @@ class SqlToSlackApiFileOperator(BaseSqlToSlackOperator):
     slack_base_url: "str | None"
     slack_method_version: "Literal['v1', 'v2']"
     df_kwargs: "dict | None"
+    action_on_empty_df: "Literal['send', 'skip', 'error']"
 
 
 class SqlToSlackOperator(SqlToSlackWebhookOperator):

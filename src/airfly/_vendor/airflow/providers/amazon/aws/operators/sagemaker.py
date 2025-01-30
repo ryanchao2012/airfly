@@ -43,6 +43,8 @@ class SageMakerTransformOperator(SageMakerBaseOperator):
     max_ingestion_time: "int | None"
     check_if_job_exists: "bool"
     action_if_job_exists: "str"
+    check_if_model_exists: "bool"
+    action_if_model_exists: "str"
     deferrable: "bool"
 
 

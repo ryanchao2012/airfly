@@ -9,3 +9,4 @@ class GCSToGoogleSheetsOperator(BaseOperator):
     spreadsheet_range: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
+    delegate_to: "str | None"

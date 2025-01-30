@@ -7,7 +7,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 class CloudTasksQueueCreateOperator(GoogleCloudBaseOperator):
     location: "str"
     task_queue: "Queue"
-    project_id: "str | None"
+    project_id: "str"
     queue_name: "str | None"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
@@ -18,7 +18,7 @@ class CloudTasksQueueCreateOperator(GoogleCloudBaseOperator):
 
 class CloudTasksQueueUpdateOperator(GoogleCloudBaseOperator):
     task_queue: "Queue"
-    project_id: "str | None"
+    project_id: "str"
     location: "str | None"
     queue_name: "str | None"
     update_mask: "FieldMask | None"
@@ -32,7 +32,7 @@ class CloudTasksQueueUpdateOperator(GoogleCloudBaseOperator):
 class CloudTasksQueueGetOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "MetaData"
@@ -42,7 +42,7 @@ class CloudTasksQueueGetOperator(GoogleCloudBaseOperator):
 
 class CloudTasksQueuesListOperator(GoogleCloudBaseOperator):
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     results_filter: "str | None"
     page_size: "int | None"
     retry: "Retry | _MethodDefault"
@@ -55,7 +55,7 @@ class CloudTasksQueuesListOperator(GoogleCloudBaseOperator):
 class CloudTasksQueueDeleteOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "MetaData"
@@ -66,7 +66,7 @@ class CloudTasksQueueDeleteOperator(GoogleCloudBaseOperator):
 class CloudTasksQueuePurgeOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "MetaData"
@@ -77,7 +77,7 @@ class CloudTasksQueuePurgeOperator(GoogleCloudBaseOperator):
 class CloudTasksQueuePauseOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "MetaData"
@@ -88,7 +88,7 @@ class CloudTasksQueuePauseOperator(GoogleCloudBaseOperator):
 class CloudTasksQueueResumeOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "MetaData"
@@ -100,7 +100,7 @@ class CloudTasksTaskCreateOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
     task: "dict | Task"
-    project_id: "str | None"
+    project_id: "str"
     task_name: "str | None"
     response_view: "Task.View | None"
     retry: "Retry | _MethodDefault"
@@ -114,7 +114,7 @@ class CloudTasksTaskGetOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
     task_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     response_view: "Task.View | None"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
@@ -126,7 +126,7 @@ class CloudTasksTaskGetOperator(GoogleCloudBaseOperator):
 class CloudTasksTasksListOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     response_view: "Task.View | None"
     page_size: "int | None"
     retry: "Retry | _MethodDefault"
@@ -140,7 +140,7 @@ class CloudTasksTaskDeleteOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
     task_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "MetaData"
@@ -152,7 +152,7 @@ class CloudTasksTaskRunOperator(GoogleCloudBaseOperator):
     location: "str"
     queue_name: "str"
     task_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     response_view: "Task.View | None"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"

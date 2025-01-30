@@ -19,6 +19,7 @@ class HttpOperator(BaseOperator):
     tcp_keep_alive_count: "int"
     tcp_keep_alive_interval: "int"
     deferrable: "bool"
+    retry_args: "dict[str, Any] | None"
 
 
 class SimpleHttpOperator(HttpOperator):

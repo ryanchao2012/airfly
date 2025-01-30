@@ -13,3 +13,4 @@ class SqlToSlackWebhookOperator(BaseSqlToSlackOperator):
     slack_message: "str"
     results_df_name: "str"
     parameters: "list | tuple | Mapping[str, Any] | None"
+    slack_conn_id: "str | ArgNotSet"

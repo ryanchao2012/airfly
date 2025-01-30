@@ -8,5 +8,6 @@ class AirbyteTriggerSyncOperator(BaseOperator):
     asynchronous: "bool"
     deferrable: "bool"
     api_version: "str"
+    api_type: "Literal['config', 'cloud']"
     wait_seconds: "float"
     timeout: "float"

@@ -27,20 +27,20 @@ class EmrStartNotebookExecutionOperator(BaseOperator):
     tags: "list | None"
     wait_for_completion: "bool"
     aws_conn_id: "str | None"
-    waiter_max_attempts: "int | None | ArgNotSet"
-    waiter_delay: "int | None | ArgNotSet"
-    waiter_countdown: "int"
-    waiter_check_interval_seconds: "int"
+    waiter_max_attempts: "int | None"
+    waiter_delay: "int | None"
+    waiter_countdown: "int | None"
+    waiter_check_interval_seconds: "int | None"
 
 
 class EmrStopNotebookExecutionOperator(BaseOperator):
     notebook_execution_id: "str"
     wait_for_completion: "bool"
     aws_conn_id: "str | None"
-    waiter_max_attempts: "int | None | ArgNotSet"
-    waiter_delay: "int | None | ArgNotSet"
-    waiter_countdown: "int"
-    waiter_check_interval_seconds: "int"
+    waiter_max_attempts: "int | None"
+    waiter_delay: "int | None"
+    waiter_countdown: "int | None"
+    waiter_check_interval_seconds: "int | None"
 
 
 class EmrEksCreateClusterOperator(BaseOperator):
@@ -79,7 +79,7 @@ class EmrCreateJobFlowOperator(BaseOperator):
     waiter_max_attempts: "int | None"
     waiter_delay: "int | None"
     waiter_countdown: "int | None"
-    waiter_check_interval_seconds: "int"
+    waiter_check_interval_seconds: "int | None"
     deferrable: "bool"
 
 

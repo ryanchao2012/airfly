@@ -4,22 +4,23 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 
 class WeaviateIngestOperator(BaseOperator):
     conn_id: "str"
-    class_name: "str"
-    input_json: "list[dict[str, Any]] | pd.DataFrame | None"
+    collection_name: "str"
     input_data: "list[dict[str, Any]] | pd.DataFrame | None"
     vector_col: "str"
     uuid_column: "str"
     tenant: "str | None"
+    hook_params: "dict | None"
+    input_json: "list[dict[str, Any]] | pd.DataFrame | None"
 
 
 class WeaviateDocumentIngestOperator(BaseOperator):
     conn_id: "str"
     input_data: "pd.DataFrame | list[dict[str, Any]] | list[pd.DataFrame]"
-    class_name: "str"
+    collection_name: "str"
     document_column: "str"
     existing: "str"
     uuid_column: "str"
     vector_col: "str"
-    batch_config_params: "dict | None"
     tenant: "str | None"
     verbose: "bool"
+    hook_params: "dict | None"

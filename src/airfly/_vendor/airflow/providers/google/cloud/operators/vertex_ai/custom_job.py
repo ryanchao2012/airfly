@@ -64,6 +64,8 @@ class CreateCustomContainerTrainingJobOperator(CustomTrainingJobBaseOperator):
     parent_model: "str | None"
     impersonation_chain: "str | Sequence[str] | None"
     dataset_id: "str | None"
+    deferrable: "bool"
+    poll_interval: "int"
 
 
 class CreateCustomPythonPackageTrainingJobOperator(CustomTrainingJobBaseOperator):
@@ -73,6 +75,8 @@ class CreateCustomPythonPackageTrainingJobOperator(CustomTrainingJobBaseOperator
     parent_model: "str | None"
     impersonation_chain: "str | Sequence[str] | None"
     dataset_id: "str | None"
+    deferrable: "bool"
+    poll_interval: "int"
 
 
 class CreateCustomTrainingJobOperator(CustomTrainingJobBaseOperator):
@@ -82,6 +86,8 @@ class CreateCustomTrainingJobOperator(CustomTrainingJobBaseOperator):
     parent_model: "str | None"
     impersonation_chain: "str | Sequence[str] | None"
     dataset_id: "str | None"
+    deferrable: "bool"
+    poll_interval: "int"
 
 
 class DeleteCustomTrainingJobOperator(GoogleCloudBaseOperator):

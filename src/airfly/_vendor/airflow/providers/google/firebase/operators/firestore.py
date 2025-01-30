@@ -5,7 +5,7 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 class CloudFirestoreExportDatabaseOperator(BaseOperator):
     body: "dict"
     database_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     impersonation_chain: "str | Sequence[str] | None"

@@ -6,7 +6,7 @@ class WorkflowExecutionSensor(BaseSensorOperator):
     workflow_id: "str"
     execution_id: "str"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     success_states: "set[Execution.State] | None"
     failure_states: "set[Execution.State] | None"
     retry: "Retry | _MethodDefault"
