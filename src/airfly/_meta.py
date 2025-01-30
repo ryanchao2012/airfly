@@ -2,7 +2,7 @@
 
 
 name = "airfly"
-version = "1.0.0"
+version = "1.1.0"
 description = "Auto generate Airflow's dag.py on the fly"
 authors = [{"name": "ryanchao2012", "email": "ryanchao2012@gmail.com"}]
 readme = "README.md"
@@ -11,7 +11,10 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
+requires_python = ">=3.8"
 dependencies = [
     "attrs",
     "cattrs",
@@ -22,5 +25,17 @@ dependencies = [
     "click",
     "libcst",
     "asttrs",
+    "loguru",
 ]
+optional_dependencies = {
+    "dev": [
+        "ipython>=8.12.3",
+        "pytest>=8.1.1",
+        "invoke>=2.2.0",
+        "pytest-cov>=4.1.0",
+        "gutt>=1.1.0",
+        "toml>=0.10.2",
+        "pytest-mock>=3.14.0",
+    ]
+}
 scripts = {"airfly": "airfly.cli.main:main"}
