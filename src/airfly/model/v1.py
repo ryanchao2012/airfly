@@ -36,7 +36,7 @@ from airfly.utils import (
 TaskClass = Type["Task"]
 
 
-AVAILABLE_OPERATORS = collect_airflow_operators()
+BUILTIN_OPERATORS = collect_airflow_operators()
 
 
 class Literal:
@@ -402,7 +402,7 @@ class Task(TaskAttribute):
             Type: The resolved operator class.
 
         Raises:
-            ValueError: If the op_class is invalid or not found in the AVAILABLE_OPERATORS.
+            ValueError: If the op_class is invalid or not found in the BUILTIN_OPERATORS.
             ValueError: If multiple op_class with the same basename are found and op_module is not provided or invalid.
             ValueError: If the op_class candidates cannot be resolved by the given op_module.
 
@@ -412,7 +412,7 @@ class Task(TaskAttribute):
         op_class = Task._get_attributes(cls).op_class
 
         if isinstance(op_class, type):
-            if issubclass_by_qualname(op_class, AVAILABLE_OPERATORS["BaseOperator"]):
+            if issubclass_by_qualname(op_class, BUILTIN_OPERATORS["BaseOperator"]):
                 return op_class
 
             raise TypeError(f"Not a valid operator type, got: {op_class}")
@@ -426,11 +426,11 @@ class Task(TaskAttribute):
         else:
             raise ValueError(f"Invalid op_class, got: {op_class}")
 
-        if basename not in AVAILABLE_OPERATORS:
+        if basename not in BUILTIN_OPERATORS:
             raise ValueError(
                 f"'{basename}' not found. If this is unexpected and the operator should exist, please report the issue."
             )
-        items = AVAILABLE_OPERATORS[basename]
+        items = BUILTIN_OPERATORS[basename]
 
         if len(items) > 1:
             # Disambiguate by op_module
