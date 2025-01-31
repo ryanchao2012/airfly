@@ -7,7 +7,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 class DataprocCreateClusterOperator(GoogleCloudBaseOperator):
     cluster_name: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     cluster_config: "dict | Cluster | None"
     virtual_cluster_config: "dict | None"
     labels: "dict | None"
@@ -30,7 +30,7 @@ class DataprocScaleClusterOperator(GoogleCloudBaseOperator):
 class DataprocDeleteClusterOperator(GoogleCloudBaseOperator):
     region: "str"
     cluster_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     cluster_uuid: "str | None"
     request_id: "str | None"
     retry: "AsyncRetry | _MethodDefault"
@@ -45,7 +45,7 @@ class DataprocDeleteClusterOperator(GoogleCloudBaseOperator):
 class _DataprocStartStopClusterBaseOperator(GoogleCloudBaseOperator):
     cluster_name: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     cluster_uuid: "str | None"
     request_id: "str | None"
     retry: "AsyncRetry | _MethodDefault"
@@ -58,7 +58,7 @@ class _DataprocStartStopClusterBaseOperator(GoogleCloudBaseOperator):
 class DataprocStartClusterOperator(_DataprocStartStopClusterBaseOperator):
     cluster_name: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     cluster_uuid: "str | None"
     request_id: "str | None"
     retry: "AsyncRetry | _MethodDefault"
@@ -71,7 +71,7 @@ class DataprocStartClusterOperator(_DataprocStartStopClusterBaseOperator):
 class DataprocStopClusterOperator(_DataprocStartStopClusterBaseOperator):
     cluster_name: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     cluster_uuid: "str | None"
     request_id: "str | None"
     retry: "AsyncRetry | _MethodDefault"
@@ -85,7 +85,7 @@ class DataprocJobBaseOperator(GoogleCloudBaseOperator):
     region: "str"
     job_name: "str"
     cluster_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     dataproc_properties: "dict | None"
     dataproc_jars: "list[str] | None"
     gcp_conn_id: "str"
@@ -124,7 +124,7 @@ class DataprocSubmitPySparkJobOperator(DataprocJobBaseOperator):
 class DataprocCreateWorkflowTemplateOperator(GoogleCloudBaseOperator):
     template: "dict"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -135,7 +135,7 @@ class DataprocCreateWorkflowTemplateOperator(GoogleCloudBaseOperator):
 class DataprocInstantiateWorkflowTemplateOperator(GoogleCloudBaseOperator):
     template_id: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     version: "int | None"
     request_id: "str | None"
     parameters: "dict[str, str] | None"
@@ -152,7 +152,7 @@ class DataprocInstantiateWorkflowTemplateOperator(GoogleCloudBaseOperator):
 class DataprocInstantiateInlineWorkflowTemplateOperator(GoogleCloudBaseOperator):
     template: "dict"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     request_id: "str | None"
     retry: "AsyncRetry | _MethodDefault"
     timeout: "float | None"
@@ -167,7 +167,7 @@ class DataprocInstantiateInlineWorkflowTemplateOperator(GoogleCloudBaseOperator)
 class DataprocSubmitJobOperator(GoogleCloudBaseOperator):
     job: "dict"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     request_id: "str | None"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
@@ -188,7 +188,7 @@ class DataprocUpdateClusterOperator(GoogleCloudBaseOperator):
     graceful_decommission_timeout: "dict | Duration"
     region: "str"
     request_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     retry: "AsyncRetry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -201,7 +201,7 @@ class DataprocUpdateClusterOperator(GoogleCloudBaseOperator):
 class DataprocDiagnoseClusterOperator(GoogleCloudBaseOperator):
     region: "str"
     cluster_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     tarball_gcs_dir: "str | None"
     diagnosis_interval: "dict | Interval | None"
     jobs: "MutableSequence[str] | None"
@@ -217,7 +217,7 @@ class DataprocDiagnoseClusterOperator(GoogleCloudBaseOperator):
 
 class DataprocCreateBatchOperator(GoogleCloudBaseOperator):
     region: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     batch: "dict | Batch"
     batch_id: "str"
     request_id: "str | None"
@@ -226,7 +226,7 @@ class DataprocCreateBatchOperator(GoogleCloudBaseOperator):
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
-    result_retry: "AsyncRetry | _MethodDefault"
+    result_retry: "AsyncRetry | _MethodDefault | Retry"
     asynchronous: "bool"
     deferrable: "bool"
     polling_interval_seconds: "int"
@@ -235,7 +235,7 @@ class DataprocCreateBatchOperator(GoogleCloudBaseOperator):
 class DataprocDeleteBatchOperator(GoogleCloudBaseOperator):
     batch_id: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -246,7 +246,7 @@ class DataprocDeleteBatchOperator(GoogleCloudBaseOperator):
 class DataprocGetBatchOperator(GoogleCloudBaseOperator):
     batch_id: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -256,7 +256,7 @@ class DataprocGetBatchOperator(GoogleCloudBaseOperator):
 
 class DataprocListBatchesOperator(GoogleCloudBaseOperator):
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     page_size: "int | None"
     page_token: "str | None"
     retry: "Retry | _MethodDefault"
@@ -271,7 +271,7 @@ class DataprocListBatchesOperator(GoogleCloudBaseOperator):
 class DataprocCancelOperationOperator(GoogleCloudBaseOperator):
     operation_name: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"

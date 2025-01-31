@@ -75,6 +75,7 @@ class RedshiftResumeClusterOperator(BaseOperator):
 class RedshiftPauseClusterOperator(BaseOperator):
     cluster_identifier: "str"
     aws_conn_id: "str | None"
+    wait_for_completion: "bool"
     deferrable: "bool"
     poll_interval: "int"
     max_attempts: "int"

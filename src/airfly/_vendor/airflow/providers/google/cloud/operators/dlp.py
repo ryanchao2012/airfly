@@ -6,7 +6,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 
 class CloudDLPCancelDLPJobOperator(GoogleCloudBaseOperator):
     dlp_job_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -16,7 +16,7 @@ class CloudDLPCancelDLPJobOperator(GoogleCloudBaseOperator):
 
 class CloudDLPCreateDeidentifyTemplateOperator(GoogleCloudBaseOperator):
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     deidentify_template: "dict | DeidentifyTemplate | None"
     template_id: "str | None"
     retry: "Retry | _MethodDefault"
@@ -27,7 +27,7 @@ class CloudDLPCreateDeidentifyTemplateOperator(GoogleCloudBaseOperator):
 
 
 class CloudDLPCreateDLPJobOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     inspect_job: "dict | InspectJobConfig | None"
     risk_job: "dict | RiskAnalysisJobConfig | None"
     job_id: "str | None"
@@ -41,7 +41,7 @@ class CloudDLPCreateDLPJobOperator(GoogleCloudBaseOperator):
 
 class CloudDLPCreateInspectTemplateOperator(GoogleCloudBaseOperator):
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     inspect_template: "InspectTemplate | None"
     template_id: "str | None"
     retry: "Retry | _MethodDefault"
@@ -52,7 +52,7 @@ class CloudDLPCreateInspectTemplateOperator(GoogleCloudBaseOperator):
 
 
 class CloudDLPCreateJobTriggerOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     job_trigger: "dict | JobTrigger | None"
     trigger_id: "str | None"
     retry: "Retry | _MethodDefault"
@@ -64,7 +64,7 @@ class CloudDLPCreateJobTriggerOperator(GoogleCloudBaseOperator):
 
 class CloudDLPCreateStoredInfoTypeOperator(GoogleCloudBaseOperator):
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     config: "StoredInfoTypeConfig | None"
     stored_info_type_id: "str | None"
     retry: "Retry | _MethodDefault"
@@ -75,7 +75,7 @@ class CloudDLPCreateStoredInfoTypeOperator(GoogleCloudBaseOperator):
 
 
 class CloudDLPDeidentifyContentOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     deidentify_config: "dict | DeidentifyConfig | None"
     inspect_config: "dict | InspectConfig | None"
     item: "dict | ContentItem | None"
@@ -91,7 +91,7 @@ class CloudDLPDeidentifyContentOperator(GoogleCloudBaseOperator):
 class CloudDLPDeleteDeidentifyTemplateOperator(GoogleCloudBaseOperator):
     template_id: "str"
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -101,7 +101,7 @@ class CloudDLPDeleteDeidentifyTemplateOperator(GoogleCloudBaseOperator):
 
 class CloudDLPDeleteDLPJobOperator(GoogleCloudBaseOperator):
     dlp_job_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -112,7 +112,7 @@ class CloudDLPDeleteDLPJobOperator(GoogleCloudBaseOperator):
 class CloudDLPDeleteInspectTemplateOperator(GoogleCloudBaseOperator):
     template_id: "str"
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -122,7 +122,7 @@ class CloudDLPDeleteInspectTemplateOperator(GoogleCloudBaseOperator):
 
 class CloudDLPDeleteJobTriggerOperator(GoogleCloudBaseOperator):
     job_trigger_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -133,7 +133,7 @@ class CloudDLPDeleteJobTriggerOperator(GoogleCloudBaseOperator):
 class CloudDLPDeleteStoredInfoTypeOperator(GoogleCloudBaseOperator):
     stored_info_type_id: "str"
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -144,7 +144,7 @@ class CloudDLPDeleteStoredInfoTypeOperator(GoogleCloudBaseOperator):
 class CloudDLPGetDeidentifyTemplateOperator(GoogleCloudBaseOperator):
     template_id: "str"
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -154,7 +154,7 @@ class CloudDLPGetDeidentifyTemplateOperator(GoogleCloudBaseOperator):
 
 class CloudDLPGetDLPJobOperator(GoogleCloudBaseOperator):
     dlp_job_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -165,7 +165,7 @@ class CloudDLPGetDLPJobOperator(GoogleCloudBaseOperator):
 class CloudDLPGetInspectTemplateOperator(GoogleCloudBaseOperator):
     template_id: "str"
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -175,7 +175,7 @@ class CloudDLPGetInspectTemplateOperator(GoogleCloudBaseOperator):
 
 class CloudDLPGetDLPJobTriggerOperator(GoogleCloudBaseOperator):
     job_trigger_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -186,7 +186,7 @@ class CloudDLPGetDLPJobTriggerOperator(GoogleCloudBaseOperator):
 class CloudDLPGetStoredInfoTypeOperator(GoogleCloudBaseOperator):
     stored_info_type_id: "str"
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -195,7 +195,7 @@ class CloudDLPGetStoredInfoTypeOperator(GoogleCloudBaseOperator):
 
 
 class CloudDLPInspectContentOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     inspect_config: "dict | InspectConfig | None"
     item: "dict | ContentItem | None"
     inspect_template_name: "str | None"
@@ -208,7 +208,7 @@ class CloudDLPInspectContentOperator(GoogleCloudBaseOperator):
 
 class CloudDLPListDeidentifyTemplatesOperator(GoogleCloudBaseOperator):
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     page_size: "int | None"
     order_by: "str | None"
     retry: "Retry | _MethodDefault"
@@ -219,7 +219,7 @@ class CloudDLPListDeidentifyTemplatesOperator(GoogleCloudBaseOperator):
 
 
 class CloudDLPListDLPJobsOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     results_filter: "str | None"
     page_size: "int | None"
     job_type: "str | None"
@@ -232,7 +232,7 @@ class CloudDLPListDLPJobsOperator(GoogleCloudBaseOperator):
 
 
 class CloudDLPListInfoTypesOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     language_code: "str | None"
     results_filter: "str | None"
     retry: "Retry | _MethodDefault"
@@ -244,7 +244,7 @@ class CloudDLPListInfoTypesOperator(GoogleCloudBaseOperator):
 
 class CloudDLPListInspectTemplatesOperator(GoogleCloudBaseOperator):
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     page_size: "int | None"
     order_by: "str | None"
     retry: "Retry | _MethodDefault"
@@ -255,7 +255,7 @@ class CloudDLPListInspectTemplatesOperator(GoogleCloudBaseOperator):
 
 
 class CloudDLPListJobTriggersOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     page_size: "int | None"
     order_by: "str | None"
     results_filter: "str | None"
@@ -268,7 +268,7 @@ class CloudDLPListJobTriggersOperator(GoogleCloudBaseOperator):
 
 class CloudDLPListStoredInfoTypesOperator(GoogleCloudBaseOperator):
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     page_size: "int | None"
     order_by: "str | None"
     retry: "Retry | _MethodDefault"
@@ -279,7 +279,7 @@ class CloudDLPListStoredInfoTypesOperator(GoogleCloudBaseOperator):
 
 
 class CloudDLPRedactImageOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     inspect_config: "dict | InspectConfig | None"
     image_redaction_configs: (
         "None | (list[dict] | list[RedactImageRequest.ImageRedactionConfig])"
@@ -294,7 +294,7 @@ class CloudDLPRedactImageOperator(GoogleCloudBaseOperator):
 
 
 class CloudDLPReidentifyContentOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     reidentify_config: "dict | DeidentifyConfig | None"
     inspect_config: "dict | InspectConfig | None"
     item: "dict | ContentItem | None"
@@ -310,7 +310,7 @@ class CloudDLPReidentifyContentOperator(GoogleCloudBaseOperator):
 class CloudDLPUpdateDeidentifyTemplateOperator(GoogleCloudBaseOperator):
     template_id: "str"
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     deidentify_template: "dict | DeidentifyTemplate | None"
     update_mask: "dict | FieldMask | None"
     retry: "Retry | _MethodDefault"
@@ -323,7 +323,7 @@ class CloudDLPUpdateDeidentifyTemplateOperator(GoogleCloudBaseOperator):
 class CloudDLPUpdateInspectTemplateOperator(GoogleCloudBaseOperator):
     template_id: "str"
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     inspect_template: "dict | InspectTemplate | None"
     update_mask: "dict | FieldMask | None"
     retry: "Retry | _MethodDefault"
@@ -335,7 +335,7 @@ class CloudDLPUpdateInspectTemplateOperator(GoogleCloudBaseOperator):
 
 class CloudDLPUpdateJobTriggerOperator(GoogleCloudBaseOperator):
     job_trigger_id: "_empty"
-    project_id: "str | None"
+    project_id: "str"
     job_trigger: "dict | JobTrigger | None"
     update_mask: "dict | FieldMask | None"
     retry: "Retry | _MethodDefault"
@@ -348,7 +348,7 @@ class CloudDLPUpdateJobTriggerOperator(GoogleCloudBaseOperator):
 class CloudDLPUpdateStoredInfoTypeOperator(GoogleCloudBaseOperator):
     stored_info_type_id: "_empty"
     organization_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     config: "dict | StoredInfoTypeConfig | None"
     update_mask: "dict | FieldMask | None"
     retry: "Retry | _MethodDefault"

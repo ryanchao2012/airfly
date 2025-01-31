@@ -3,8 +3,11 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 
 class TimeSensor(BaseSensorOperator):
-    target_time: "_empty"
+    target_time: "datetime.time"
 
 
 class TimeSensorAsync(BaseSensorOperator):
-    target_time: "_empty"
+    target_time: "datetime.time"
+    start_from_trigger: "bool"
+    trigger_kwargs: "dict[str, Any] | None"
+    end_from_trigger: "bool"

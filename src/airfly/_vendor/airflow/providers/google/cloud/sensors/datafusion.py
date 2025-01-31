@@ -9,7 +9,7 @@ class CloudDataFusionPipelineStateSensor(BaseSensorOperator):
     instance_name: "str"
     location: "str"
     failure_statuses: "Iterable[str] | None"
-    project_id: "str | None"
+    project_id: "str"
     namespace: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"

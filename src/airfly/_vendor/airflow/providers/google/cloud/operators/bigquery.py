@@ -6,104 +6,30 @@ from airfly._vendor.airflow.providers.common.sql.operators.sql import (
     SQLTableCheckOperator,
     SQLValueCheckOperator,
 )
+from airfly._vendor.airflow.providers.google.cloud.openlineage.mixins import (
+    _BigQueryOpenLineageMixin,
+)
 from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
     GoogleCloudBaseOperator,
 )
 
 
-class _BigQueryDbHookMixin:
-    pass
-
-
-class BigQueryCheckOperator(_BigQueryDbHookMixin, SQLCheckOperator):
-    sql: "str"
-    gcp_conn_id: "str"
-    use_legacy_sql: "bool"
+class BigQueryCreateEmptyDatasetOperator(GoogleCloudBaseOperator):
+    dataset_id: "str | None"
+    project_id: "str"
+    dataset_reference: "dict | None"
     location: "str | None"
-    impersonation_chain: "str | Sequence[str] | None"
-    labels: "dict | None"
-    deferrable: "bool"
-    poll_interval: "float"
-
-
-class BigQueryValueCheckOperator(_BigQueryDbHookMixin, SQLValueCheckOperator):
-    sql: "str"
-    pass_value: "Any"
-    tolerance: "Any"
     gcp_conn_id: "str"
-    use_legacy_sql: "bool"
-    location: "str | None"
     impersonation_chain: "str | Sequence[str] | None"
-    labels: "dict | None"
-    deferrable: "bool"
-    poll_interval: "float"
-
-
-class BigQueryIntervalCheckOperator(_BigQueryDbHookMixin, SQLIntervalCheckOperator):
-    table: "str"
-    metrics_thresholds: "dict"
-    date_filter_column: "str"
-    days_back: "SupportsAbs[int]"
-    gcp_conn_id: "str"
-    use_legacy_sql: "bool"
-    location: "str | None"
-    impersonation_chain: "str | Sequence[str] | None"
-    labels: "dict | None"
-    deferrable: "bool"
-    poll_interval: "float"
-    project_id: "str | None"
-
-
-class BigQueryColumnCheckOperator(_BigQueryDbHookMixin, SQLColumnCheckOperator):
-    table: "str"
-    column_mapping: "dict"
-    partition_clause: "str | None"
-    database: "str | None"
-    accept_none: "bool"
-    gcp_conn_id: "str"
-    use_legacy_sql: "bool"
-    location: "str | None"
-    impersonation_chain: "str | Sequence[str] | None"
-    labels: "dict | None"
-
-
-class BigQueryTableCheckOperator(_BigQueryDbHookMixin, SQLTableCheckOperator):
-    table: "str"
-    checks: "dict"
-    partition_clause: "str | None"
-    gcp_conn_id: "str"
-    use_legacy_sql: "bool"
-    location: "str | None"
-    impersonation_chain: "str | Sequence[str] | None"
-    labels: "dict | None"
-
-
-class BigQueryGetDataOperator(GoogleCloudBaseOperator):
-    dataset_id: "str"
-    table_id: "str"
-    table_project_id: "str | None"
-    job_project_id: "str | None"
-    project_id: "str | None"
-    max_results: "int"
-    selected_fields: "str | None"
-    gcp_conn_id: "str"
-    location: "str | None"
-    impersonation_chain: "str | Sequence[str] | None"
-    deferrable: "bool"
-    poll_interval: "float"
-    as_dict: "bool"
-    use_legacy_sql: "bool"
-
-
-class BigQueryExecuteQueryOperator(GoogleCloudBaseOperator):
-    pass
+    if_exists: "str"
+    exists_ok: "bool | None"
 
 
 class BigQueryCreateEmptyTableOperator(GoogleCloudBaseOperator):
     dataset_id: "str"
     table_id: "str"
     table_resource: "dict[str, Any] | None"
-    project_id: "str | None"
+    project_id: "str"
     schema_fields: "list | None"
     gcs_schema_object: "str | None"
     time_partitioning: "dict | None"
@@ -119,6 +45,30 @@ class BigQueryCreateEmptyTableOperator(GoogleCloudBaseOperator):
     if_exists: "str"
     bigquery_conn_id: "str | None"
     exists_ok: "bool | None"
+
+
+class BigQueryDeleteDatasetOperator(GoogleCloudBaseOperator):
+    dataset_id: "str"
+    project_id: "str"
+    delete_contents: "bool"
+    gcp_conn_id: "str"
+    impersonation_chain: "str | Sequence[str] | None"
+
+
+class BigQueryInsertJobOperator(GoogleCloudBaseOperator, _BigQueryOpenLineageMixin):
+    configuration: "dict[str, Any]"
+    project_id: "str"
+    location: "str | None"
+    job_id: "str | None"
+    force_rerun: "bool"
+    reattach_states: "set[str] | None"
+    gcp_conn_id: "str"
+    impersonation_chain: "str | Sequence[str] | None"
+    cancel_on_kill: "bool"
+    result_retry: "Retry"
+    result_timeout: "float | None"
+    deferrable: "bool"
+    poll_interval: "float"
 
 
 class BigQueryCreateExternalTableOperator(GoogleCloudBaseOperator):
@@ -148,35 +98,139 @@ class BigQueryCreateExternalTableOperator(GoogleCloudBaseOperator):
     bigquery_conn_id: "str | None"
 
 
-class BigQueryDeleteDatasetOperator(GoogleCloudBaseOperator):
-    dataset_id: "str"
-    project_id: "str | None"
-    delete_contents: "bool"
+class _BigQueryDbHookMixin:
+    pass
+
+
+class _BigQueryOperatorsEncryptionConfigurationMixin:
+    pass
+
+
+class BigQueryCheckOperator(
+    _BigQueryDbHookMixin,
+    SQLCheckOperator,
+    _BigQueryOperatorsEncryptionConfigurationMixin,
+):
+    sql: "str"
     gcp_conn_id: "str"
-    impersonation_chain: "str | Sequence[str] | None"
-
-
-class BigQueryCreateEmptyDatasetOperator(GoogleCloudBaseOperator):
-    dataset_id: "str | None"
-    project_id: "str | None"
-    dataset_reference: "dict | None"
+    use_legacy_sql: "bool"
     location: "str | None"
-    gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
-    if_exists: "str"
-    exists_ok: "bool | None"
+    labels: "dict | None"
+    encryption_configuration: "dict | None"
+    deferrable: "bool"
+    poll_interval: "float"
+    query_params: "list | None"
+
+
+class BigQueryValueCheckOperator(
+    _BigQueryDbHookMixin,
+    SQLValueCheckOperator,
+    _BigQueryOperatorsEncryptionConfigurationMixin,
+):
+    sql: "str"
+    pass_value: "Any"
+    tolerance: "Any"
+    encryption_configuration: "dict | None"
+    gcp_conn_id: "str"
+    use_legacy_sql: "bool"
+    location: "str | None"
+    impersonation_chain: "str | Sequence[str] | None"
+    labels: "dict | None"
+    deferrable: "bool"
+    poll_interval: "float"
+
+
+class BigQueryIntervalCheckOperator(
+    _BigQueryDbHookMixin,
+    SQLIntervalCheckOperator,
+    _BigQueryOperatorsEncryptionConfigurationMixin,
+):
+    table: "str"
+    metrics_thresholds: "dict"
+    date_filter_column: "str"
+    days_back: "SupportsAbs[int]"
+    gcp_conn_id: "str"
+    use_legacy_sql: "bool"
+    location: "str | None"
+    encryption_configuration: "dict | None"
+    impersonation_chain: "str | Sequence[str] | None"
+    labels: "dict | None"
+    deferrable: "bool"
+    poll_interval: "float"
+    project_id: "str"
+
+
+class BigQueryColumnCheckOperator(
+    _BigQueryDbHookMixin,
+    SQLColumnCheckOperator,
+    _BigQueryOperatorsEncryptionConfigurationMixin,
+):
+    table: "str"
+    column_mapping: "dict"
+    partition_clause: "str | None"
+    database: "str | None"
+    accept_none: "bool"
+    encryption_configuration: "dict | None"
+    gcp_conn_id: "str"
+    use_legacy_sql: "bool"
+    location: "str | None"
+    impersonation_chain: "str | Sequence[str] | None"
+    labels: "dict | None"
+
+
+class BigQueryTableCheckOperator(
+    _BigQueryDbHookMixin,
+    SQLTableCheckOperator,
+    _BigQueryOperatorsEncryptionConfigurationMixin,
+):
+    table: "str"
+    checks: "dict"
+    partition_clause: "str | None"
+    gcp_conn_id: "str"
+    use_legacy_sql: "bool"
+    location: "str | None"
+    impersonation_chain: "str | Sequence[str] | None"
+    labels: "dict | None"
+    encryption_configuration: "dict | None"
+
+
+class BigQueryGetDataOperator(
+    GoogleCloudBaseOperator,
+    _BigQueryOperatorsEncryptionConfigurationMixin,
+):
+    dataset_id: "str | None"
+    table_id: "str | None"
+    table_project_id: "str | None"
+    job_id: "str | None"
+    job_project_id: "str | None"
+    project_id: "str"
+    max_results: "int"
+    selected_fields: "str | None"
+    gcp_conn_id: "str"
+    location: "str | None"
+    encryption_configuration: "dict | None"
+    impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"
+    poll_interval: "float"
+    as_dict: "bool"
+    use_legacy_sql: "bool"
+
+
+class BigQueryExecuteQueryOperator(GoogleCloudBaseOperator):
+    pass
 
 
 class BigQueryGetDatasetOperator(GoogleCloudBaseOperator):
     dataset_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
 class BigQueryGetDatasetTablesOperator(GoogleCloudBaseOperator):
     dataset_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     max_results: "int | None"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
@@ -191,7 +245,7 @@ class BigQueryUpdateTableOperator(GoogleCloudBaseOperator):
     fields: "list[str] | None"
     dataset_id: "str | None"
     table_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
@@ -200,7 +254,7 @@ class BigQueryUpdateDatasetOperator(GoogleCloudBaseOperator):
     dataset_resource: "dict[str, Any]"
     fields: "list[str] | None"
     dataset_id: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
@@ -216,7 +270,7 @@ class BigQueryDeleteTableOperator(GoogleCloudBaseOperator):
 class BigQueryUpsertTableOperator(GoogleCloudBaseOperator):
     dataset_id: "str"
     table_resource: "dict"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     location: "str | None"
     impersonation_chain: "str | Sequence[str] | None"
@@ -227,26 +281,7 @@ class BigQueryUpdateTableSchemaOperator(GoogleCloudBaseOperator):
     dataset_id: "str"
     table_id: "str"
     include_policy_tags: "bool"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
-
-
-class _BigQueryOpenLineageMixin:
-    pass
-
-
-class BigQueryInsertJobOperator(GoogleCloudBaseOperator, _BigQueryOpenLineageMixin):
-    configuration: "dict[str, Any]"
-    project_id: "str | None"
     location: "str | None"
-    job_id: "str | None"
-    force_rerun: "bool"
-    reattach_states: "set[str] | None"
-    gcp_conn_id: "str"
-    impersonation_chain: "str | Sequence[str] | None"
-    cancel_on_kill: "bool"
-    result_retry: "Retry"
-    result_timeout: "float | None"
-    deferrable: "bool"
-    poll_interval: "float"

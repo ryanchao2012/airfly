@@ -15,7 +15,7 @@ class PythonOperator(BaseOperator):
 
 class _BasePythonVirtualenvOperator(PythonOperator):
     python_callable: "Callable"
-    use_dill: "bool"
+    serializer: "_SerializerTypeDef | None"
     op_args: "Collection[Any] | None"
     op_kwargs: "Mapping[str, Any] | None"
     string_args: "Iterable[str] | None"
@@ -23,12 +23,15 @@ class _BasePythonVirtualenvOperator(PythonOperator):
     templates_exts: "list[str] | None"
     expect_airflow: "bool"
     skip_on_exit_code: "int | Container[int] | None"
+    env_vars: "dict[str, str] | None"
+    inherit_env: "bool"
+    use_dill: "bool"
 
 
 class ExternalPythonOperator(_BasePythonVirtualenvOperator):
     python: "str"
     python_callable: "Callable"
-    use_dill: "bool"
+    serializer: "_SerializerTypeDef | None"
     op_args: "Collection[Any] | None"
     op_kwargs: "Mapping[str, Any] | None"
     string_args: "Iterable[str] | None"
@@ -37,12 +40,15 @@ class ExternalPythonOperator(_BasePythonVirtualenvOperator):
     expect_airflow: "bool"
     expect_pendulum: "bool"
     skip_on_exit_code: "int | Container[int] | None"
+    env_vars: "dict[str, str] | None"
+    inherit_env: "bool"
+    use_dill: "bool"
 
 
 class BranchExternalPythonOperator(ExternalPythonOperator, BranchMixIn):
     python: "str"
     python_callable: "Callable"
-    use_dill: "bool"
+    serializer: "_SerializerTypeDef | None"
     op_args: "Collection[Any] | None"
     op_kwargs: "Mapping[str, Any] | None"
     string_args: "Iterable[str] | None"
@@ -51,6 +57,9 @@ class BranchExternalPythonOperator(ExternalPythonOperator, BranchMixIn):
     expect_airflow: "bool"
     expect_pendulum: "bool"
     skip_on_exit_code: "int | Container[int] | None"
+    env_vars: "dict[str, str] | None"
+    inherit_env: "bool"
+    use_dill: "bool"
 
 
 class BranchPythonOperator(PythonOperator, BranchMixIn):
@@ -66,7 +75,7 @@ class PythonVirtualenvOperator(_BasePythonVirtualenvOperator):
     python_callable: "Callable"
     requirements: "None | Iterable[str] | str"
     python_version: "str | None"
-    use_dill: "bool"
+    serializer: "_SerializerTypeDef | None"
     system_site_packages: "bool"
     pip_install_options: "list[str] | None"
     op_args: "Collection[Any] | None"
@@ -78,13 +87,16 @@ class PythonVirtualenvOperator(_BasePythonVirtualenvOperator):
     skip_on_exit_code: "int | Container[int] | None"
     index_urls: "None | Collection[str] | str"
     venv_cache_path: "None | os.PathLike[str]"
+    env_vars: "dict[str, str] | None"
+    inherit_env: "bool"
+    use_dill: "bool"
 
 
 class BranchPythonVirtualenvOperator(PythonVirtualenvOperator, BranchMixIn):
     python_callable: "Callable"
     requirements: "None | Iterable[str] | str"
     python_version: "str | None"
-    use_dill: "bool"
+    serializer: "_SerializerTypeDef | None"
     system_site_packages: "bool"
     pip_install_options: "list[str] | None"
     op_args: "Collection[Any] | None"
@@ -96,6 +108,9 @@ class BranchPythonVirtualenvOperator(PythonVirtualenvOperator, BranchMixIn):
     skip_on_exit_code: "int | Container[int] | None"
     index_urls: "None | Collection[str] | str"
     venv_cache_path: "None | os.PathLike[str]"
+    env_vars: "dict[str, str] | None"
+    inherit_env: "bool"
+    use_dill: "bool"
 
 
 class ShortCircuitOperator(PythonOperator, SkipMixin):

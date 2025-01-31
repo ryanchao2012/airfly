@@ -6,7 +6,7 @@ class BigQueryDataTransferServiceTransferRunSensor(BaseSensorOperator):
     run_id: "str"
     transfer_config_id: "str"
     expected_statuses: "set[str | TransferState | int] | str | TransferState | int"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     retry: "Retry | _MethodDefault"
     request_timeout: "float | None"

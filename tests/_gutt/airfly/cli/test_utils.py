@@ -1,24 +1,6 @@
 import pytest
 
 
-class TestInvalidModule:
-    @classmethod
-    def setup_class(cls):
-        from airfly.cli.utils import InvalidModule
-
-        assert InvalidModule
-
-    @classmethod
-    def teardown_class(cls):
-        pass
-
-    def setup_method(self, method):
-        pass
-
-    def teardown_method(self, method):
-        pass
-
-
 def test_convert_dag_params():
     from airfly.cli.utils import convert_dag_params
 
@@ -61,3 +43,13 @@ def test_validate_includes():
 
     with pytest.raises(FileNotFoundError):
         validate_includes(None, None, ["non_existent_path"])
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [(None, False), (1, True), ("true", True), ("True", True), ("1", True)],
+)
+def test_convert_task_group(value, expected):
+    from airfly.cli.utils import convert_task_group
+
+    assert convert_task_group(None, None, value) is expected

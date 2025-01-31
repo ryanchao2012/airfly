@@ -6,3 +6,6 @@ class FileSensor(BaseSensorOperator):
     filepath: "_empty"
     fs_conn_id: "_empty"
     recursive: "_empty"
+    deferrable: "bool"
+    start_from_trigger: "bool"
+    trigger_kwargs: "dict[str, Any] | None"

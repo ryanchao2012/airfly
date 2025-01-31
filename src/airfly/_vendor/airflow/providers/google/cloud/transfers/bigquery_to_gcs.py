@@ -5,7 +5,7 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 class BigQueryToGCSOperator(BaseOperator):
     source_project_dataset_table: "str"
     destination_cloud_storage_uris: "list[str]"
-    project_id: "str | None"
+    project_id: "str"
     compression: "str"
     export_format: "str"
     field_delimiter: "str"

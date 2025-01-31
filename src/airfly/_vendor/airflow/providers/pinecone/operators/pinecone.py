@@ -5,7 +5,32 @@ from airfly._vendor.airflow.models.baseoperator import BaseOperator
 class PineconeIngestOperator(BaseOperator):
     conn_id: "str"
     index_name: "str"
-    input_vectors: "list[tuple]"
+    input_vectors: "list[Vector] | list[tuple] | list[dict]"
     namespace: "str"
     batch_size: "int | None"
     upsert_kwargs: "dict | None"
+
+
+class CreatePodIndexOperator(BaseOperator):
+    conn_id: "str"
+    index_name: "str"
+    dimension: "int"
+    environment: "str | None"
+    replicas: "int | None"
+    shards: "int | None"
+    pods: "int | None"
+    pod_type: "str"
+    metadata_config: "dict | None"
+    source_collection: "str | None"
+    metric: "str"
+    timeout: "int | None"
+
+
+class CreateServerlessIndexOperator(BaseOperator):
+    conn_id: "str"
+    index_name: "str"
+    dimension: "int"
+    cloud: "str"
+    region: "str | None"
+    metric: "str | None"
+    timeout: "int | None"

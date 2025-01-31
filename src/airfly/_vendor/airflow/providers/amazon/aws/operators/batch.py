@@ -9,6 +9,7 @@ class BatchOperator(BaseOperator):
     overrides: "dict | None"
     container_overrides: "dict | None"
     array_properties: "dict | None"
+    ecs_properties_override: "dict | None"
     node_overrides: "dict | None"
     share_identifier: "str | None"
     scheduling_priority_override: "int | None"
@@ -41,3 +42,4 @@ class BatchCreateComputeEnvironmentOperator(BaseOperator):
     aws_conn_id: "str | None"
     region_name: "str | None"
     deferrable: "bool"
+    status_retries: "_empty"

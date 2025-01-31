@@ -10,6 +10,6 @@ class BigtableTableReplicationCompletedSensor(
 ):
     instance_id: "str"
     table_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"

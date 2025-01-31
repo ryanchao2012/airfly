@@ -7,4 +7,5 @@ class TimeDeltaSensor(BaseSensorOperator):
 
 
 class TimeDeltaSensorAsync(TimeDeltaSensor):
+    end_from_trigger: "bool"
     delta: "_empty"

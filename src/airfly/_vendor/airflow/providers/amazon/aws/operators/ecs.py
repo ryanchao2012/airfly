@@ -9,6 +9,7 @@ class EcsBaseOperator(AwsBaseOperator):
     region_name: "str | None"
     verify: "bool | str | None"
     botocore_config: "dict | None"
+    region: "str | None | ArgNotSet"
 
 
 class EcsCreateClusterOperator(EcsBaseOperator):
@@ -30,12 +31,18 @@ class EcsDeleteClusterOperator(EcsBaseOperator):
 
 class EcsDeregisterTaskDefinitionOperator(EcsBaseOperator):
     task_definition: "str"
+    wait_for_completion: "_empty"
+    waiter_delay: "_empty"
+    waiter_max_attempts: "_empty"
 
 
 class EcsRegisterTaskDefinitionOperator(EcsBaseOperator):
     family: "str"
     container_definitions: "list[dict]"
     register_task_kwargs: "dict | None"
+    wait_for_completion: "_empty"
+    waiter_delay: "_empty"
+    waiter_max_attempts: "_empty"
 
 
 class EcsRunTaskOperator(EcsBaseOperator):

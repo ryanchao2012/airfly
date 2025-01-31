@@ -41,4 +41,4 @@ class GCSToBigQueryOperator(BaseOperator):
     job_id: "str | None"
     force_rerun: "bool"
     reattach_states: "set[str] | None"
-    project_id: "str | None"
+    project_id: "str"

@@ -36,7 +36,7 @@ from airfly.utils import (
 TaskClass = Type["Task"]
 
 
-AVAILABLE_OPERATORS = collect_airflow_operators()
+BUILTIN_OPERATORS = collect_airflow_operators()
 
 
 class Literal:
@@ -330,6 +330,42 @@ class Task(TaskAttribute):
         return deps
 
     @staticmethod
+    @lru_cache()
+    def _collect_op_annotations(op: Type) -> Dict[str, Any]:
+        """Collect annotations for the operator."""
+        avai_params = {}
+
+        if Task._is_builtin_op(op):
+            for base in op.mro()[::-1]:
+                avai_params.update(getattr(base, "__annotations__", {}))
+
+        elif Task._is_private_op(op):
+            for base in op.mro()[::-1]:
+                signature = inspect.signature(base)
+                for k, v in signature.parameters.items():
+
+                    anno = v.annotation
+                    if isinstance(anno, type):
+                        typename = qualname(anno, level=1)
+                    elif hasattr(anno, "__module__") and anno.__module__ == "typing":
+                        typename = str(anno)
+                    elif isinstance(anno, str):
+                        typename = anno
+                    else:
+                        raise TypeError(f"got: {anno}")
+
+                    if v.kind not in [
+                        inspect._ParameterKind.VAR_KEYWORD,
+                        inspect._ParameterKind.VAR_POSITIONAL,
+                    ]:
+
+                        avai_params.update({k: typename})
+        else:
+            raise ValueError(f"Operator {op} is not supported.")
+
+        return avai_params
+
+    @staticmethod
     def _to_ast(
         cls, param_ctx: ParamContext = None, task_group: bool = True
     ) -> asttrs.AST:
@@ -346,8 +382,7 @@ class Task(TaskAttribute):
             - The parameters are obtained from the Task's attributes and the operator's available parameters.
             - The AST node is an assignment statement, where the target is the variable name and the value is the function call.
 
-        TODO:
-            - Add unit tests for this method.
+        # TODO: Add unit tests for this method.
         """
 
         op = Task._resolve_operator(cls)
@@ -356,13 +391,12 @@ class Task(TaskAttribute):
         task_id = Task._get_taskid(cls)
         task_varname = Task._to_varname(cls)
 
-        avai_params = {}
-        for base in op.mro()[::-1]:
-            avai_params.update(getattr(base, "__annotations__", {}))
-
+        avai_params = Task._collect_op_annotations(op)
         params = dict(task_id=task_id)
 
         for k, v in (Task._get_attributes(cls).op_params or {}).items():
+            if k in params:
+                loguru.logger.warning(f"Overwrite param {k}={params[k]} with value {v}")
             if k in avai_params:
                 params.update({k: v})
             else:
@@ -371,7 +405,6 @@ class Task(TaskAttribute):
         keywords = []
 
         for k, v in params.items():
-
             par = ParamContext.get(v, param_ctx)
             keywords.append(asttrs.keyword(arg=k, value=par._target_ast(param_ctx)))
 
@@ -396,6 +429,24 @@ class Task(TaskAttribute):
         return assign
 
     @staticmethod
+    @lru_cache()
+    def _is_builtin_op(op: Type) -> bool:
+        return issubclass_by_qualname(op, BUILTIN_OPERATORS["BaseOperator"])
+
+    @staticmethod
+    @lru_cache()
+    def _is_private_op(op: Type) -> bool:
+        try:
+            from airflow.models.baseoperator import BaseOperator
+
+            return issubclass_by_qualname(op, BaseOperator)
+        except Exception as err:
+            loguru.logger.warning(f"{err.__class__}: {err}")
+            pass
+
+        return False
+
+    @staticmethod
     def _resolve_operator(cls) -> Type:
         """Resolve the operator class for the Task.
 
@@ -403,35 +454,32 @@ class Task(TaskAttribute):
             Type: The resolved operator class.
 
         Raises:
-            ValueError: If the op_class is invalid or not found in the AVAILABLE_OPERATORS.
+            ValueError: If the op_class is invalid or not found in the BUILTIN_OPERATORS.
             ValueError: If multiple op_class with the same basename are found and op_module is not provided or invalid.
             ValueError: If the op_class candidates cannot be resolved by the given op_module.
-
-        TODO: support Operator not provided in _vendor
         """
 
         op_class = Task._get_attributes(cls).op_class
 
         if isinstance(op_class, type):
-            if issubclass_by_qualname(op_class, AVAILABLE_OPERATORS["BaseOperator"]):
+
+            if Task._is_builtin_op(op_class) or Task._is_private_op(op_class):
                 return op_class
 
             raise TypeError(f"Not a valid operator type, got: {op_class}")
 
+        # NOTE: if op_class is str, assume it's a builtin operator
         if isinstance(op_class, str):
             basename = op_class
-
-        # elif isinstance(op_class, type):
-        #     basename = qualname(op_class, level=1)
 
         else:
             raise ValueError(f"Invalid op_class, got: {op_class}")
 
-        if basename not in AVAILABLE_OPERATORS:
+        if basename not in BUILTIN_OPERATORS:
             raise ValueError(
                 f"'{basename}' not found. If this is unexpected and the operator should exist, please report the issue."
             )
-        items = AVAILABLE_OPERATORS[basename]
+        items = BUILTIN_OPERATORS[basename]
 
         if len(items) > 1:
             # Disambiguate by op_module
@@ -590,7 +638,7 @@ class TaskTree:
             >>> module = ...
             >>> task_tree = TaskTree.from_module(module)
 
-        TODO: add predicate in argument
+        # TODO: add predicate in argument
         """
 
         loguru.logger.info(

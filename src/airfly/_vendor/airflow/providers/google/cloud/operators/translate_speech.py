@@ -11,6 +11,6 @@ class CloudTranslateSpeechOperator(GoogleCloudBaseOperator):
     format_: "str"
     source_language: "str | None"
     model: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"

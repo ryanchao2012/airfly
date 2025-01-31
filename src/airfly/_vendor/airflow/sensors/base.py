@@ -11,3 +11,4 @@ class BaseSensorOperator(BaseOperator, SkipMixin):
     exponential_backoff: "bool"
     max_wait: "timedelta | float | None"
     silent_fail: "bool"
+    never_fail: "bool"

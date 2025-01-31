@@ -29,3 +29,4 @@ class SlackAPIFileOperator(SlackAPIOperator):
     content: "str | None"
     title: "str | None"
     method_version: "Literal['v1', 'v2']"
+    channel: "str | Sequence[str] | None | ArgNotSet"

@@ -7,6 +7,7 @@ class OpenSearchQueryOperator(BaseOperator):
     search_object: "Any | None"
     index_name: "str | None"
     opensearch_conn_id: "str"
+    opensearch_conn_class: "type[OpenSearchConnectionClass] | None"
     log_query: "bool"
 
 

@@ -7,3 +7,6 @@ from airfly._vendor.airflow.providers.google.cloud.transfers.bigquery_to_sql imp
 class BigQueryToPostgresOperator(BigQueryToSqlBaseOperator):
     target_table_name: "str"
     postgres_conn_id: "str"
+    replace: "bool"
+    selected_fields: "list[str] | str | None"
+    replace_index: "list[str] | str | None"

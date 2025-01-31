@@ -480,6 +480,26 @@ class TestTask:
 
         assert self.Task._resolve_operator(Task7) == DataprocCreateClusterOperator
 
+    def test__collect_op_annotations(self):
+        pass
+
+    @pytest.mark.parametrize(
+        "op_name",
+        ["BashOperator", "PythonOperator", "KubernetesPodOperator"],
+    )
+    def test__is_builtin_op(self, op_name):
+
+        class Task(self.Task):
+            op_class = op_name
+
+        op = self.Task._resolve_operator(Task)
+
+        assert self.Task._is_builtin_op(op)
+
+    def test__is_private_op(self, mocker):
+
+        assert not self.Task._is_private_op(mocker.MagicMock())
+
 
 class TestAirFly:
     @classmethod

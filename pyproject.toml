@@ -1,6 +1,6 @@
 [project]
 name = "airfly"
-version = "1.0.0"
+version = "1.1.0"
 description = "Auto generate Airflow's dag.py on the fly"
 authors = [
     {name = "ryanchao2012", email = "ryanchao2012@gmail.com"},
@@ -33,7 +33,7 @@ dependencies = [
 [tool.pdm]
 distribution = true
 
-[tool.pdm.dev-dependencies]
+[project.optional-dependencies]
 dev = [
     "ipython>=8.12.3",
     "pytest>=8.1.1",

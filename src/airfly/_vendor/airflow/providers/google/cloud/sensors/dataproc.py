@@ -5,7 +5,7 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 class DataprocJobSensor(BaseSensorOperator):
     dataproc_job_id: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     wait_timeout: "int | None"
 
@@ -13,6 +13,6 @@ class DataprocJobSensor(BaseSensorOperator):
 class DataprocBatchSensor(BaseSensorOperator):
     batch_id: "str"
     region: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     wait_timeout: "int | None"

@@ -23,6 +23,8 @@ class RunPipelineJobOperator(GoogleCloudBaseOperator):
     experiment: "str | experiment_resources.Experiment | None"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"
+    poll_interval: "int"
 
 
 class GetPipelineJobOperator(GoogleCloudBaseOperator):

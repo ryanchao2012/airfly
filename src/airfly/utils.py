@@ -162,10 +162,13 @@ def _collect_from_module(
     module: ModuleType,
 ) -> Generator[Union[FunctionType, type], None, None]:
 
-    for _, obj in module.__dict__.items():
+    for key, obj in module.__dict__.items():
 
-        if isinstance(obj, (type, FunctionType)):
-            yield obj
+        try:
+            if isinstance(obj, (type, FunctionType)):
+                yield obj
+        except Exception as err:
+            loguru.logger.warning(f"Ignore invalid object: '{key}'. Reason: {err}")
 
 
 def makefile(fullpath: str, content: Union[str, bytes] = "", overwrite: bool = False):

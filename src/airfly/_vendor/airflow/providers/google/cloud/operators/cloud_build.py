@@ -6,7 +6,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 
 class CloudBuildCancelBuildOperator(GoogleCloudBaseOperator):
     id_: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -17,7 +17,7 @@ class CloudBuildCancelBuildOperator(GoogleCloudBaseOperator):
 
 class CloudBuildCreateBuildOperator(GoogleCloudBaseOperator):
     build: "dict | Build"
-    project_id: "str | None"
+    project_id: "str"
     wait: "bool"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
@@ -31,7 +31,7 @@ class CloudBuildCreateBuildOperator(GoogleCloudBaseOperator):
 
 class CloudBuildCreateBuildTriggerOperator(GoogleCloudBaseOperator):
     trigger: "dict | BuildTrigger"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -42,7 +42,7 @@ class CloudBuildCreateBuildTriggerOperator(GoogleCloudBaseOperator):
 
 class CloudBuildDeleteBuildTriggerOperator(GoogleCloudBaseOperator):
     trigger_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -53,7 +53,7 @@ class CloudBuildDeleteBuildTriggerOperator(GoogleCloudBaseOperator):
 
 class CloudBuildGetBuildOperator(GoogleCloudBaseOperator):
     id_: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -64,7 +64,7 @@ class CloudBuildGetBuildOperator(GoogleCloudBaseOperator):
 
 class CloudBuildGetBuildTriggerOperator(GoogleCloudBaseOperator):
     trigger_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"
@@ -75,7 +75,7 @@ class CloudBuildGetBuildTriggerOperator(GoogleCloudBaseOperator):
 
 class CloudBuildListBuildTriggersOperator(GoogleCloudBaseOperator):
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     page_size: "int | None"
     page_token: "str | None"
     retry: "Retry | _MethodDefault"
@@ -87,7 +87,7 @@ class CloudBuildListBuildTriggersOperator(GoogleCloudBaseOperator):
 
 class CloudBuildListBuildsOperator(GoogleCloudBaseOperator):
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     page_size: "int | None"
     filter_: "str | None"
     retry: "Retry | _MethodDefault"
@@ -99,7 +99,7 @@ class CloudBuildListBuildsOperator(GoogleCloudBaseOperator):
 
 class CloudBuildRetryBuildOperator(GoogleCloudBaseOperator):
     id_: "str"
-    project_id: "str | None"
+    project_id: "str"
     wait: "bool"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
@@ -112,7 +112,7 @@ class CloudBuildRetryBuildOperator(GoogleCloudBaseOperator):
 class CloudBuildRunBuildTriggerOperator(GoogleCloudBaseOperator):
     trigger_id: "str"
     source: "dict | RepoSource"
-    project_id: "str | None"
+    project_id: "str"
     wait: "bool"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
@@ -125,7 +125,7 @@ class CloudBuildRunBuildTriggerOperator(GoogleCloudBaseOperator):
 class CloudBuildUpdateBuildTriggerOperator(GoogleCloudBaseOperator):
     trigger_id: "str"
     trigger: "dict | BuildTrigger"
-    project_id: "str | None"
+    project_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
     metadata: "Sequence[tuple[str, str]]"

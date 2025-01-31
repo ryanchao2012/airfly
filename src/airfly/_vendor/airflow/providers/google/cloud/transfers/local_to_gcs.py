@@ -9,4 +9,5 @@ class LocalFilesystemToGCSOperator(BaseOperator):
     gcp_conn_id: "_empty"
     mime_type: "_empty"
     gzip: "_empty"
+    chunk_size: "int | None"
     impersonation_chain: "str | Sequence[str] | None"

@@ -10,7 +10,7 @@ class CloudTextToSpeechSynthesizeOperator(GoogleCloudBaseOperator):
     audio_config: "dict | AudioConfig"
     target_bucket_name: "str"
     target_filename: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"

@@ -9,7 +9,7 @@ class CloudDataTransferServiceCreateJobOperator(GoogleCloudBaseOperator):
     aws_conn_id: "str | None"
     gcp_conn_id: "str"
     api_version: "str"
-    project_id: "str | None"
+    project_id: "str"
     google_impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -19,7 +19,7 @@ class CloudDataTransferServiceUpdateJobOperator(GoogleCloudBaseOperator):
     aws_conn_id: "str | None"
     gcp_conn_id: "str"
     api_version: "str"
-    project_id: "str | None"
+    project_id: "str"
     google_impersonation_chain: "str | Sequence[str] | None"
 
 
@@ -27,12 +27,20 @@ class CloudDataTransferServiceDeleteJobOperator(GoogleCloudBaseOperator):
     job_name: "str"
     gcp_conn_id: "str"
     api_version: "str"
-    project_id: "str | None"
+    project_id: "str"
+    google_impersonation_chain: "str | Sequence[str] | None"
+
+
+class CloudDataTransferServiceRunJobOperator(GoogleCloudBaseOperator):
+    job_name: "str"
+    gcp_conn_id: "str"
+    api_version: "str"
+    project_id: "str"
     google_impersonation_chain: "str | Sequence[str] | None"
 
 
 class CloudDataTransferServiceGetOperationOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     operation_name: "str"
     gcp_conn_id: "str"
     api_version: "str"
@@ -41,7 +49,7 @@ class CloudDataTransferServiceGetOperationOperator(GoogleCloudBaseOperator):
 
 class CloudDataTransferServiceListOperationsOperator(GoogleCloudBaseOperator):
     request_filter: "dict"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     google_impersonation_chain: "str | Sequence[str] | None"
@@ -73,7 +81,7 @@ class CloudDataTransferServiceS3ToGCSOperator(GoogleCloudBaseOperator):
     gcs_bucket: "str"
     s3_path: "str | None"
     gcs_path: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     aws_conn_id: "str | None"
     gcp_conn_id: "str"
     description: "str | None"
@@ -84,6 +92,7 @@ class CloudDataTransferServiceS3ToGCSOperator(GoogleCloudBaseOperator):
     timeout: "float | None"
     google_impersonation_chain: "str | Sequence[str] | None"
     delete_job_after_completion: "bool"
+    aws_role_arn: "str | None"
 
 
 class CloudDataTransferServiceGCSToGCSOperator(GoogleCloudBaseOperator):
@@ -91,7 +100,7 @@ class CloudDataTransferServiceGCSToGCSOperator(GoogleCloudBaseOperator):
     destination_bucket: "str"
     source_path: "str | None"
     destination_path: "str | None"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     description: "str | None"
     schedule: "dict | None"

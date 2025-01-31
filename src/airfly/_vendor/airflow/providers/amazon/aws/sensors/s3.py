@@ -11,6 +11,7 @@ class S3KeySensor(BaseSensorOperator):
     verify: "str | bool | None"
     deferrable: "bool"
     use_regex: "bool"
+    metadata_keys: "list[str] | None"
 
 
 class S3KeysUnchangedSensor(BaseSensorOperator):

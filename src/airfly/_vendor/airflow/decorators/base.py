@@ -7,5 +7,4 @@ class DecoratedOperator(BaseOperator):
     task_id: "str"
     op_args: "Collection[Any] | None"
     op_kwargs: "Mapping[str, Any] | None"
-    multiple_outputs: "bool"
     kwargs_to_upstream: "dict[str, Any] | None"
