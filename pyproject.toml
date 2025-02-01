@@ -1,6 +1,6 @@
 [project]
 name = "airfly"
-version = "1.0.0"
+version = "1.1.0"
 description = "Auto generate Airflow's dag.py on the fly"
 authors = [
     {name = "ryanchao2012", email = "ryanchao2012@gmail.com"},
@@ -14,6 +14,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
 requires-python = ">=3.8"
@@ -30,10 +31,7 @@ dependencies = [
     "loguru",
 ]
 
-[tool.pdm]
-distribution = true
-
-[tool.pdm.dev-dependencies]
+[project.optional-dependencies]
 dev = [
     "ipython>=8.12.3",
     "pytest>=8.1.1",
@@ -44,9 +42,12 @@ dev = [
     "pytest-mock>=3.14.0",
 ]
 
+[project.scripts]
+airfly = "airfly.cli.main:main"
+
+[tool.pdm]
+distribution = true
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
-[project.scripts]
-airfly = "airfly.cli.main:main"
