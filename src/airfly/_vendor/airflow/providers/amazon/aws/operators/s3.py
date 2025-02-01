@@ -60,6 +60,8 @@ class S3DeleteObjectsOperator(BaseOperator):
     bucket: "str"
     keys: "str | list | None"
     prefix: "str | None"
+    from_datetime: "datetime | None"
+    to_datetime: "datetime | None"
     aws_conn_id: "str | None"
     verify: "str | bool | None"
 
@@ -69,6 +71,7 @@ class S3FileTransformOperator(BaseOperator):
     dest_s3_key: "str"
     transform_script: "str | None"
     select_expression: "_empty"
+    select_expr_serialization_config: "dict[str, dict[str, dict]] | None"
     script_args: "Sequence[str] | None"
     source_aws_conn_id: "str | None"
     source_verify: "bool | str | None"

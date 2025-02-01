@@ -9,14 +9,14 @@ class SpannerDeployInstanceOperator(GoogleCloudBaseOperator):
     configuration_name: "str"
     node_count: "int"
     display_name: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
 
 class SpannerDeleteInstanceOperator(GoogleCloudBaseOperator):
     instance_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
@@ -25,7 +25,7 @@ class SpannerQueryDatabaseInstanceOperator(GoogleCloudBaseOperator):
     instance_id: "str"
     database_id: "str"
     query: "str | list[str]"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
@@ -34,7 +34,7 @@ class SpannerDeployDatabaseInstanceOperator(GoogleCloudBaseOperator):
     instance_id: "str"
     database_id: "str"
     ddl_statements: "list[str]"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
@@ -43,7 +43,7 @@ class SpannerUpdateDatabaseInstanceOperator(GoogleCloudBaseOperator):
     instance_id: "str"
     database_id: "str"
     ddl_statements: "list[str]"
-    project_id: "str | None"
+    project_id: "str"
     operation_id: "str | None"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
@@ -52,6 +52,6 @@ class SpannerUpdateDatabaseInstanceOperator(GoogleCloudBaseOperator):
 class SpannerDeleteDatabaseInstanceOperator(GoogleCloudBaseOperator):
     instance_id: "str"
     database_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"

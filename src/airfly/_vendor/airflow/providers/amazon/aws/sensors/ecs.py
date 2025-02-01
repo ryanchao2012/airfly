@@ -7,6 +7,7 @@ class EcsBaseSensor(AwsBaseSensor):
     region_name: "str | None"
     verify: "bool | str | None"
     botocore_config: "dict | None"
+    region: "str | None | ArgNotSet"
 
 
 class EcsClusterStateSensor(EcsBaseSensor):

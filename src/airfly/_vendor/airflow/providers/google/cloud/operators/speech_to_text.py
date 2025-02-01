@@ -7,7 +7,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 class CloudSpeechToTextRecognizeSpeechOperator(GoogleCloudBaseOperator):
     audio: "RecognitionAudio"
     config: "RecognitionConfig"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"

@@ -11,3 +11,4 @@ class GCSToSambaOperator(BaseOperator):
     gcp_conn_id: "str"
     samba_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
+    buffer_size: "int | None"

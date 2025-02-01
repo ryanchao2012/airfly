@@ -80,3 +80,17 @@ class CloudComposerListImageVersionsOperator(GoogleCloudBaseOperator):
     metadata: "Sequence[tuple[str, str]]"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
+
+
+class CloudComposerRunAirflowCLICommandOperator(GoogleCloudBaseOperator):
+    project_id: "str"
+    region: "str"
+    environment_id: "str"
+    command: "str"
+    retry: "Retry | _MethodDefault"
+    timeout: "float | None"
+    metadata: "Sequence[tuple[str, str]]"
+    gcp_conn_id: "str"
+    impersonation_chain: "str | Sequence[str] | None"
+    deferrable: "bool"
+    poll_interval: "int"

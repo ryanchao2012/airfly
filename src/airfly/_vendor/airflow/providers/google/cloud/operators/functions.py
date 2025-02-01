@@ -7,7 +7,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 class CloudFunctionDeployFunctionOperator(GoogleCloudBaseOperator):
     location: "str"
     body: "dict"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     zip_path: "str | None"
@@ -20,14 +20,14 @@ class CloudFunctionDeleteFunctionOperator(GoogleCloudBaseOperator):
     gcp_conn_id: "str"
     api_version: "str"
     impersonation_chain: "str | Sequence[str] | None"
-    project_id: "str | None"
+    project_id: "str"
 
 
 class CloudFunctionInvokeFunctionOperator(GoogleCloudBaseOperator):
     function_id: "str"
     input_data: "dict"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     impersonation_chain: "str | Sequence[str] | None"

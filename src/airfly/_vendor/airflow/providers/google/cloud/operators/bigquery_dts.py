@@ -6,7 +6,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 
 class BigQueryCreateDataTransferOperator(GoogleCloudBaseOperator):
     transfer_config: "dict"
-    project_id: "str | None"
+    project_id: "str"
     location: "str | None"
     authorization_code: "str | None"
     retry: "Retry | _MethodDefault"
@@ -18,7 +18,7 @@ class BigQueryCreateDataTransferOperator(GoogleCloudBaseOperator):
 
 class BigQueryDeleteDataTransferConfigOperator(GoogleCloudBaseOperator):
     transfer_config_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     location: "str | None"
     retry: "Retry | _MethodDefault"
     timeout: "float | None"
@@ -29,7 +29,7 @@ class BigQueryDeleteDataTransferConfigOperator(GoogleCloudBaseOperator):
 
 class BigQueryDataTransferServiceStartTransferRunsOperator(GoogleCloudBaseOperator):
     transfer_config_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     location: "str | None"
     requested_time_range: "dict | None"
     requested_run_time: "dict | None"

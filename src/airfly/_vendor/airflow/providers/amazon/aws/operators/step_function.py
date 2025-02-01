@@ -7,6 +7,7 @@ from airfly._vendor.airflow.providers.amazon.aws.operators.base_aws import (
 class StepFunctionStartExecutionOperator(AwsBaseOperator):
     state_machine_arn: "str"
     name: "str | None"
+    is_redrive_execution: "bool"
     state_machine_input: "dict | str | None"
     waiter_max_attempts: "int"
     waiter_delay: "int"

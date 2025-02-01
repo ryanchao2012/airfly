@@ -9,10 +9,18 @@ class GCSCreateBucketOperator(GoogleCloudBaseOperator):
     resource: "dict | None"
     storage_class: "str"
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     labels: "dict | None"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
+
+
+class GCSDeleteBucketOperator(GoogleCloudBaseOperator):
+    bucket_name: "str"
+    force: "bool"
+    gcp_conn_id: "str"
+    impersonation_chain: "str | Sequence[str] | None"
+    user_project: "str | None"
 
 
 class GCSListObjectsOperator(GoogleCloudBaseOperator):
@@ -27,7 +35,7 @@ class GCSListObjectsOperator(GoogleCloudBaseOperator):
 class GCSDeleteObjectsOperator(GoogleCloudBaseOperator):
     bucket_name: "str"
     objects: "list[str] | None"
-    prefix: "str | None"
+    prefix: "str | list[str] | None"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"
 
@@ -77,14 +85,6 @@ class GCSTimeSpanFileTransformOperator(GoogleCloudBaseOperator):
     download_num_attempts: "int"
     upload_continue_on_fail: "bool | None"
     upload_num_attempts: "int"
-
-
-class GCSDeleteBucketOperator(GoogleCloudBaseOperator):
-    bucket_name: "str"
-    force: "bool"
-    gcp_conn_id: "str"
-    impersonation_chain: "str | Sequence[str] | None"
-    user_project: "str | None"
 
 
 class GCSSynchronizeBucketsOperator(GoogleCloudBaseOperator):

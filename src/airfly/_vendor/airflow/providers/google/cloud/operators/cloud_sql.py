@@ -6,7 +6,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 
 class CloudSQLBaseOperator(GoogleCloudBaseOperator):
     instance: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     impersonation_chain: "str | Sequence[str] | None"
@@ -15,7 +15,7 @@ class CloudSQLBaseOperator(GoogleCloudBaseOperator):
 class CloudSQLCreateInstanceOperator(CloudSQLBaseOperator):
     body: "dict"
     instance: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     validate_body: "bool"
@@ -25,7 +25,7 @@ class CloudSQLCreateInstanceOperator(CloudSQLBaseOperator):
 class CloudSQLInstancePatchOperator(CloudSQLBaseOperator):
     body: "dict"
     instance: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     impersonation_chain: "str | Sequence[str] | None"
@@ -33,7 +33,7 @@ class CloudSQLInstancePatchOperator(CloudSQLBaseOperator):
 
 class CloudSQLDeleteInstanceOperator(CloudSQLBaseOperator):
     instance: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     impersonation_chain: "str | Sequence[str] | None"
@@ -43,7 +43,7 @@ class CloudSQLCloneInstanceOperator(CloudSQLBaseOperator):
     instance: "str"
     destination_instance_name: "str"
     clone_context: "dict | None"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     impersonation_chain: "str | Sequence[str] | None"
@@ -52,7 +52,7 @@ class CloudSQLCloneInstanceOperator(CloudSQLBaseOperator):
 class CloudSQLCreateInstanceDatabaseOperator(CloudSQLBaseOperator):
     instance: "str"
     body: "dict"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     validate_body: "bool"
@@ -63,7 +63,7 @@ class CloudSQLPatchInstanceDatabaseOperator(CloudSQLBaseOperator):
     instance: "str"
     database: "str"
     body: "dict"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     validate_body: "bool"
@@ -73,7 +73,7 @@ class CloudSQLPatchInstanceDatabaseOperator(CloudSQLBaseOperator):
 class CloudSQLDeleteInstanceDatabaseOperator(CloudSQLBaseOperator):
     instance: "str"
     database: "str"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     impersonation_chain: "str | Sequence[str] | None"
@@ -82,7 +82,7 @@ class CloudSQLDeleteInstanceDatabaseOperator(CloudSQLBaseOperator):
 class CloudSQLExportInstanceOperator(CloudSQLBaseOperator):
     instance: "str"
     body: "dict"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     validate_body: "bool"
@@ -94,7 +94,7 @@ class CloudSQLExportInstanceOperator(CloudSQLBaseOperator):
 class CloudSQLImportInstanceOperator(CloudSQLBaseOperator):
     instance: "str"
     body: "dict"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
     api_version: "str"
     validate_body: "bool"
@@ -108,3 +108,7 @@ class CloudSQLExecuteQueryOperator(GoogleCloudBaseOperator):
     gcp_conn_id: "str"
     gcp_cloudsql_conn_id: "str"
     sql_proxy_binary_path: "str | None"
+    ssl_server_cert: "str | None"
+    ssl_client_cert: "str | None"
+    ssl_client_key: "str | None"
+    ssl_secret_id: "str | None"

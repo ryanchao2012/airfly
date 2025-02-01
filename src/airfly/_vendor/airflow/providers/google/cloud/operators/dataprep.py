@@ -11,20 +11,20 @@ class DataprepGetJobsForJobGroupOperator(GoogleCloudBaseOperator):
 
 class DataprepGetJobGroupOperator(GoogleCloudBaseOperator):
     dataprep_conn_id: "str"
-    project_id: "str | None"
+    project_id: "str"
     job_group_id: "int | str"
     embed: "str"
     include_deleted: "bool"
 
 
 class DataprepRunJobGroupOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     dataprep_conn_id: "str"
     body_request: "dict"
 
 
 class DataprepCopyFlowOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     dataprep_conn_id: "str"
     flow_id: "int | str"
     name: "str"
@@ -38,7 +38,7 @@ class DataprepDeleteFlowOperator(GoogleCloudBaseOperator):
 
 
 class DataprepRunFlowOperator(GoogleCloudBaseOperator):
-    project_id: "str | None"
+    project_id: "str"
     flow_id: "int | str"
     body_request: "dict"
     dataprep_conn_id: "str"

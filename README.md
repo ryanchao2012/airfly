@@ -6,26 +6,26 @@
 
 # AirFly: Auto Generate Airflow's `dag.py` On The Fly
 
-Pipeline management is crucial for efficient data operations within a company. Many engineering teams rely on tools like Airflow to help them organize workflows, including ETL processes, reporting pipelines, or machine learning projects.
+Effective data pipeline management is essential for a company's data operations. Many engineering teams rely on tools like Airflow to organize various batch processing tasks, such as ETL/ELT workflows, data reporting pipelines, machine learning projects and so on.
 
-Airflow offers rich extensibility, allowing developers to arrange workloads into a sequence of tasks. These tasks are then declared within a `DAG` context in a `dag.py` file, specifying task dependencies.
+Airflow is a powerful tool for task scheduling and orchestration, allowing users to define workflows as "DAGs". A typical DAG represents a data pipeline and includes a series of tasks along with their dependencies.
 
-As a workflow grows in complexity, the increasing intricacy of task relations can lead to confusion and disrupt the DAG structure. This complexity often results in decreased code maintainability, particularly in collaborative scenarios.
+As a pipeline grows in complexity, more tasks and interdependencies are added, which often lead to confusion and disrupt the structure of the DAG, resulting in lower code quality and making it more difficult to maintain and update, especially in collaborative environments.
 
-`airfly` tries to alleviate such pain points and streamline the development life cycle. It operates under the assumption that all tasks are managed within a certain Python module. Developers define task dependencies while creating task objects. During deployment, `airfly` can resolve the dependency tree and automatically generate the `dag.py` for you.
+`airfly` aims to alleviate such challenges and streamline the development lifecycle. It assumes that tasks are encapsulated in a specific structure, with dependencies defined as part of the task attributes. During deployment, `airfly` recursively collects all tasks, resolves the dependency tree, and automatically generates the DAG.
 
 <img src="https://github.com/ryanchao2012/airfly/blob/main/assets/graph-view.png?raw=true" width="800"></img>
 ***airfly** helps you build complex dags*
 
 
 
-
 ## Key Features
 
-* `dag.py` automation: focus on your task, let airfly handle the rest.
-* No need to install Airflow: keep your environment lean.
-* support task group: a nice feature from Airflow 2.0+
-* support duck typing: flexible class inheritance.
+* `dag.py` Automation: focus on your tasks and let airfly handle the rest.
+* No Airflow Installation Required: keep your environment lean without the need for Airflow.
+* Task Group Support: a nice feature from Airflow 2.0+.
+* Duck Typing Support: flexible class inheritance for greater customization.
+
 
 ## Install
 
@@ -64,7 +64,8 @@ Options:
 
 ## How It Works
 
-`airfly` assumes the tasks are populated in a Python module(or a package, e.g., `man_dag` in the below example), the dependencies are declared by assigning `upstream` or `downstream` attributes to each task. A task holds some attributes corresponding to an airflow operator, when `airfly` walks through the entire module, all tasks are discovered and collected, the dependency tree and the `DAG` context are auto-built, with some `ast` helpers, `airfly` can wrap the information, convert it into python code, and finally save them to `dag.py`.
+`airfly` assumes that tasks are defined within a Python module (or package, such as `main_dag` in the example below). Each task holds attributes corresponding to an Airflow operator, and the dependencies are declared by assigning `upstream` or `downstream`. As `airfly` walks through the module, it discovers and collects all tasks, resolves the dependency tree, and generates the `DAG` in Python code, which can then be saved as `dag.py`.
+
 
 ```sh
 main_dag
@@ -85,7 +86,7 @@ main_dag
 
 ### Define your task with `AirFly`
 
-Declare a task as following(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/demo.py)):
+Declare a task as follows(see [demo](https://github.com/ryanchao2012/airfly/blob/main/examples/tutorial/demo.py)):
 
 ```python
 # in demo.py
@@ -97,9 +98,8 @@ class print_date(AirFly):
     op_params = dict(bash_command="date")
 
 
-# during dag generation,
-# this class will be converted to airflow operator
-print_date._to_ast(print_date).show()
+# During DAG generation,
+# This class will be auto-converted to the following code:
 # examples_tutorial_demo_print_date = BashOperator(
 #     task_id='examples.tutorial.demo.print_date',
 #     bash_command='date',
@@ -109,9 +109,10 @@ print_date._to_ast(print_date).show()
 ```
 
 * `op_class (str)`: specifies the airflow operator to this task.
-* `op_params`: keyword arguments which will be passed to the airflow operator(`op_class`), a parameter (i.e., value in the dictionary) could be one of the [primitive types](https://docs.python.org/3/library/stdtypes.html), a function or a class.
+* `op_params`: keyword arguments which will be passed to the operator(`op_class`), a parameter (i.e., value in the dictionary) could be one of the [primitive types](https://docs.python.org/3/library/stdtypes.html), a function or a class.
 
-You can also define the attributes by `property`:
+You can also define the attributes using `property`:
+
 ```python
 from airfly.model import AirFly
 
@@ -122,40 +123,44 @@ class print_date(AirFly):
     def op_class(self):
         return "BashOperator"
 
+    def greeting(self) -> str:
+        return "Hello World"
+
     @property
     def op_params(self):
-        return dict(bash_command="date")
+        return dict(bash_command=f"echo {self.greeting()}")
 
-print_date._to_ast(print_date).show()
+# Corresponding generated code:
 # examples_tutorial_demo_print_date = BashOperator(
 #     task_id='examples.tutorial.demo.print_date',
-#     bash_command='date',
+#     bash_command='echo Hello World',
 #     task_group=group_examples_tutorial_demo
 # )
 
 ```
 
-By default, the class name(`print_date`) maps to `task_id` to the applied operator after dag generation. You can change this behavior by overriding `_get_taskid` as a classmethod, you have to make sure the task id is globally unique:
+By default, the class name (`print_date`) is used as the `task_id` for the applied operator after DAG generation. You can change this behavior by overriding `_get_taskid` as a class method. Make sure that the `task_id` is globally unique:
 
 ```python
-
+import re
 from airfly.model import AirFly
 
 
-class print_date(AirFly):
+class PrintDate(AirFly):
     @classmethod
     def _get_taskid(cls):
         # customize the task id
-        return f"my_task_{cls.__qualname__}"
+        return "task_" + re.sub(r'(?<!^)(?=[A-Z])', '_', cls.__name__).lower()
+
     op_class = "BashOperator" 
     op_params = dict(bash_command="date")
 
 
-print_date._to_ast(print_date).show()
-# my_task_print_date = BashOperator(
-#     task_id='my_task_print_date',
+# Corresponding generated code:
+# task_print_date = BashOperator(
+#     task_id='task_print_date',
 #     bash_command='date',
-#     task_group=group_my_task_print_date
+#     task_group=group_task_print_date
 # )
 
 ```
@@ -372,10 +377,11 @@ with DAG("demo_dag", **dag_kwargs) as dag:
 
 ```
 
-`airfly` wraps required information including variables and imports into output python script, and pass the specified value to `DAG` object.
+As you can see, `airfly` wraps required information including variables and import dependencies into output code, and pass the specified value to `DAG` object.
 
 
 ## Exclude tasks from codegen
+
 By passing `--exclude-pattern` to match any unwanted objects with their `__qualname__`. then filter them out.
 
 ```
@@ -410,12 +416,99 @@ with DAG("demo_dag") as dag:
 The `templated` task is gone.
 
 
+### Operators Support
+
+#### Built-in Operators
+
+Operators defined in the official Airflow package, such as `BashOperator`, `PythonOperator`, and `KubernetesPodOperator`, are considered built-in, including those contributed by the community through various providers (e.g., Google, Facebook, OpenAI).
+
+To use a built-in operator, assign `op_class` to its name and specify corresponding parameters using `op_params`:
+
+```python
+from airfly.model import AirFly
+
+def log_sql(**kwargs):
+    print("Python task decorator query: %s", str(kwargs["templates_dict"]["query"]))
+
+class Task1(AirFly):
+
+    op_class = "KubernetesPodOperator"
+    op_params = dict(
+        image="debian",
+        cmds=["bash", "-cx"],
+        arguments=["echo", "10"],
+        labels={"foo": "bar"},
+    )
+
+
+class Task2(AirFly):
+
+    op_class = "PythonOperator"
+    op_params = dict(
+        python_callable=log_sql,
+        templates_dict={"query": "sql/sample.sql"},
+        templates_exts=[".sql"],
+    )
+
+```
+
+Sometimes, operators may have a naming ambiguity. For instance, `EmailOperator` could refer to either [`airflow.operators.email.EmailOperator`](https://github.com/apache/airflow/blob/2.10.4/airflow/operators/email.py#L29) or [`airflow.providers.smtp.operators.smtp.EmailOperator`](https://github.com/apache/airflow/blob/2.10.4/airflow/providers/smtp/operators/smtp.py#L29). To resolve such ambiguities, specify the correct module using `op_module`:  
+
+
+```python
+
+from airfly.model import AirFly
+
+class Task3(AirFly):
+
+    op_class = "EmailOperator"
+    op_module = "airflow.providers.smtp.operators.smtp"
+    op_params = dict(
+        subject="Hello World",
+        from_email="me@mail.com",
+        to="you@mail.com",
+    )
+
+```
+
+This approach ensures that `Task3` explicitly references the `EmailOperator` from the `airflow.providers.smtp.operators.smtp` module, avoiding conflicts with similarly named operators.
+
+
+#### Private Operators
+
+Operators not included in the official Airflow package are considered private. Developers often create custom operators by extending existing built-in ones to meet their use cases. Since these custom operators are not registered within Airflow, `airfly` cannot automatically infer them by name.
+
+To use a private operator, provide its class definition directly in `op_class`:
+
+```python
+# in my_package/operators.py
+from airflow.operators.bash import BashOperator
+
+class EchoOperator(BashOperator):
+
+    def __init__(self, text: str, **kwargs):
+        cmd = f"echo {text}"
+        super().__init__(bash_command=cmd, **kwargs)
+
+# in my_package/tasks.py
+from airfly.model import AirFly
+from my_package.operators import EchoOperator
+
+class Task4(AirFly):
+    op_class = EchoOperator
+    op_params = dict(text="Hello World")
+
+```
+
+This approach enables seamless integration of private, custom-built operators with `airfly`.
+
+
 ### Task Group
 
 `airfly`  defines `TaskGroup` in the DAG context and assigns `task_group` to each operator for you.
 It maps the module hierarchy to the nested group structure,
 so the tasks in the same python module will be grouped closer.
-If you don't like this feature, pass `--task-group`/`-g` with `False` to disable it. 
+If you don't like this feature, pass `--task-group`/`-g` with `0` to disable it. 
 
 
 ## Duck Typing

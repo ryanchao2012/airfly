@@ -4,7 +4,7 @@ from airfly._vendor.airflow.sensors.base import BaseSensorOperator
 
 class TaskQueueEmptySensor(BaseSensorOperator):
     location: "str"
-    project_id: "str | None"
+    project_id: "str"
     queue_name: "str | None"
     gcp_conn_id: "str"
     impersonation_chain: "str | Sequence[str] | None"

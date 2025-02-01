@@ -6,7 +6,7 @@ from airfly._vendor.airflow.providers.google.cloud.operators.cloud_base import (
 
 class PubSubCreateTopicOperator(GoogleCloudBaseOperator):
     topic: "str"
-    project_id: "str | None"
+    project_id: "str"
     fail_if_exists: "bool"
     gcp_conn_id: "str"
     labels: "dict[str, str] | None"
@@ -22,7 +22,7 @@ class PubSubCreateTopicOperator(GoogleCloudBaseOperator):
 
 class PubSubCreateSubscriptionOperator(GoogleCloudBaseOperator):
     topic: "str"
-    project_id: "str | None"
+    project_id: "str"
     subscription: "str | None"
     subscription_project_id: "str | None"
     ack_deadline_secs: "int"
@@ -45,7 +45,7 @@ class PubSubCreateSubscriptionOperator(GoogleCloudBaseOperator):
 
 class PubSubDeleteTopicOperator(GoogleCloudBaseOperator):
     topic: "str"
-    project_id: "str | None"
+    project_id: "str"
     fail_if_not_exists: "bool"
     gcp_conn_id: "str"
     retry: "Retry | _MethodDefault"
@@ -56,7 +56,7 @@ class PubSubDeleteTopicOperator(GoogleCloudBaseOperator):
 
 class PubSubDeleteSubscriptionOperator(GoogleCloudBaseOperator):
     subscription: "str"
-    project_id: "str | None"
+    project_id: "str"
     fail_if_not_exists: "bool"
     gcp_conn_id: "str"
     retry: "Retry | _MethodDefault"
@@ -68,8 +68,9 @@ class PubSubDeleteSubscriptionOperator(GoogleCloudBaseOperator):
 class PubSubPublishMessageOperator(GoogleCloudBaseOperator):
     topic: "str"
     messages: "list"
-    project_id: "str | None"
+    project_id: "str"
     gcp_conn_id: "str"
+    enable_message_ordering: "bool"
     impersonation_chain: "str | Sequence[str] | None"
 
 
