@@ -111,6 +111,93 @@ class print_date(AirFly):
 * `op_class (str)`: specifies the airflow operator to this task.
 * `op_params`: keyword arguments which will be passed to the operator(`op_class`), a parameter (i.e., value in the dictionary) could be one of the [primitive types](https://docs.python.org/3/library/stdtypes.html), a function or a class.
 
+
+#### Built-in Operators
+
+Operators defined in the official Airflow package, such as `BashOperator`, `PythonOperator`, and `KubernetesPodOperator`, are considered built-in, including those contributed by the community through various providers (e.g., Google, Facebook, OpenAI).
+
+To use a built-in operator, assign `op_class` to its name and specify corresponding parameters using `op_params`:
+
+```python
+from airfly.model import AirFly
+
+def log_sql(**kwargs):
+    print("Python task decorator query: %s", str(kwargs["templates_dict"]["query"]))
+
+class Task1(AirFly):
+
+    op_class = "KubernetesPodOperator"
+    op_params = dict(
+        image="debian",
+        cmds=["bash", "-cx"],
+        arguments=["echo", "10"],
+        labels={"foo": "bar"},
+    )
+
+
+class Task2(AirFly):
+
+    op_class = "PythonOperator"
+    op_params = dict(
+        python_callable=log_sql,
+        templates_dict={"query": "sql/sample.sql"},
+        templates_exts=[".sql"],
+    )
+
+```
+
+Sometimes, operators may have a naming ambiguity. For instance, `EmailOperator` could refer to either [`airflow.operators.email.EmailOperator`](https://github.com/apache/airflow/blob/2.10.4/airflow/operators/email.py#L29) or [`airflow.providers.smtp.operators.smtp.EmailOperator`](https://github.com/apache/airflow/blob/2.10.4/airflow/providers/smtp/operators/smtp.py#L29). To resolve such ambiguities, specify the correct module using `op_module`:  
+
+
+```python
+
+from airfly.model import AirFly
+
+class Task3(AirFly):
+
+    op_class = "EmailOperator"
+    op_module = "airflow.providers.smtp.operators.smtp"
+    op_params = dict(
+        subject="Hello World",
+        from_email="me@mail.com",
+        to="you@mail.com",
+    )
+
+```
+
+This approach ensures that `Task3` explicitly references the `EmailOperator` from the `airflow.providers.smtp.operators.smtp` module, avoiding conflicts with similarly named operators.
+
+
+#### Private Operators
+
+Operators not included in the official Airflow package are considered private. Developers often create custom operators by extending existing built-in ones to meet their use cases. Since these custom operators are not registered within Airflow, `airfly` cannot automatically infer them by name.
+
+To use a private operator, provide its class definition directly in `op_class`:
+
+```python
+# Assume the customized operator is defined in my_package/operators.py
+from airflow.operators.bash import BashOperator
+
+class EchoOperator(BashOperator):
+    """A customized example extending from BashOperator"""
+
+    def __init__(self, text: str, **kwargs):
+        cmd = f"echo {text}"
+        super().__init__(bash_command=cmd, **kwargs)
+
+# import the operator in the other file, e.g., my_package/tasks.py
+from airfly.model import AirFly
+from my_package.operators import EchoOperator
+
+class Task4(AirFly):
+    op_class = EchoOperator
+    op_params = dict(text="Hello World")
+
+```
+
+This approach enables seamless integration of private, custom-built operators with `airfly`.
+
+
 You can also define the attributes using `property`:
 
 ```python
@@ -309,6 +396,7 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 
+# Assume this is the argument we would like to pass to the DAG.
 dag_kwargs = dict(
     default_args=default_args,
     description="A simple tutorial DAG",
@@ -414,93 +502,6 @@ with DAG("demo_dag") as dag:
 ```
 
 The `templated` task is gone.
-
-
-### Operators Support
-
-#### Built-in Operators
-
-Operators defined in the official Airflow package, such as `BashOperator`, `PythonOperator`, and `KubernetesPodOperator`, are considered built-in, including those contributed by the community through various providers (e.g., Google, Facebook, OpenAI).
-
-To use a built-in operator, assign `op_class` to its name and specify corresponding parameters using `op_params`:
-
-```python
-from airfly.model import AirFly
-
-def log_sql(**kwargs):
-    print("Python task decorator query: %s", str(kwargs["templates_dict"]["query"]))
-
-class Task1(AirFly):
-
-    op_class = "KubernetesPodOperator"
-    op_params = dict(
-        image="debian",
-        cmds=["bash", "-cx"],
-        arguments=["echo", "10"],
-        labels={"foo": "bar"},
-    )
-
-
-class Task2(AirFly):
-
-    op_class = "PythonOperator"
-    op_params = dict(
-        python_callable=log_sql,
-        templates_dict={"query": "sql/sample.sql"},
-        templates_exts=[".sql"],
-    )
-
-```
-
-Sometimes, operators may have a naming ambiguity. For instance, `EmailOperator` could refer to either [`airflow.operators.email.EmailOperator`](https://github.com/apache/airflow/blob/2.10.4/airflow/operators/email.py#L29) or [`airflow.providers.smtp.operators.smtp.EmailOperator`](https://github.com/apache/airflow/blob/2.10.4/airflow/providers/smtp/operators/smtp.py#L29). To resolve such ambiguities, specify the correct module using `op_module`:  
-
-
-```python
-
-from airfly.model import AirFly
-
-class Task3(AirFly):
-
-    op_class = "EmailOperator"
-    op_module = "airflow.providers.smtp.operators.smtp"
-    op_params = dict(
-        subject="Hello World",
-        from_email="me@mail.com",
-        to="you@mail.com",
-    )
-
-```
-
-This approach ensures that `Task3` explicitly references the `EmailOperator` from the `airflow.providers.smtp.operators.smtp` module, avoiding conflicts with similarly named operators.
-
-
-#### Private Operators
-
-Operators not included in the official Airflow package are considered private. Developers often create custom operators by extending existing built-in ones to meet their use cases. Since these custom operators are not registered within Airflow, `airfly` cannot automatically infer them by name.
-
-To use a private operator, provide its class definition directly in `op_class`:
-
-```python
-# in my_package/operators.py
-from airflow.operators.bash import BashOperator
-
-class EchoOperator(BashOperator):
-
-    def __init__(self, text: str, **kwargs):
-        cmd = f"echo {text}"
-        super().__init__(bash_command=cmd, **kwargs)
-
-# in my_package/tasks.py
-from airfly.model import AirFly
-from my_package.operators import EchoOperator
-
-class Task4(AirFly):
-    op_class = EchoOperator
-    op_params = dict(text="Hello World")
-
-```
-
-This approach enables seamless integration of private, custom-built operators with `airfly`.
 
 
 ### Task Group
